@@ -1,5 +1,7 @@
 *.py[co]
 .DS_Store
+*.swp
 
 local_settings.py
 *.db
+musique/migrations

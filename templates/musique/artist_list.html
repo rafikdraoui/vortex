@@ -1,0 +1,12 @@
+{% extends "musique/base.html" %}
+
+{% block content %}
+<h1>Artists</h1>
+
+<ul>
+{% for artist in artist_list %}
+<li><a href="/artist/{{artist.id}}">{{ artist.name }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

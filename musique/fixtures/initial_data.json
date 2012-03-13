@@ -1,0 +1,1 @@
+[{"pk": 1, "model": "musique.artist", "fields": {"name": "Unknown Artist"}}, {"pk": 1, "model": "musique.album", "fields": {"artist": 1, "title": "Unknown Album"}}]

@@ -92,6 +92,8 @@ def remove_artist(sender, **kwargs):
         os.removedirs(artist.filepath)
 
 
-#TODO: logging
 def handle_delete_error(instance):
-    pass
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info("Problem deleting %s (%s)" % (instance.title,
+                                              instance.filepath))

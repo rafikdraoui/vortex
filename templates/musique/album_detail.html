@@ -5,7 +5,11 @@
 
 <ul>
 {% for song in songs %}
-<li><a href="/song/{{song.id}}">{{song.track}} - {{ song.title }}</a></li>
+<li>
+    <a href="/song/{{song.id}}">
+        {% if song.track %}{{ song.track }} - {% endif %}{{ song.title }}
+    </a>
+</li>
 {% endfor %}
 </ul>
 

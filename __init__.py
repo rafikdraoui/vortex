@@ -10,9 +10,9 @@ def get_config(config_path='config/vortex.conf'):
     return config
 
 
-def add_logging_config():
+def add_logging_config(config_path='config/vortex.conf'):
     """Add logging configuration to the settings to create a custom logger"""
-    config = get_config()
+    config = get_config(config_path)
     logfile = config.get('log', 'logfile')
     logformat = config.get('log', 'logformat', raw=1)
 
@@ -31,6 +31,3 @@ def add_logging_config():
                                                     'level': 'INFO'}
     LOGGING['loggers']['vortex.musique.models'] = {'handlers': ['vortex_log'],
                                                    'level': 'INFO'}
-
-
-add_logging_config()

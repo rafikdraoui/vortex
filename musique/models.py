@@ -4,7 +4,11 @@ from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
-from vortex.settings import MEDIA_ROOT
+import vortex
+
+
+config = vortex.get_config()
+MEDIA_ROOT = config.get('vortex', 'media_root')
 
 
 class Artist(models.Model):
@@ -94,6 +98,8 @@ def remove_artist(sender, **kwargs):
 
 def handle_delete_error(instance):
     import logging
+    import vortex
+    vortex.add_logging_config()
     logger = logging.getLogger(__name__)
     logger.info("Problem deleting %s (%s)" % (instance.title,
                                               instance.filepath))

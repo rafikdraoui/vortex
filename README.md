@@ -45,11 +45,6 @@ provide the followings:
 
 * `DATABASES`: configuration info for your database.
 
-* `MEDIA_ROOT`: the absolute path of the directory where the music files
-  will be kept on disk. This should be the same as the `music_directory`
-  option in the `mpd.conf` file for the `mpd` server.
-
-
 Application specific settings are provided in a configuration file (by
 default, it is `config/vortex.conf`).
 

@@ -1,11 +1,28 @@
+{% load static %}
 <doctype html>
 <html>
 <head>
+    <meta charset="utf-8" />
     <title>vortex</title>
+    <link rel="stylesheet" href="{% static "css/base.css" %}" />
+    {% block css %}{% endblock %}
 </head>
 <body>
 
+{% block header %}
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li>|</li>
+        <li><a href="/artist/">Artists</a></li>
+        <li>|</li>
+        <li><a href="/album/">Albums</a></li>
+    </ul>
+</nav>
+{% endblock %}
+
 {% block content %}{% endblock %}
+{% block footer %}{% endblock %}
 
 </body>
 </html>

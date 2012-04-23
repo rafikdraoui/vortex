@@ -56,7 +56,7 @@ class Song(models.Model):
 
     class Meta:
         ordering = ['track', 'title']
-        unique_together = ('title', 'artist', 'album', 'bitrate')
+        unique_together = ('title', 'artist', 'album', 'track', 'bitrate')
 
     def __unicode__(self):
         return self.title

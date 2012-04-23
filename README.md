@@ -20,7 +20,7 @@ playlists, search the library and download audio files.
 
 
 ## Dependencies
-* [django][] (>= 1.3)
+* [django][]
 * [mutagen][] (for getting information on audio files)
 * [python-mpd][] (for interfacing with the mpd server)
 

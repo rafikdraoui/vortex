@@ -1,16 +1,24 @@
 {% extends "musique/base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static "css/album.css" %}" />
+{% endblock %}
 
 {% block content %}
 <h1>{{ album.title }}</h1>
+<h2>by <a href="/artist/{{ album.artist.id }}">{{ album.artist }} </a></h2>
 
-<ul>
-{% for song in songs %}
-<li>
-    <a href="/song/{{song.id}}">
-        {% if song.track %}{{ song.track }} - {% endif %}{{ song.title }}
-    </a>
-</li>
-{% endfor %}
-</ul>
+<div id="songlist">
+    <ul>
+    {% for song in songs %}
+        <li>
+            <a href="/song/{{song.id}}">{% if song.track %}{{ song.track }} - {% endif %}{{ song.title }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="#">Download Album</a>
+</div>
 
+<img id="cover" src="/static/images/cover.png" />
 {% endblock %}

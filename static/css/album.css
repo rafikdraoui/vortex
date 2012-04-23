@@ -1,0 +1,20 @@
+body {
+    width: auto;
+    margin: 0 20px;
+}
+
+h1, h2 {
+    width: 550px;
+}
+
+#songlist {
+    float: left;
+    width: 550px;
+}
+
+#cover {
+    position: fixed;
+    left: 550px;
+    top: 42px;
+    width: 300px;
+}

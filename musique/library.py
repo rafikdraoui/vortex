@@ -56,15 +56,17 @@ def update():
 
     dummy_files = [f.strip() for f in
                    config.get('vortex', 'dummy_files').split(',')]
-    dropbox = config.get('vortex', 'dropbox')
-    media_root = config.get('vortex', 'media_root')
+    dropbox = unicode(config.get('vortex', 'dropbox'))
+    media_root = unicode(config.get('vortex', 'media_root'))
     mutagen_options = get_mutagen_audio_options()
     for root, dirs, files in os.walk(dropbox, topdown=False):
         for name in files:
-            if name in dummy_files:
+            if name in dummy_files \
+               or name.endswith(('jpg', 'jpeg', 'gif', 'png')):
+                #FIXME: keep images for cover image
                 os.remove(os.path.join(root, name))
             else:
-                import_file(os.path.join(root, name),
+                import_file(unicode(os.path.join(root, name)),
                             media_root,
                             mutagen_options)
         try:
@@ -107,29 +109,26 @@ def import_file(filename, media_root, mutagen_options):
     filepath = u'%s/%s' % (album_path, basename)
     fullpath = media_root + filepath
 
-    query = Song.objects.all().filter(filepath=filepath)
-    if query.exists():
+    #TODO: Handle Unkown Title by Unknown Artist
+    song, created = Song.objects.get_or_create(title=info['title'],
+                                               artist=artist,
+                                               album=album,
+                                               track=info['track'],
+                                               bitrate=info['bitrate'],
+                                               filepath=filepath)
+    if not created:
         # Song already exists, keep only if better bitrate
-        previous_song = query[0]
-        if previous_song.bitrate >= info['bitrate']:
+        if song.bitrate >= info['bitrate']:
             os.remove(filename)
             logger.info('%s already exists' % basename)
             return
         else:
-            previous_song.bitrate = info['bitrate']
+            song.bitrate = info['bitrate']
             os.chmod(filename, 0644)
             shutil.move(filename, fullpath)
             return
 
-    # if we get there, this is a brand new song
-    song = Song(title=info['title'],
-                artist=artist,
-                album=album,
-                track=info['track'],
-                bitrate=info['bitrate'],
-                filepath=filepath)
-    song.save()
-
+    # if we get here this is a brand new song
     if not os.path.exists(os.path.dirname(fullpath)):
         os.makedirs(os.path.dirname(fullpath))
     os.chmod(filename, 0644)
@@ -149,9 +148,13 @@ def get_song_info(filename, mutagen_options):
     if audio is None:
         raise ValueError
 
-    title = audio.get('title', [u'Unknown Title'])[0]
-    artist = audio.get('artist', [u'Unknown Artist'])[0]
-    album = audio.get('album', [u'Unknown Album'])[0]
+    get_tag_field = lambda tag: \
+        audio.get(tag,
+                 [u'Unknown %s' % tag.capitalize()])[0].replace('/', '-')
+
+    title = get_tag_field('title')
+    artist = get_tag_field('artist')
+    album = get_tag_field('album')
     track = audio.get('tracknumber', [u''])[0]
 
     try:

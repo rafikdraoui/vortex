@@ -1,0 +1,21 @@
+body {
+    width: 600px;
+    margin: auto;
+    font-family: sans-serif;
+    background-color: #fcf6cf;
+}
+
+a {
+    color: #0070bb;
+    text-decoration: none;
+}
+
+nav {
+    font-size: large;
+    text-align: center;
+}
+
+nav li {
+    display: inline;
+}
+

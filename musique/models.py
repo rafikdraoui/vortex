@@ -8,7 +8,7 @@ import vortex
 
 
 config = vortex.get_config()
-MEDIA_ROOT = config.get('vortex', 'media_root')
+MEDIA_ROOT = unicode(config.get('vortex', 'media_root'))
 
 
 class Artist(models.Model):
@@ -16,8 +16,7 @@ class Artist(models.Model):
     filepath = models.FilePathField(path=MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
-                                    unique=True,
-                                    editable=False)
+                                    unique=True)
 
     def __unicode__(self):
         return self.name
@@ -32,8 +31,10 @@ class Album(models.Model):
     filepath = models.FilePathField(path=MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
-                                    unique=True,
-                                    editable=False)
+                                    unique=True)
+
+    class Meta:
+        ordering = ['title']
 
     def __unicode__(self):
         return self.title
@@ -48,11 +49,12 @@ class Song(models.Model):
     album = models.ForeignKey(Album)
     track = models.CharField(max_length=10)
     bitrate = models.IntegerField()
+    filetype = models.CharField(max_length=10)
     filepath = models.FilePathField(path=MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
-                                    unique=True,
-                                    editable=False)
+                                    unique=True)
+    original_path = models.CharField(max_length=200)
 
     class Meta:
         ordering = ['track', 'title']
@@ -66,40 +68,39 @@ class Song(models.Model):
 def remove_song(sender, **kwargs):
     try:
         song = kwargs['instance']
-        os.remove(song.filepath)
+        os.remove(os.path.join(MEDIA_ROOT, song.filepath))
         if song.album.song_set.count() == 0:
             song.album.delete()
     except Album.DoesNotExist:
         pass
-    except Exception:
-        handle_delete_error(song)
+    except Exception, msg:
+        handle_delete_error(song, msg)
 
 
 @receiver(post_delete, sender=Album, dispatch_uid='delete_album')
 def remove_album(sender, **kwargs):
     try:
         album = kwargs['instance']
-        os.removedirs(album.filepath)
+        os.removedirs(os.path.join(MEDIA_ROOT, album.filepath))
         if album.artist.album_set.count() == 0:
             album.artist.delete()
     except Artist.DoesNotExist:
         pass
-    except Exception:
-        handle_delete_error(album)
+    except Exception, msg:
+        handle_delete_error(album, msg)
 
 
 @receiver(post_delete, sender=Artist, dispatch_uid='delete_artist')
 def remove_artist(sender, **kwargs):
     artist = kwargs['instance']
 
-    if os.path.exists(artist.filepath):
-        os.removedirs(artist.filepath)
+    if os.path.exists(os.path.join(MEDIA_ROOT, artist.filepath)):
+        os.removedirs(os.path.join(MEDIA_ROOT, artist.filepath))
 
 
-def handle_delete_error(instance):
+def handle_delete_error(instance, msg):
     import logging
-    import vortex
-    vortex.add_logging_config()
     logger = logging.getLogger(__name__)
-    logger.info("Problem deleting %s (%s)" % (instance.title,
-                                              instance.filepath))
+    logger.info("Problem deleting %s (%s): %s" % (instance.title,
+                                                  instance.filepath,
+                                                  msg))

@@ -1,8 +1,7 @@
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.views.generic import DetailView
 
 from models import Artist, Album, Song
-
 import library
 
 
@@ -25,7 +24,7 @@ class AlbumDetailView(DetailView):
 
 
 def home(request):
-    return render_to_response('musique/home.html')
+    return render(request, 'musique/home.html')
 
 
 def update_library(request):

@@ -5,12 +5,14 @@ import re
 
 import mutagen
 
+from django.db import IntegrityError
+
 import vortex
 from vortex.musique.models import Artist, Album, Song
 
+#FIXME: Handle permission errors better
 
 config = vortex.get_config()
-vortex.add_logging_config()
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +66,10 @@ def update():
             if name in dummy_files \
                or name.endswith(('jpg', 'jpeg', 'gif', 'png')):
                 #FIXME: keep images for cover image
-                os.remove(os.path.join(root, name))
+                try:
+                    os.remove(os.path.join(root, name))
+                except Exception:
+                    pass
             else:
                 import_file(unicode(os.path.join(root, name)),
                             media_root,
@@ -88,7 +93,7 @@ def import_file(filename, media_root, mutagen_options):
     try:
         info = get_song_info(filename, mutagen_options)
     except ValueError:
-        handle_import_error(filename)
+        handle_import_error(filename, 'mutagen error')
         return
 
     artist_name = info['artist'].title()
@@ -108,31 +113,46 @@ def import_file(filename, media_root, mutagen_options):
 
     filepath = u'%s/%s' % (album_path, basename)
     fullpath = media_root + filepath
+    original_path = filename.replace(config.get('vortex', 'dropbox'), '', 1)
 
-    #TODO: Handle Unkown Title by Unknown Artist
-    song, created = Song.objects.get_or_create(title=info['title'],
-                                               artist=artist,
-                                               album=album,
-                                               track=info['track'],
-                                               bitrate=info['bitrate'],
-                                               filepath=filepath)
+    #TODO: Handle Unknown Title by Unknown Artist
+    try:
+        song, created = Song.objects.get_or_create(
+            title=info['title'], artist=artist, album=album,
+            track=info['track'], bitrate=info['bitrate'], filetype=extension,
+            defaults={'filepath': filepath, 'original_path': original_path})
+    except IntegrityError, msg:
+        handle_import_error(filename, msg)
+        return
+    except Exception, msg:
+        handle_import_error(filename, msg)
+        return
+
     if not created:
         # Song already exists, keep only if better bitrate
         if song.bitrate >= info['bitrate']:
-            os.remove(filename)
+            #FIXME: uncomment when Unknown songs are handled correctly
+            #os.remove(filename)
             logger.info('%s already exists' % basename)
             return
-        else:
-            song.bitrate = info['bitrate']
-            os.chmod(filename, 0644)
-            shutil.move(filename, fullpath)
-            return
 
-    # if we get here this is a brand new song
-    if not os.path.exists(os.path.dirname(fullpath)):
-        os.makedirs(os.path.dirname(fullpath))
-    os.chmod(filename, 0644)
-    shutil.move(filename, fullpath)
+    song.bitrate = info['bitrate']
+    song.original_path = original_path
+
+    try:
+        if not os.path.exists(os.path.dirname(fullpath)):
+            os.makedirs(os.path.dirname(fullpath))
+        os.chmod(filename, 0644)
+        shutil.move(filename, fullpath)
+    except Exception, msg:
+        handle_import_error(filename, msg)
+
+
+def get_tag_field(container, tag_name):
+    tag = container.get(tag_name, [u'Unknown %s' % tag_name.capitalize()])[0]
+    if tag == '':
+        tag = u'Unknown %s' % tag_name.capitalize()
+    return tag.replace('/', '-')
 
 
 def get_song_info(filename, mutagen_options):
@@ -148,13 +168,9 @@ def get_song_info(filename, mutagen_options):
     if audio is None:
         raise ValueError
 
-    get_tag_field = lambda tag: \
-        audio.get(tag,
-                 [u'Unknown %s' % tag.capitalize()])[0].replace('/', '-')
-
-    title = get_tag_field('title')
-    artist = get_tag_field('artist')
-    album = get_tag_field('album')
+    title = get_tag_field(audio, 'title')
+    artist = get_tag_field(audio, 'artist')
+    album = get_tag_field(audio, 'album')
     track = audio.get('tracknumber', [u''])[0]
 
     try:
@@ -174,5 +190,8 @@ def get_song_info(filename, mutagen_options):
             'track': track, 'bitrate': bitrate}
 
 
-def handle_import_error(filename):
-    logger.info('Problem importing file %s' % filename)
+def handle_import_error(filename, error_msg=None):
+    log_msg = 'Problem importing file %s' % filename
+    if error_msg:
+        log_msg = '%s (%s)' % (log_msg, error_msg)
+    logger.info(log_msg)

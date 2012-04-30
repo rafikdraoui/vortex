@@ -1,14 +1,23 @@
 {% extends "musique/base.html" %}
-{% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static "css/song.css" %}" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/song.css" />
 {% endblock %}
 
 {% block content %}
-<h2>{{ song.title }}</h2>
+
+<div id=title>
+    <h2>
+        {{ song.title }}
+        <a href="/admin/musique/song/{{ song.id }}">(edit)</a>
+    </h2>
+</div>
+
 <h3>Artist: <a href="/artist/{{ song.artist.id }}">{{ song.artist }}</a></h3>
 <h3>Album: <a href="/album/{{ song.album.id }}">{{ song.album }}</a></h3>
 
+<h3>Original Path: {{ song.original_path }}</h3>
+
 <h2><a href="/media/{{song.filepath}}">Download Song</a></h2>
+
 {% endblock %}

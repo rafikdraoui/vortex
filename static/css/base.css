@@ -19,3 +19,6 @@ nav li {
     display: inline;
 }
 
+#title a {
+    font-size: small;
+}

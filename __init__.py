@@ -31,3 +31,6 @@ def add_logging_config(config_path='config/vortex.conf'):
                                                     'level': 'INFO'}
     LOGGING['loggers']['vortex.musique.models'] = {'handlers': ['vortex_log'],
                                                    'level': 'INFO'}
+
+
+add_logging_config()

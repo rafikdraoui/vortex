@@ -1,10 +1,9 @@
-{% load static %}
 <doctype html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title>vortex</title>
-    <link rel="stylesheet" href="{% static "css/base.css" %}" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" />
     {% block css %}{% endblock %}
 </head>
 <body>

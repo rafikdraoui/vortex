@@ -1,12 +1,17 @@
 {% extends "musique/base.html" %}
-{% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static "css/album.css" %}" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/album.css" />
 {% endblock %}
 
 {% block content %}
-<h1>{{ album.title }}</h1>
+<div id=title>
+    <h1>
+        {{ album.title }}
+        <a href="/admin/musique/album/{{ album.id }}">(edit)</a>
+    </h1>
+</div>
+
 <h2>by <a href="/artist/{{ album.artist.id }}">{{ album.artist }} </a></h2>
 
 <div id="songlist">
@@ -20,5 +25,5 @@
     <a href="#">Download Album</a>
 </div>
 
-<img id="cover" src="/static/images/cover.png" />
+<img id="cover" src="{{ STATIC_URL }}images/cover.png" />
 {% endblock %}

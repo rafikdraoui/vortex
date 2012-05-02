@@ -5,6 +5,7 @@ import re
 
 import mutagen
 
+from django.core.files import File
 from django.db import IntegrityError
 
 import vortex
@@ -106,20 +107,16 @@ def import_file(filename, media_root, mutagen_options):
                                                  artist=artist,
                                                  filepath=album_path)
 
-    extension = filename.rsplit('.')[-1].lower()
-    basename = u'%s.%s' % (info['title'], extension)
-    if info['track']:
-        basename = u'%s - %s' % (info['track'], basename)
-
-    filepath = os.path.join(album_path, basename)
+    filetype = filename.rsplit('.')[-1].lower()
     original_path = filename.replace(config.get('vortex', 'dropbox'), '', 1)
 
     #TODO: Handle Unknown Title by Unknown Artist
     try:
         song, created = Song.objects.get_or_create(
             title=info['title'], artist=artist, album=album,
-            track=info['track'], bitrate=info['bitrate'], filetype=extension,
-            defaults={'filepath': filepath, 'original_path': original_path})
+            track=info['track'], bitrate=info['bitrate'], filetype=filetype,
+            defaults={'filefield': File(open(filename, 'rb')),
+                      'original_path': original_path})
     except IntegrityError, msg:
         handle_import_error(filename, msg)
         return
@@ -132,21 +129,17 @@ def import_file(filename, media_root, mutagen_options):
         if song.bitrate >= info['bitrate']:
             #FIXME: uncomment when Unknown songs are handled correctly
             #os.remove(filename)
-            logger.info('%s already exists' % basename)
+            logger.info('%s (by %s) already exists'
+                            % (song.title, song.artist.name))
             return
         else:
             song.bitrate = info['bitrate']
+            song.filefield = File(open(filename, 'rb'))
             song.original_path = original_path
             song.save()
 
-    fullpath = os.path.join(media_root, filepath)
-    try:
-        if not os.path.exists(os.path.dirname(fullpath)):
-            os.makedirs(os.path.dirname(fullpath))
-        os.chmod(filename, 0644)
-        shutil.move(filename, fullpath)
-    except Exception, msg:
-        handle_import_error(filename, msg)
+    # remove original file from dropbox folder
+    os.remove(filename)
 
 
 def get_tag_field(container, tag_name):

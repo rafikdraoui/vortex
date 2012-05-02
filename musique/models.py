@@ -43,6 +43,13 @@ class Album(models.Model):
         ordering = ['title']
 
 
+def get_song_filepath(instance, filename):
+    basename = u'%s.%s' % (instance.title, instance.filetype)
+    if instance.track:
+        basename = u'%s - %s' % (instance.track, basename)
+    return os.path.join(instance.album.filepath, basename)
+
+
 class Song(models.Model):
     title = models.CharField(max_length=100)
     artist = models.ForeignKey(Artist)
@@ -50,10 +57,8 @@ class Song(models.Model):
     track = models.CharField(max_length=10)
     bitrate = models.IntegerField()
     filetype = models.CharField(max_length=10)
-    filepath = models.FilePathField(path=MEDIA_ROOT,
-                                    recursive=True,
-                                    max_length=200,
-                                    unique=True)
+    filefield = models.FileField(upload_to=get_song_filepath,
+                                 max_length=200)
     original_path = models.CharField(max_length=200)
 
     class Meta:
@@ -68,7 +73,7 @@ class Song(models.Model):
 def remove_song(sender, **kwargs):
     try:
         song = kwargs['instance']
-        os.remove(os.path.join(MEDIA_ROOT, song.filepath))
+        song.filefield.delete(save=False)
         if song.album.song_set.count() == 0:
             song.album.delete()
     except Album.DoesNotExist:

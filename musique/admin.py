@@ -27,7 +27,7 @@ class AlbumAdmin(MusiqueAdmin):
 
 
 class SongAdmin(MusiqueAdmin):
-    readonly_fields = ['bitrate', 'filetype', 'filepath', 'original_path']
+    readonly_fields = ['bitrate', 'filetype', 'filefield', 'original_path']
     search_fields = ['title']
 
 

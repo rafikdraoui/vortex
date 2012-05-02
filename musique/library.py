@@ -97,11 +97,11 @@ def import_file(filename, media_root, mutagen_options):
         return
 
     artist_name = info['artist'].title()
-    artist_path = u'%s/%s' % (artist_name[0], artist_name)
+    artist_path = os.path.join(artist_name[0], artist_name)
     artist, created = Artist.objects.get_or_create(name=artist_name,
                                                    filepath=artist_path)
 
-    album_path = u'%s/%s' % (artist_path, info['album'].title())
+    album_path = os.path.join(artist_path, info['album'].title())
     album, created = Album.objects.get_or_create(title=info['album'].title(),
                                                  artist=artist,
                                                  filepath=album_path)
@@ -111,8 +111,7 @@ def import_file(filename, media_root, mutagen_options):
     if info['track']:
         basename = u'%s - %s' % (info['track'], basename)
 
-    filepath = u'%s/%s' % (album_path, basename)
-    fullpath = media_root + filepath
+    filepath = os.path.join(album_path, basename)
     original_path = filename.replace(config.get('vortex', 'dropbox'), '', 1)
 
     #TODO: Handle Unknown Title by Unknown Artist
@@ -135,10 +134,12 @@ def import_file(filename, media_root, mutagen_options):
             #os.remove(filename)
             logger.info('%s already exists' % basename)
             return
+        else:
+            song.bitrate = info['bitrate']
+            song.original_path = original_path
+            song.save()
 
-    song.bitrate = info['bitrate']
-    song.original_path = original_path
-
+    fullpath = os.path.join(media_root, filepath)
     try:
         if not os.path.exists(os.path.dirname(fullpath)):
             os.makedirs(os.path.dirname(fullpath))

@@ -22,7 +22,7 @@ urlpatterns = patterns('',
     url(r'^album/(?P<pk>\d+)/$', AlbumDetailView.as_view()),
 
     url(r'^song/$', ListView.as_view(model=Song)),
-    url(r'^song/(?P<pk>\d+)$', DetailView.as_view(model=Song)),
+    url(r'^song/(?P<pk>\d+)/$', DetailView.as_view(model=Song)),
 
     #FIXME: expose views.update_library to admin only
     url(r'^update/$', views.update_library),

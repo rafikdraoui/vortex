@@ -138,14 +138,10 @@ def import_file(filename, media_root, mutagen_options):
             song.original_path = original_path
             song.save()
 
-    # remove original file from dropbox folder
-    os.remove(filename)
-
 
 def get_tag_field(container, tag_name):
     tag = container.get(tag_name, [u'Unknown %s' % tag_name.capitalize()])[0]
-    if tag == '':
-        tag = u'Unknown %s' % tag_name.capitalize()
+    tag = tag or u'Unknown %s' % tag_name.capitalize()
     return tag.replace('/', '-')
 
 

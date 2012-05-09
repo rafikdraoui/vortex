@@ -28,5 +28,6 @@ def home(request):
 
 
 def update_library(request):
+    #TODO: run asynchronously (using celery?)
     library.update()
     return redirect('/')

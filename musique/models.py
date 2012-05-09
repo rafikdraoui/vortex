@@ -3,8 +3,11 @@ import os
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
 
 import vortex
+from musique.utils import full_path
 
 
 config = vortex.get_config()
@@ -39,15 +42,48 @@ class Album(models.Model):
     def __unicode__(self):
         return self.title
 
-    class Meta:
-        ordering = ['title']
+    #FIXME: Reduce number of SQL queries needed for saving
+    def save(self, *args, **kwargs):
+        old_path = self.filepath
+        new_path = os.path.join(self.artist.filepath, self.title)
+        query = Album.objects.filter(artist__id=self.artist.id,
+                                     title=self.title
+                            ).exclude(id=self.id)[:1]
+        if query:
+            new_album = query[0]
+            for song in self.song_set.all():
+                song.album = new_album
+                song.save()
+            self.delete()
+        elif new_path != old_path:
+            self.filepath = new_path
+            super(Album, self).save(*args, **kwargs)
+            for song in self.song_set.all():
+                song.save()
+            try:
+                os.removedirs(full_path(old_path))
+            except OSError, msg:
+                handle_delete_error(self, msg)
+        else:
+            super(Album, self).save(*args, **kwargs)
 
 
-def get_song_filepath(instance, filename):
-    basename = u'%s.%s' % (instance.title, instance.filetype)
-    if instance.track:
-        basename = u'%s - %s' % (instance.track, basename)
-    return os.path.join(instance.album.filepath, basename)
+class _CustomStorage(FileSystemStorage):
+
+    def _save(self, name, content):
+        if self.exists(name):
+            self.delete(name)
+        return super(_CustomStorage, self)._save(name, content)
+
+    def get_available_name(self, name):
+        return name
+
+
+def _get_song_filepath(song_instance, filename=None):
+    basename = u'%s.%s' % (song_instance.title, song_instance.filetype)
+    if song_instance.track:
+        basename = u'%s - %s' % (song_instance.track, basename)
+    return os.path.join(song_instance.album.filepath, basename)
 
 
 class Song(models.Model):
@@ -57,8 +93,9 @@ class Song(models.Model):
     track = models.CharField(max_length=10)
     bitrate = models.IntegerField()
     filetype = models.CharField(max_length=10)
-    filefield = models.FileField(upload_to=get_song_filepath,
-                                 max_length=200)
+    filefield = models.FileField(upload_to=_get_song_filepath,
+                                 max_length=200,
+                                 storage=_CustomStorage())
     original_path = models.CharField(max_length=200)
 
     class Meta:
@@ -67,6 +104,22 @@ class Song(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        file = self.filefield
+        old_path = file.name
+        new_path = _get_song_filepath(self)
+
+        if old_path != new_path:
+            content = ContentFile(file.read())
+            file.save(new_path, content, save=False)
+            #TODO?: Use file.delete?
+            try:
+                os.remove(full_path(old_path))
+            except OSError, msg:
+                handle_delete_error(song, error)
+
+        super(Song, self).save(*args, **kwargs)
 
 
 @receiver(post_delete, sender=Song, dispatch_uid='delete_song')
@@ -86,7 +139,7 @@ def remove_song(sender, **kwargs):
 def remove_album(sender, **kwargs):
     try:
         album = kwargs['instance']
-        os.removedirs(os.path.join(MEDIA_ROOT, album.filepath))
+        os.removedirs(full_path(album.filepath))
         if album.artist.album_set.count() == 0:
             album.artist.delete()
     except Artist.DoesNotExist:
@@ -99,13 +152,13 @@ def remove_album(sender, **kwargs):
 def remove_artist(sender, **kwargs):
     artist = kwargs['instance']
 
-    if os.path.exists(os.path.join(MEDIA_ROOT, artist.filepath)):
-        os.removedirs(os.path.join(MEDIA_ROOT, artist.filepath))
+    if os.path.exists(full_path(artist.filepath)):
+        os.removedirs(full_path(artist.filepath))
 
 
 def handle_delete_error(instance, msg):
     import logging
     logger = logging.getLogger(__name__)
-    logger.info("Problem deleting %s (%s): %s" % (instance.title,
+    logger.info('Problem deleting %s (%s): %s' % (instance.title,
                                                   instance.filepath,
                                                   msg))

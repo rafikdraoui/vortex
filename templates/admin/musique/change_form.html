@@ -1,7 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% load admin_modify %}
 
-{% block submit_buttons_bottom %}
-{% submit_row %}
+{% block after_related_objects %}
 <h3><a href="{{ back_link }}">Go back to main site</a></h3>
 {% endblock %}

@@ -116,7 +116,8 @@ def import_file(filename, media_root, mutagen_options):
             title=info['title'], artist=artist, album=album,
             track=info['track'], bitrate=info['bitrate'], filetype=filetype,
             defaults={'filefield': File(open(filename, 'rb')),
-                      'original_path': original_path})
+                      'original_path': original_path,
+                      'first_save': True})
     except IntegrityError, msg:
         handle_import_error(filename, msg)
         return
@@ -136,16 +137,15 @@ def import_file(filename, media_root, mutagen_options):
             song.bitrate = info['bitrate']
             song.filefield = File(open(filename, 'rb'))
             song.original_path = original_path
+            song.first_save = True
             song.save()
 
-    # remove original file from dropbox folder
     os.remove(filename)
 
 
 def get_tag_field(container, tag_name):
     tag = container.get(tag_name, [u'Unknown %s' % tag_name.capitalize()])[0]
-    if tag == '':
-        tag = u'Unknown %s' % tag_name.capitalize()
+    tag = tag or u'Unknown %s' % tag_name.capitalize()
     return tag.replace('/', '-')
 
 

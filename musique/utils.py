@@ -1,9 +1,7 @@
 import os
 import shutil
 
-from django.core.files.base import ContentFile
-
-from vortex.settings import MEDIA_ROOT
+from django.conf import settings
 
 
 def path_exists(path):
@@ -16,7 +14,7 @@ def path_exists(path):
 
 
 def full_path(name):
-    return os.path.join(MEDIA_ROOT, name)
+    return os.path.join(settings.MEDIA_ROOT, name)
 
 
 def move_album(src, dst):

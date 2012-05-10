@@ -5,6 +5,11 @@
 
 import os
 
+try:
+    from conf import *
+except:
+    #FIXME: more informative error
+    raise
 
 DATABASES = {
     'default': {
@@ -25,11 +30,6 @@ USE_L10N = True
 
 FILE_UPLOAD_PERMISSIONS = 0644
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/home/media/media.lawrence.com/media/"
-# TODO: use value from config file
-MEDIA_ROOT = ''
-
 STATIC_URL = '/static/'
 
 # Additional locations of static files
@@ -43,10 +43,6 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), 'templates'),
 )
-
-# Make this unique, and don't share it with anybody.
-# Example:  'f8u=!_ql(0slj4y-n)4-1^qfe5sf5jhg$*(ms)a1%m&_te89-%'
-SECRET_KEY = '___SECRET_KEY___'
 
 ROOT_URLCONF = 'vortex.urls'
 
@@ -62,15 +58,12 @@ INSTALLED_APPS = (
     'vortex.musique',
 )
 
-# TODO: get this value from config file
-_LOGFILE = os.path.join(os.path.dirname(__file__), '..', 'vortex.log')
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'vortex_fmt': {
-            'format': '%(asctime)s: %(message)s'
+            'format': LOGFORMAT
         }
     },
     'handlers': {
@@ -80,7 +73,7 @@ LOGGING = {
         },
         'vortex_log': {
             'class': 'logging.FileHandler',
-            'filename': _LOGFILE,
+            'filename': LOGFILE,
             'formatter': 'vortex_fmt'
         }
     },

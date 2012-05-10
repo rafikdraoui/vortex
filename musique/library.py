@@ -1,19 +1,16 @@
 import os
 import shutil
-import logging
 import re
+import logging
 
 import mutagen
 
 from django.core.files import File
 from django.db import IntegrityError
 
-import vortex
 from vortex.musique.models import Artist, Album, Song
 
-#FIXME: Handle permission errors better
 
-config = vortex.get_config()
 logger = logging.getLogger(__name__)
 
 
@@ -22,8 +19,7 @@ def get_mutagen_audio_options():
     audio tags according to the supported formats in the config
     """
 
-    formats_string = config.get('vortex', 'formats')
-    formats = [fmt.strip() for fmt in formats_string.split(',')]
+    formats = settings.SUPPORTED_FORMATS
 
     from mutagen.easyid3 import EasyID3FileType
     audio_options = [EasyID3FileType]
@@ -48,23 +44,20 @@ def get_mutagen_audio_options():
     return audio_options
 
 
+#TODO: log exceptions
 def update():
     """Import into the library all files in the directory structure
-    rooted at `dropbox`.
+    rooted at `DROPBOX`.
 
     The files that are successfully imported are moved into the
-    `media_root` folder. The others are left in place, except for those
-    whose name matches one in `dummy_files`, which are deleted.
+    `MEDIA_ROOT` folder. The others are left in place, except for those
+    whose name matches one in `DUMMY_FILES`, which are deleted.
     """
 
-    dummy_files = [f.strip() for f in
-                   config.get('vortex', 'dummy_files').split(',')]
-    dropbox = unicode(config.get('vortex', 'dropbox'))
-    media_root = unicode(config.get('vortex', 'media_root'))
     mutagen_options = get_mutagen_audio_options()
-    for root, dirs, files in os.walk(dropbox, topdown=False):
+    for root, dirs, files in os.walk(settings.DROPBOX, topdown=False):
         for name in files:
-            if name in dummy_files \
+            if name in settings.DUMMY_FILES \
                or name.endswith(('jpg', 'jpeg', 'gif', 'png')):
                 #FIXME: keep images for cover image
                 try:
@@ -73,21 +66,19 @@ def update():
                     pass
             else:
                 import_file(unicode(os.path.join(root, name)),
-                            media_root,
                             mutagen_options)
         try:
-            if root != dropbox:
+            if root != settings.DROPBOX:
                 os.rmdir(root)
         except Exception:
             pass
 
 
-def import_file(filename, media_root, mutagen_options):
+def import_file(filename, mutagen_options):
     """Import the song referred to by filename into the library
 
     Arguments:
         filename - the filename of the audio file to import
-        media_root - the base directory to which the file will be moved
         mutagen_options - list of options needed by mutagen.File
     """
 
@@ -108,7 +99,7 @@ def import_file(filename, media_root, mutagen_options):
                                                  filepath=album_path)
 
     filetype = filename.rsplit('.')[-1].lower()
-    original_path = filename.replace(config.get('vortex', 'dropbox'), '', 1)
+    original_path = filename.replace(settings.DROPBOX, '', 1)
 
     #TODO: Handle Unknown Title by Unknown Artist
     try:

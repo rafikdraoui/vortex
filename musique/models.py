@@ -3,20 +3,16 @@ import os
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 
-import vortex
-from musique.utils import full_path
-
-
-config = vortex.get_config()
-MEDIA_ROOT = unicode(config.get('vortex', 'media_root'))
+from vortex.musique.utils import full_path
 
 
 class Artist(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    filepath = models.FilePathField(path=MEDIA_ROOT,
+    filepath = models.FilePathField(path=settings.MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
                                     unique=True)
@@ -31,7 +27,7 @@ class Artist(models.Model):
 class Album(models.Model):
     title = models.CharField(max_length=100)
     artist = models.ForeignKey(Artist)
-    filepath = models.FilePathField(path=MEDIA_ROOT,
+    filepath = models.FilePathField(path=settings.MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
                                     unique=True)

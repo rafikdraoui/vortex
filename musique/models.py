@@ -24,6 +24,28 @@ class Artist(models.Model):
     class Meta:
         ordering = ['name']
 
+    def save(self, *args, **kwargs):
+        old_path = self.filepath
+        new_path = os.path.join(self.name[0].upper(), self.name)
+        query = Artist.objects.filter(name=self.name).exclude(id=self.id)[:1]
+        if query:
+            new_artist = query[0]
+            for album in self.album_set.all():
+                album.artist = new_artist
+                album.save()
+            self.delete()
+        elif new_path != old_path:
+            self.filepath = new_path
+            super(Artist, self).save(*args, **kwargs)
+            for album in self.album_set.all():
+                album.save()
+            try:
+                os.removedirs(full_path(old_path))
+            except OSError, msg:
+                handle_delete_error(self, msg)
+        else:
+            super(Artist, self).save(*args, **kwargs)
+
 
 class Album(models.Model):
     title = models.CharField(max_length=100)
@@ -159,4 +181,7 @@ def remove_artist(sender, **kwargs):
 def handle_delete_error(instance, msg):
     import logging
     logger = logging.getLogger(__name__)
-    logger.info('Problem deleting %s: %s' % (instance.title, msg))
+    if isinstance(instance, Artist):
+        logger.info('Problem deleting %s: %s' % (instance.name, msg))
+    else:
+        logger.info('Problem deleting %s: %s' % (instance.title, msg))

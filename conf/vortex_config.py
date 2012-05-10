@@ -1,33 +1,24 @@
-[vortex]
-
 # The directory in which files that are to be imported into the music
 # library are uploaded.
-dropbox = /path/to/dropbox
+DROPBOX = '/path/to/dropbox'
 
 # The directory in which media files will be kept. This should be the same
 # as the `music_directory` option in the `mpd.conf` file of the mpd server.
-media_root = /path/to/library/root
+MEDIA_ROOT = '/path/to/media/root'
 
 # Files that are removed from the dropbox by the file import routine.
-dummy_files = .DS_Store, Thumbs.db, desktop.ini
+DUMMY_FILES = ['.DS_Store', 'Thumbs.db', 'desktop.ini']
 
 # Supported audio formats.
-formats = mp3, mp4, ogg, flac
-
-
-[log]
+SUPPORTED_FORMATS = ['mp3', 'mp4', 'ogg', 'flac']
 
 # The file used for logging.
-logfile = /path/to/logfile
+LOGFILE = '/path/to/logfile'
 
 # See http://docs.python.org/library/logging.html#logrecord-attributes for
 # valid attributes for log record format expansion.
-logformat = %(asctime)s: %(message)s
+LOGFORMAT = '%(asctime)s: %(message)s'
 
-
-[mpd]
-
-mpd_user = __USER__
-mpd_password = __PSWD__
-mpd_server = localhost
-mpd_port = 6600
+# Make this unique, and don't share it with anybody.
+# Example:  'f8u=!_ql(0slj4y-n)4-1^qfe5sf5jhg$*(ms)a1%m&_te89-%'
+SECRET_KEY = '___SECRET_KEY___'

@@ -46,7 +46,7 @@ provide the followings:
 * `DATABASES`: configuration info for your database.
 
 Application specific settings are provided in a configuration file (by
-default, it is `config/vortex.conf`).
+default, it is `conf/vortex_config.py`).
 
 
 ## About

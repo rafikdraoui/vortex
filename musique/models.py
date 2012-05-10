@@ -46,7 +46,7 @@ class Album(models.Model):
     def save(self, *args, **kwargs):
         old_path = self.filepath
         new_path = os.path.join(self.artist.filepath, self.title)
-        query = Album.objects.filter(artist__id=self.artist.id,
+        query = Album.objects.filter(artist__id=self.artist_id,
                                      title=self.title
                             ).exclude(id=self.id)[:1]
         if query:

@@ -1,5 +1,5 @@
 *.py[co]
 *.db
 
-local_settings.py
-musique/migrations
+vortex/local_settings.py
+vortex/musique/migrations

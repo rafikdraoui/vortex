@@ -1,5 +1,5 @@
 from django.contrib import admin
-from musique.models import Artist, Album, Song
+from vortex.musique.models import Artist, Album, Song
 
 
 class MusiqueAdmin(admin.ModelAdmin):

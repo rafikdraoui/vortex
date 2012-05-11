@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -12,8 +13,9 @@ from vortex.musique.utils import full_path
 
 
 class Artist(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    filepath = models.FilePathField(path=settings.MEDIA_ROOT,
+    name = models.CharField(_('name'), max_length=100, unique=True)
+    filepath = models.FilePathField(_('file path'),
+                                    path=settings.MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
                                     unique=True)
@@ -23,6 +25,8 @@ class Artist(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _('artist')
+        verbose_name_plural = _('artists')
 
     def save(self, *args, **kwargs):
         old_path = self.filepath
@@ -48,15 +52,18 @@ class Artist(models.Model):
 
 
 class Album(models.Model):
-    title = models.CharField(max_length=100)
-    artist = models.ForeignKey(Artist)
-    filepath = models.FilePathField(path=settings.MEDIA_ROOT,
+    title = models.CharField(_('title'), max_length=100)
+    artist = models.ForeignKey(Artist, verbose_name=_('artist'))
+    filepath = models.FilePathField(_('file path'),
+                                    path=settings.MEDIA_ROOT,
                                     recursive=True,
                                     max_length=200,
                                     unique=True)
 
     class Meta:
         ordering = ['title']
+        verbose_name = _('album')
+        verbose_name_plural = _('albums')
 
     def __unicode__(self):
         return self.title
@@ -106,21 +113,24 @@ def _get_song_filepath(song_instance, filename=None):
 
 
 class Song(models.Model):
-    title = models.CharField(max_length=100)
-    artist = models.ForeignKey(Artist)
-    album = models.ForeignKey(Album)
-    track = models.CharField(max_length=10)
-    bitrate = models.IntegerField()
-    filetype = models.CharField(max_length=10)
-    filefield = models.FileField(upload_to=_get_song_filepath,
+    title = models.CharField(_('title'), max_length=100)
+    artist = models.ForeignKey(Artist, verbose_name=_('artist'))
+    album = models.ForeignKey(Album, verbose_name=_('album'))
+    track = models.CharField(_('track'), max_length=10)
+    bitrate = models.IntegerField(_('bitrate'))
+    filetype = models.CharField(_('file type'), max_length=10)
+    filefield = models.FileField(_('file'),
+                                 upload_to=_get_song_filepath,
                                  max_length=200,
                                  storage=_CustomStorage())
-    original_path = models.CharField(max_length=200)
+    original_path = models.CharField(_('original path'), max_length=200)
     first_save = models.BooleanField(editable=False)
 
     class Meta:
         ordering = ['track', 'title']
         unique_together = ('title', 'artist', 'album', 'track', 'bitrate')
+        verbose_name = _('song')
+        verbose_name_plural = _('songs')
 
     def __unicode__(self):
         return self.title

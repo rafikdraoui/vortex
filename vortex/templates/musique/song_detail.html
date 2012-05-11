@@ -1,4 +1,5 @@
 {% extends "musique/base.html" %}
+{% load i18n %}
 
 {% block css %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/song.css" />
@@ -9,7 +10,7 @@
 <div id=title>
     <h2>
         {{ song.title }}
-        <a href="/admin/musique/song/{{ song.id }}">(edit)</a>
+        <a href="/admin/musique/song/{{ song.id }}">({% trans "edit" %})</a>
     </h2>
 </div>
 
@@ -18,6 +19,8 @@
 
 <h3>Original Path: {{ song.original_path }}</h3>
 
-<h2><a href="/media/{{song.filefield.url}}">Download Song</a></h2>
+<h2>
+    <a href="/media/{{song.filefield.url}}">{% trans "Download Song" %}</a>
+</h2>
 
 {% endblock %}

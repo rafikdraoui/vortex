@@ -1,7 +1,8 @@
 {% extends "musique/base.html" %}
+{% load i18n %}
 
 {% block content %}
-<h1>Albums</h1>
+<h1>{% trans "Albums" %}</h1>
 
 <ul>
 {% for album in album_list %}

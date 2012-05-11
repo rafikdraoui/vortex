@@ -1,5 +1,7 @@
+{% load i18n %}
+
 <doctype html>
-<html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="utf-8" />
     <title>vortex</title>
@@ -11,11 +13,11 @@
 {% block header %}
 <nav>
     <ul>
-        <li><a href="/">Home</a></li>
+        <li><a href="/">{% trans "Home" %}</a></li>
         <li>|</li>
-        <li><a href="/artist/">Artists</a></li>
+        <li><a href="/artist/">{% trans "Artists" %}</a></li>
         <li>|</li>
-        <li><a href="/album/">Albums</a></li>
+        <li><a href="/album/">{% trans "Albums" %}</a></li>
     </ul>
 </nav>
 {% endblock %}

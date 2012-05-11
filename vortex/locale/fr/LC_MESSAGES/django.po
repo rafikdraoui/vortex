@@ -1,0 +1,134 @@
+# Translation file for vortex
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-05-11 12:18-0400\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+
+#: musique/models.py:16
+msgid "name"
+msgstr "nom"
+
+#: musique/models.py:17 musique/models.py:57
+msgid "file path"
+msgstr "chemin d'accès"
+
+#: musique/models.py:28 musique/models.py:56 musique/models.py:117
+msgid "artist"
+msgstr "artiste"
+
+#: musique/models.py:29
+msgid "artists"
+msgstr "artistes"
+
+#: musique/models.py:55 musique/models.py:116
+msgid "title"
+msgstr "titre"
+
+#: musique/models.py:65 musique/models.py:118
+msgid "album"
+msgstr "album"
+
+#: musique/models.py:66
+msgid "albums"
+msgstr "albums"
+
+#: musique/models.py:119
+msgid "track"
+msgstr "numéro"
+
+#: musique/models.py:120
+msgid "bitrate"
+msgstr ""
+
+#: musique/models.py:121
+msgid "file type"
+msgstr "type de fichier"
+
+#: musique/models.py:122
+msgid "file"
+msgstr "fichier"
+
+#: musique/models.py:126
+msgid "original path"
+msgstr "chemin d'accès original"
+
+#: musique/models.py:132
+msgid "song"
+msgstr "chanson"
+
+#: musique/models.py:133
+msgid "songs"
+msgstr "chansons"
+
+#: templates/admin/change_form.html:21 templates/musique/base.html:16
+msgid "Home"
+msgstr "Accueil"
+
+#: templates/admin/change_form.html:24
+msgid "Add"
+msgstr "Ajouter"
+
+#: templates/admin/change_form.html:34
+msgid "History"
+msgstr "Historique"
+
+#: templates/admin/change_form.html:35
+msgid "View on site"
+msgstr "Voir sur le site"
+
+#: templates/admin/change_form.html:46
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "S'il vous plaît corriger l'erreur plus bas"
+msgstr[1] "S'il vous plaît corriger les erreurs plus bas"
+
+#: templates/admin/musique/change_form.html:7
+msgid "Go back to main site"
+msgstr "Retour au site principal"
+
+#: templates/musique/album_detail.html:12
+#: templates/musique/artist_detail.html:9
+#: templates/musique/song_detail.html:13
+msgid "edit"
+msgstr "modifier"
+
+#: templates/musique/album_detail.html:17
+msgid "by"
+msgstr "par"
+
+#: templates/musique/album_detail.html:29
+msgid "Download Album"
+msgstr "Télécharger l'album"
+
+#: templates/musique/album_list.html:5 templates/musique/base.html:20
+msgid "Albums"
+msgstr "Albums"
+
+#: templates/musique/artist_list.html:5 templates/musique/base.html:18
+msgid "Artists"
+msgstr "Artistes"
+
+#: templates/musique/home.html:5
+msgid "Home page"
+msgstr "Page d'accueil"
+
+#: templates/musique/home.html:7
+msgid "Update Library"
+msgstr "Mettre à jour la bibliothèque"
+
+#: templates/musique/home.html:8
+msgid "Admin"
+msgstr "Admin"
+
+#: templates/musique/song_detail.html:23
+msgid "Download Song"
+msgstr "Télécharger la chanson"
+
+#: templates/musique/song_list.html:5
+msgid "Songs"
+msgstr "Chansons"

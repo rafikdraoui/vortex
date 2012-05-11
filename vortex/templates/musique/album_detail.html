@@ -1,4 +1,5 @@
 {% extends "musique/base.html" %}
+{% load i18n %}
 
 {% block css %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/album.css" />
@@ -8,11 +9,14 @@
 <div id=title>
     <h1>
         {{ album.title }}
-        <a href="/admin/musique/album/{{ album.id }}">(edit)</a>
+        <a href="/admin/musique/album/{{ album.id }}">({% trans "edit" %})</a>
     </h1>
 </div>
 
-<h2>by <a href="/artist/{{ album.artist.id }}">{{ album.artist }} </a></h2>
+<h2>
+    {% trans "by" %}
+    <a href="/artist/{{ album.artist.id }}">{{ album.artist }} </a>
+</h2>
 
 <div id="songlist">
     <ul>
@@ -22,7 +26,7 @@
         </li>
     {% endfor %}
     </ul>
-    <a href="#">Download Album</a>
+    <a href="#">{% trans "Download Album" %}</a>
 </div>
 
 <img id="cover" src="{{ STATIC_URL }}images/cover.png" />

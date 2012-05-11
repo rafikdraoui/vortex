@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from vortex.musique.models import Artist, Album, Song
 
 

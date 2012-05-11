@@ -174,8 +174,11 @@ def remove_album(sender, **kwargs):
 def remove_artist(sender, **kwargs):
     artist = kwargs['instance']
 
-    if os.path.exists(full_path(artist.filepath)):
-        os.removedirs(full_path(artist.filepath))
+    try:
+        if os.path.exists(full_path(artist.filepath)):
+            os.removedirs(full_path(artist.filepath))
+    except Exception, msg:
+        handle_delete_error(artist, msg)
 
 
 def handle_delete_error(instance, msg):

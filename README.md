@@ -63,4 +63,4 @@ and whatever else would come up in such a multi-faceted project.
 [python-mpd]: http://pypi.python.org/pypi/python-mpd
 [south]: http://south.aeracode.org
 [pip]: http://www.pip-installer.org
-[me]: https://github.com/rafikdraoui
+[me]: http://www.rafik.ca

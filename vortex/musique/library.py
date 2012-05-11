@@ -7,7 +7,6 @@ import mutagen
 
 from django.conf import settings
 from django.core.files import File
-from django.db import IntegrityError
 
 from vortex.musique.models import Artist, Album, Song
 
@@ -58,16 +57,15 @@ def update():
     mutagen_options = get_mutagen_audio_options()
     for root, dirs, files in os.walk(settings.DROPBOX, topdown=False):
         for name in files:
-            if name in settings.DUMMY_FILES \
-               or name.endswith(('jpg', 'jpeg', 'gif', 'png')):
+            if (name in settings.DUMMY_FILES or
+                name.endswith(('jpg', 'jpeg', 'gif', 'png'))):
                 #FIXME: keep images for cover image
                 try:
                     os.remove(os.path.join(root, name))
                 except Exception:
                     pass
             else:
-                import_file(unicode(os.path.join(root, name)),
-                            mutagen_options)
+                import_file(os.path.join(root, name), mutagen_options)
         try:
             if root != settings.DROPBOX:
                 os.rmdir(root)
@@ -110,9 +108,6 @@ def import_file(filename, mutagen_options):
             defaults={'filefield': File(open(filename, 'rb')),
                       'original_path': original_path,
                       'first_save': True})
-    except IntegrityError, msg:
-        handle_import_error(filename, msg)
-        return
     except Exception, msg:
         handle_import_error(filename, msg)
         return
@@ -122,10 +117,11 @@ def import_file(filename, mutagen_options):
         if song.bitrate >= info['bitrate']:
             #FIXME: uncomment when Unknown songs are handled correctly
             #os.remove(filename)
-            logger.info('%s (by %s) already exists'
-                            % (song.title, song.artist.name))
+            logger.info(
+                '%s (by %s) already exists' % (song.title, song.artist.name))
             return
         else:
+            #TODO: test this
             song.bitrate = info['bitrate']
             song.filefield = File(open(filename, 'rb'))
             song.original_path = original_path

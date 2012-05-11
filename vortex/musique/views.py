@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views.generic import DetailView
 
-from models import Artist, Album, Song
-import library
+from vortex.musique.models import Artist, Album
+from vortex.musique import library
 
 
 class ArtistDetailView(DetailView):

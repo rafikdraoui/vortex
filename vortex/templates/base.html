@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8" />
+    <title>vortex</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" />
+    {% block css %}{% endblock %}
+</head>
+<body>
+
+{% block header %}{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{% endblock %}
+
+</body>
+</html>

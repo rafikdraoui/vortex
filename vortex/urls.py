@@ -9,6 +9,8 @@ from vortex.musique import views
 from django.contrib import admin
 admin.autodiscover()
 
+handler404 = views.page_not_found
+
 urlpatterns = patterns('',
     url(r'^$', views.home),
 

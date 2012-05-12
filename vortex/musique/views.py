@@ -1,5 +1,9 @@
+import re
+
 from django.shortcuts import render, redirect
 from django.views.generic import DetailView
+from django.views import defaults
+from django.views.decorators.csrf import requires_csrf_token
 
 from vortex.musique.models import Artist, Album
 from vortex.musique import library
@@ -31,3 +35,15 @@ def update_library(request):
     #TODO: run asynchronously (using celery?)
     library.update()
     return redirect('/')
+
+
+@requires_csrf_token
+def page_not_found(request, template_name='404.html'):
+
+    if re.match(r'/artist/\d+/', request.path):
+        return redirect('/artist/')
+    if re.match(r'/album/\d+/', request.path):
+        return redirect('/album/')
+    if re.match(r'/song/\d+/', request.path):
+        return redirect('/song/')
+    return defaults.page_not_found(request, template_name)

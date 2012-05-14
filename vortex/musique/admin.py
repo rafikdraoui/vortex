@@ -21,7 +21,7 @@ class MusiqueAdmin(admin.ModelAdmin):
     change_form_template = 'admin/musique/change_form.html'
 
     def get_back_link(self, request):
-        return request.path.replace('admin/musique/', '')
+        return request.path.replace('admin/', '')
 
     def change_view(self, request, object_id, extra_context=None):
         extra_context = extra_context or {}

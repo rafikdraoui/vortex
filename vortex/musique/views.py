@@ -40,10 +40,10 @@ def update_library(request):
 @requires_csrf_token
 def page_not_found(request, template_name='404.html'):
 
-    if re.match(r'/artist/\d+/', request.path):
-        return redirect('/artist/')
-    if re.match(r'/album/\d+/', request.path):
-        return redirect('/album/')
-    if re.match(r'/song/\d+/', request.path):
-        return redirect('/song/')
+    if re.match(r'/musique/artist/\d+/', request.path):
+        return redirect('/musique/artist/')
+    if re.match(r'/musique/album/\d+/', request.path):
+        return redirect('/musique/album/')
+    if re.match(r'/musique/song/\d+/', request.path):
+        return redirect('/musique/song/')
     return defaults.page_not_found(request, template_name)

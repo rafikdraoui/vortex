@@ -1,32 +1,19 @@
 from django.conf import settings
+from django.contrib import admin
 from django.conf.urls.defaults import patterns, include, url
-from django.views.generic import ListView, DetailView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from vortex.musique.models import Artist, Album, Song
-from vortex.musique import views
+from vortex.musique.views import home, page_not_found
 
-from django.contrib import admin
+
 admin.autodiscover()
 
-handler404 = views.page_not_found
+handler404 = page_not_found
 
 urlpatterns = patterns('',
-    url(r'^$', views.home),
-
+    url(r'^$', home),
+    url(r'^musique/', include('vortex.musique.urls')),
     url(r'^admin/', include(admin.site.urls)),
-
-    url(r'^artist/$', ListView.as_view(model=Artist)),
-    url(r'^artist/(?P<pk>\d+)/$', views.ArtistDetailView.as_view()),
-
-    url(r'^album/$', ListView.as_view(model=Album)),
-    url(r'^album/(?P<pk>\d+)/$', views.AlbumDetailView.as_view()),
-
-    url(r'^song/$', ListView.as_view(model=Song)),
-    url(r'^song/(?P<pk>\d+)/$', DetailView.as_view(model=Song)),
-
-    #FIXME: expose views.update_library to admin only
-    url(r'^update/$', views.update_library),
 )
 
 urlpatterns += staticfiles_urlpatterns()

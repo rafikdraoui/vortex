@@ -15,14 +15,14 @@
 
 <h2>
     {% trans "by" %}
-    <a href="/artist/{{ album.artist.id }}">{{ album.artist }} </a>
+    <a href="/musique/artist/{{ album.artist.id }}">{{ album.artist }} </a>
 </h2>
 
 <div id="songlist">
     <ul>
     {% for song in songs %}
         <li>
-            <a href="/song/{{song.id}}">{% if song.track %}{{ song.track }} - {% endif %}{{ song.title }}</a>
+            <a href="/musique/song/{{song.id}}">{% if song.track %}{{ song.track }} - {% endif %}{{ song.title }}</a>
         </li>
     {% endfor %}
     </ul>

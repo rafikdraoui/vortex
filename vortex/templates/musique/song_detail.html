@@ -14,8 +14,13 @@
     </h2>
 </div>
 
-<h3>Artist: <a href="/artist/{{ song.artist.id }}">{{ song.artist }}</a></h3>
-<h3>Album: <a href="/album/{{ song.album.id }}">{{ song.album }}</a></h3>
+<h3>Artist:
+    <a href="/musique/artist/{{ song.artist.id }}">{{ song.artist }}</a>
+</h3>
+
+<h3>Album:
+    <a href="/musique/album/{{ song.album.id }}">{{ song.album }}</a>
+</h3>
 
 <h3>Original Path: {{ song.original_path }}</h3>
 

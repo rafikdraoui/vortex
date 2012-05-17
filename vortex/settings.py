@@ -44,7 +44,13 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), 'templates'),
 )
 
+LOCALE_PATHS = (
+    os.path.join(os.path.dirname(__file__), 'locale'),
+)
+
 ROOT_URLCONF = 'vortex.urls'
+
+WSGI_APPLICATION = 'vortex.wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -61,6 +67,11 @@ INSTALLED_APPS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'formatters': {
         'vortex_fmt': {
             'format': LOGFORMAT
@@ -69,6 +80,7 @@ LOGGING = {
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
+            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'vortex_log': {

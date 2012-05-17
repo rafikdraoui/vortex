@@ -1,6 +1,6 @@
 from django.conf import settings
+from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from django.conf.urls.defaults import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from vortex.musique.views import home, page_not_found

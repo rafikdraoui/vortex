@@ -7,14 +7,14 @@ class SongInline(admin.StackedInline):
     model = Song
     fields = [('track', 'title')]
 
-    has_add_permission = lambda x, y : False
+    has_add_permission = lambda x, y: False
 
 
 class AlbumInline(admin.StackedInline):
     model = Album
     fields = ('title',)
 
-    has_add_permission = lambda x, y : False
+    has_add_permission = lambda x, y: False
 
 
 class MusiqueAdmin(admin.ModelAdmin):

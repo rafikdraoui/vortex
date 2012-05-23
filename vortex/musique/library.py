@@ -55,9 +55,11 @@ def update():
     """
 
     mutagen_options = get_mutagen_audio_options()
+    pattern = '|'.join(settings.DUMMY_FILES)
+    regex = re.compile(r'%s' % pattern)
     for root, dirs, files in os.walk(settings.DROPBOX, topdown=False):
         for name in files:
-            if (name in settings.DUMMY_FILES or
+            if (re.match(regex, name) or
                 name.endswith(('jpg', 'jpeg', 'gif', 'png'))):
                 #FIXME: keep images for cover image
                 try:
@@ -146,7 +148,11 @@ def get_song_info(filename, mutagen_options):
         mutagen_options - list of options needed by mutagen.File
     """
 
-    audio = mutagen.File(filename, options=mutagen_options)
+    try:
+        audio = mutagen.File(filename, options=mutagen_options)
+    except Exception, msg:
+        handle_import_error(filename, msg)
+        raise ValueError
     if audio is None:
         raise ValueError
 

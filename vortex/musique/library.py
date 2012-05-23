@@ -38,6 +38,9 @@ def get_mutagen_audio_options():
         elif fmt == 'flac':
             from mutagen.flac import FLAC
             audio_options.append(FLAC)
+        elif fmt == 'wma':
+            from mutagen.asf import ASF
+            audio_options.append(ASF)
         else:
             logger.info('"%s" support not implemented yet' % fmt)
 
@@ -84,7 +87,10 @@ def import_file(filename, mutagen_options):
     """
 
     try:
-        info = get_song_info(filename, mutagen_options)
+        if filename.rsplit('.')[-1].lower() == 'wma':
+            info =  get_wma_info(filename)
+        else:
+            info = get_song_info(filename, mutagen_options)
     except ValueError:
         handle_import_error(filename, 'mutagen error')
         return
@@ -137,6 +143,47 @@ def get_tag_field(container, tag_name):
     tag = container.get(tag_name, [u'Unknown %s' % tag_name.capitalize()])[0]
     tag = tag or u'Unknown %s' % tag_name.capitalize()
     return tag.replace('/', '-')
+
+
+def get_wma_info(filename):
+
+    try:
+        audio = mutagen.File(filename)
+    except Exception, msg:
+        handle_import_error(filename, msg)
+        raise ValueError
+    if audio is None:
+        raise ValueError
+
+
+    title = audio.get('Title', [u'Unknown Title'])[0]
+
+    artist = audio.get('Author', [None])[0]
+    if not artist:
+        artist = audio.get('WM/AlbumArtist', [None])[0]
+        if artist:
+            artist = artist.value
+        else:
+            artist = u'Unknown Artist'
+
+    album = audio.get('WM/AlbumTitle', [None])[0]
+    if album:
+        album = album.value
+    else:
+        album = u'Unknown Album'
+
+    track = audio.get('WM/TrackNumber', [None])[0]
+    if track:
+        track = unicode(track.value)
+        if len(track) == 1:
+            track = u'0' + track
+    else:
+        track = u''
+
+    bitrate = audio.info.bitrate
+
+    return {'title': title, 'artist': artist, 'album': album,
+            'track': track, 'bitrate': bitrate}
 
 
 def get_song_info(filename, mutagen_options):

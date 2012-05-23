@@ -11,7 +11,7 @@ MEDIA_ROOT = '/path/to/media/root'
 DUMMY_FILES = [r'\.DS_Store', r'Thumbs\.db', r'desktop\.ini', r'._*']
 
 # Supported audio formats.
-SUPPORTED_FORMATS = ['mp3', 'mp4', 'ogg', 'flac']
+SUPPORTED_FORMATS = ['mp3', 'mp4', 'ogg', 'flac', 'wma']
 
 # The file used for logging.
 LOGFILE = '/path/to/logfile'

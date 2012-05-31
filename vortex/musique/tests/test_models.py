@@ -119,8 +119,8 @@ class ArtistModelTest(TestCase):
 
         albums = artist2.album_set.all()
         self.assertEquals(len(albums), 2)
-        self.assertEquals(os.listdir(full_path(artist2.filepath)),
-                          ['First Album', 'Second Album'])
+        self.assertEquals(set(os.listdir(full_path(artist2.filepath))),
+                          set(['First Album', 'Second Album']))
         #TODO: more tests
 
     def test_save_artist_without_change_is_idempotent(self):

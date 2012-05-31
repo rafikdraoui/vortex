@@ -7,9 +7,8 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage
 
-from vortex.musique.utils import full_path
+from vortex.musique.utils import full_path, CustomStorage
 
 
 class Artist(models.Model):
@@ -35,6 +34,9 @@ class Artist(models.Model):
         if query:
             new_artist = query[0]
             for album in self.album_set.all():
+                for song in album.song_set.all():
+                    song.artist = new_artist
+                    song.save()
                 album.artist = new_artist
                 album.save()
             self.delete()
@@ -44,7 +46,7 @@ class Artist(models.Model):
             for album in self.album_set.all():
                 album.save()
             try:
-                os.removedirs(full_path(old_path))
+                os.rmdir(full_path(old_path))
             except OSError, msg:
                 handle_delete_error(self, msg)
         else:
@@ -87,22 +89,11 @@ class Album(models.Model):
             for song in self.song_set.all():
                 song.save()
             try:
-                os.removedirs(full_path(old_path))
+                os.rmdir(full_path(old_path))
             except OSError, msg:
                 handle_delete_error(self, msg)
         else:
             super(Album, self).save(*args, **kwargs)
-
-
-class _CustomStorage(FileSystemStorage):
-
-    def _save(self, name, content):
-        if self.exists(name):
-            self.delete(name)
-        return super(_CustomStorage, self)._save(name, content)
-
-    def get_available_name(self, name):
-        return name
 
 
 def _get_song_filepath(song_instance, filename=None):
@@ -116,14 +107,16 @@ class Song(models.Model):
     title = models.CharField(_('title'), max_length=100)
     artist = models.ForeignKey(Artist, verbose_name=_('artist'))
     album = models.ForeignKey(Album, verbose_name=_('album'))
-    track = models.CharField(_('track'), max_length=10)
+    track = models.CharField(_('track'), max_length=10, default='')
     bitrate = models.IntegerField(_('bitrate'))
     filetype = models.CharField(_('file type'), max_length=10)
     filefield = models.FileField(_('file'),
                                  upload_to=_get_song_filepath,
                                  max_length=200,
-                                 storage=_CustomStorage())
-    original_path = models.CharField(_('original path'), max_length=200)
+                                 storage=CustomStorage())
+    original_path = models.CharField(_('original path'),
+                                     max_length=200,
+                                     default='')
     first_save = models.BooleanField(editable=False)
 
     class Meta:
@@ -136,6 +129,8 @@ class Song(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        if len(self.track) == 1:
+            self.track = '0' + self.track
         file = self.filefield
         old_path = file.name
         new_path = _get_song_filepath(self)
@@ -148,7 +143,7 @@ class Song(models.Model):
                 try:
                     os.remove(full_path(old_path))
                 except OSError, msg:
-                    handle_delete_error(song, error)
+                    handle_delete_error(self, msg)
         self.first_save = False
 
         super(Song, self).save(*args, **kwargs)
@@ -171,7 +166,7 @@ def remove_song(sender, **kwargs):
 def remove_album(sender, **kwargs):
     try:
         album = kwargs['instance']
-        os.removedirs(full_path(album.filepath))
+        os.rmdir(full_path(album.filepath))
         if album.artist.album_set.count() == 0:
             album.artist.delete()
     except Artist.DoesNotExist:
@@ -183,10 +178,9 @@ def remove_album(sender, **kwargs):
 @receiver(post_delete, sender=Artist, dispatch_uid='delete_artist')
 def remove_artist(sender, **kwargs):
     artist = kwargs['instance']
-
     try:
         if os.path.exists(full_path(artist.filepath)):
-            os.removedirs(full_path(artist.filepath))
+            os.rmdir(full_path(artist.filepath))
     except Exception, msg:
         handle_delete_error(artist, msg)
 

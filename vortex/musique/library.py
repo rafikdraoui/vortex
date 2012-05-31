@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def get_mutagen_audio_options():
     """Build the list of options to give mutagen.File for reading
-    audio tags according to the supported formats in the config
+    audio tags according to the supported formats in the config.
     """
 
     formats = settings.SUPPORTED_FORMATS
@@ -70,7 +70,8 @@ def update():
                 except Exception:
                     pass
             else:
-                import_file(os.path.join(root, name), mutagen_options)
+                filename = os.path.join(root, name).decode('utf-8')
+                import_file(filename, mutagen_options)
         try:
             if root != settings.DROPBOX:
                 os.rmdir(root)
@@ -88,7 +89,7 @@ def import_file(filename, mutagen_options):
 
     try:
         if filename.rsplit('.')[-1].lower() == 'wma':
-            info =  get_wma_info(filename)
+            info = get_wma_info(filename)
         else:
             info = get_song_info(filename, mutagen_options)
     except ValueError:
@@ -125,8 +126,7 @@ def import_file(filename, mutagen_options):
         if song.bitrate >= info['bitrate']:
             #FIXME: uncomment when Unknown songs are handled correctly
             #os.remove(filename)
-            logger.info(
-                '%s (by %s) already exists' % (song.title, song.artist.name))
+            handle_import_error(filename, 'already exists')
             return
         else:
             #TODO: test this
@@ -154,7 +154,6 @@ def get_wma_info(filename):
         raise ValueError
     if audio is None:
         raise ValueError
-
 
     title = audio.get('Title', [u'Unknown Title'])[0]
 

@@ -5,8 +5,10 @@
 
 import os
 
+PROJECT_DIR = os.path.dirname(__file__)
+
 try:
-    from conf import *
+    from vortex.conf import *
 except:
     #FIXME: more informative error
     raise
@@ -14,11 +16,11 @@ except:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': '',                       # Or path to database file if using sqlite3.
+        'USER': '',                       # Not used with sqlite3.
+        'PASSWORD': '',                   # Not used with sqlite3.
+        'HOST': '',                       # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                       # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -37,15 +39,15 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), 'static'),
+    os.path.join(PROJECT_DIR, 'static'),
 )
 
 TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), 'templates'),
+    os.path.join(PROJECT_DIR, 'templates'),
 )
 
 LOCALE_PATHS = (
-    os.path.join(os.path.dirname(__file__), 'locale'),
+    os.path.join(PROJECT_DIR, 'locale'),
 )
 
 ROOT_URLCONF = 'vortex.urls'

@@ -2,6 +2,18 @@ import os
 import shutil
 
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+
+class CustomStorage(FileSystemStorage):
+
+    def _save(self, name, content):
+        if self.exists(name):
+            self.delete(name)
+        return super(CustomStorage, self)._save(name, content)
+
+    def get_available_name(self, name):
+        return name
 
 
 def path_exists(path):

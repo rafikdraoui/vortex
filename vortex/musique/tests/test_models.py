@@ -255,8 +255,10 @@ class AlbumModelTest(TestCase):
 
         songs = album2.song_set.all()
         self.assertEquals(len(songs), 2)
-        self.assertEquals(os.listdir(full_path(album2.filepath)),
-                          ['02 - Second Song.ogg', 'The First Song.ogg'])
+        self.assertEquals(
+                set(os.listdir(full_path(album2.filepath))),
+                set(['02 - Second Song.ogg', 'The First Song.ogg'])
+        )
         #TODO: more tests
 
     def test_save_album_without_change_is_idempotent(self):

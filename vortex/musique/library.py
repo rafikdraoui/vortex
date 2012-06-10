@@ -11,7 +11,7 @@ from django.core.files import File
 from vortex.musique.models import Artist, Album, Song
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def get_mutagen_audio_options():
@@ -27,7 +27,7 @@ def get_mutagen_audio_options():
         if fmt == 'mp3':
             from mutagen.mp3 import EasyMP3
             audio_options.append(EasyMP3)
-        elif fmt == 'mp4':
+        elif fmt == 'mp4' or fmt == 'm4a':
             from mutagen.easymp4 import EasyMP4
             audio_options.append(EasyMP4)
         elif fmt == 'ogg':
@@ -42,12 +42,11 @@ def get_mutagen_audio_options():
             from mutagen.asf import ASF
             audio_options.append(ASF)
         else:
-            logger.info('"%s" support not implemented yet' % fmt)
+            LOGGER.info('"%s" support not implemented yet' % fmt)
 
     return audio_options
 
 
-#TODO: log exceptions
 def update():
     """Import into the library all files in the directory structure
     rooted at `DROPBOX`.
@@ -107,16 +106,21 @@ def import_file(filename, mutagen_options):
                                                  filepath=album_path)
 
     filetype = filename.rsplit('.')[-1].lower()
-    original_path = filename.replace(settings.DROPBOX, '', 1)
+    original_path = filename.replace(
+                        settings.DROPBOX, '', 1).lstrip(os.path.sep)
 
     #TODO: Handle Unknown Title by Unknown Artist
     try:
         song, created = Song.objects.get_or_create(
-            title=info['title'], artist=artist, album=album,
-            track=info['track'], bitrate=info['bitrate'], filetype=filetype,
-            defaults={'filefield': File(open(filename, 'rb')),
-                      'original_path': original_path,
-                      'first_save': True})
+                            title=info['title'],
+                            artist=artist,
+                            album=album,
+                            track=info['track'],
+                            defaults={'filefield': File(open(filename, 'rb')),
+                                      'bitrate': info['bitrate'],
+                                      'filetype': filetype,
+                                      'original_path': original_path,
+                                      'first_save': True})
     except Exception, msg:
         handle_import_error(filename, msg)
         return
@@ -126,10 +130,11 @@ def import_file(filename, mutagen_options):
         if song.bitrate >= info['bitrate']:
             #FIXME: uncomment when Unknown songs are handled correctly
             #os.remove(filename)
-            handle_import_error(filename, 'already exists')
+            handle_import_error(filename,
+                                '%s by %s already exists'
+                                    % (info['title'], info['artist']))
             return
         else:
-            #TODO: test this
             song.bitrate = info['bitrate']
             song.filefield = File(open(filename, 'rb'))
             song.original_path = original_path
@@ -228,4 +233,4 @@ def handle_import_error(filename, error_msg=None):
     log_msg = 'Problem importing file %s' % filename
     if error_msg:
         log_msg = '%s (%s)' % (log_msg, error_msg)
-    logger.info(log_msg)
+    LOGGER.info(log_msg)

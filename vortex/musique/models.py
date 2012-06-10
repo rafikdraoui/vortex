@@ -1,5 +1,6 @@
 import os
 import shutil
+import logging
 
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
@@ -121,7 +122,7 @@ class Song(models.Model):
 
     class Meta:
         ordering = ['track', 'title']
-        unique_together = ('title', 'artist', 'album', 'track', 'bitrate')
+        unique_together = ('title', 'artist', 'album', 'track')
         verbose_name = _('song')
         verbose_name_plural = _('songs')
 
@@ -185,10 +186,11 @@ def remove_artist(sender, **kwargs):
         handle_delete_error(artist, msg)
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 def handle_delete_error(instance, msg):
-    import logging
-    logger = logging.getLogger(__name__)
     if isinstance(instance, Artist):
-        logger.info('Problem deleting %s: %s' % (instance.name, msg))
+        LOGGER.info('Problem deleting %s: %s' % (instance.name, msg))
     else:
-        logger.info('Problem deleting %s: %s' % (instance.title, msg))
+        LOGGER.info('Problem deleting %s: %s' % (instance.title, msg))

@@ -1,26 +1,27 @@
 import os
 import shutil
 import tempfile
+from logging import FileHandler
 
 from django.utils import unittest
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.files import File
 
-from vortex.musique.models import Artist, Album, Song
+from vortex.musique.models import Artist, Album, Song, LOGGER
 from vortex.musique.utils import CustomStorage, full_path
 
 
-TEST_MEDIA_FOLDER = tempfile.mkdtemp()
+TEST_MEDIA_DIR = tempfile.mkdtemp()
 
 
-@override_settings(MEDIA_ROOT=TEST_MEDIA_FOLDER)
-class ArtistModelTest(TestCase):
+@override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
+class ModelTest(TestCase):
 
     def setUp(self):
-        self.media_folder = TEST_MEDIA_FOLDER
-        if not os.path.exists(TEST_MEDIA_FOLDER):
-            os.mkdir(TEST_MEDIA_FOLDER)
+        self.media_dir = TEST_MEDIA_DIR
+        if not os.path.exists(TEST_MEDIA_DIR):
+            os.mkdir(TEST_MEDIA_DIR)
         self.media_file = tempfile.NamedTemporaryFile(suffix='.ogg',
                                                       delete=False)
         self.media_file.write("""
@@ -30,22 +31,34 @@ class ArtistModelTest(TestCase):
         """)
         self.media_file.close()
 
+        self.logfile = tempfile.NamedTemporaryFile(delete=False)
+        default_handler = LOGGER.handlers[0]
+        LOGGER.removeHandler(default_handler)
+        LOGGER.addHandler(FileHandler(self.logfile.name))
+
         # Swap CustomStorage for filefield for testing so that it uses
         # the temporary media folder instead of settings.MEDIA_ROOT
         self._field = Song._meta.get_field_by_name('filefield')[0]
         self._default_storage = self._field.storage
-        test_storage = CustomStorage(location=self.media_folder)
+        test_storage = CustomStorage(location=self.media_dir)
         self._field.storage = test_storage
-
-        # Save songs in the database
-        self._save_songs()
 
     def tearDown(self):
         os.remove(self.media_file.name)
-        shutil.rmtree(self.media_folder)
+        os.remove(self.logfile.name)
+        shutil.rmtree(self.media_dir)
         self._field = self._default_storage
 
-    def _save_songs(self):
+    def assertNoLogError(self):
+        self.assertEquals(os.path.getsize(self.logfile.name), 0)
+
+
+@override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
+class ArtistModelTest(ModelTest):
+
+    def setUp(self):
+        super(ArtistModelTest, self).setUp()
+
         artist1 = Artist.objects.create(name='First Artist',
                                         filepath='F/First Artist')
         album1 = Album.objects.create(title='First Album',
@@ -98,6 +111,8 @@ class ArtistModelTest(TestCase):
 
         # TODO: check that album was preserved during artist renaming
 
+        self.assertNoLogError()
+
     def test_rename_artist_to_existing_artist_merges_folders(self):
         artist1 = Artist.objects.get(name='First Artist')
         artist2 = Artist.objects.get(name='Other Artist')
@@ -123,6 +138,8 @@ class ArtistModelTest(TestCase):
                           set(['First Album', 'Second Album']))
         #TODO: more tests
 
+        self.assertNoLogError()
+
     def test_save_artist_without_change_is_idempotent(self):
         artist = Artist.objects.get(name='First Artist')
         self.assertEquals(artist.name, 'First Artist')
@@ -138,6 +155,7 @@ class ArtistModelTest(TestCase):
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
         self.assertEquals(os.listdir(full_path(artist.filepath)),
                           ['First Album'])
+        self.assertNoLogError()
 
     def test_delete_artist_removes_folder(self):
         artist = Artist.objects.get(name='First Artist')
@@ -147,40 +165,15 @@ class ArtistModelTest(TestCase):
         artist.delete()
 
         self.assertFalse(os.path.exists(filename))
+        self.assertNoLogError()
 
 
-@override_settings(MEDIA_ROOT=TEST_MEDIA_FOLDER)
-class AlbumModelTest(TestCase):
+@override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
+class AlbumModelTest(ModelTest):
 
     def setUp(self):
-        self.media_folder = TEST_MEDIA_FOLDER
-        if not os.path.exists(TEST_MEDIA_FOLDER):
-            os.mkdir(TEST_MEDIA_FOLDER)
-        self.media_file = tempfile.NamedTemporaryFile(suffix='.ogg',
-                                                      delete=False)
-        self.media_file.write("""
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-        feugiat sem velit, sed rutrum urna. Etiam sed varius risus. Aenean
-        consequat enim magna. Praesent sed metus tellus, eget sagittis sem.
-        """)
-        self.media_file.close()
+        super(AlbumModelTest, self).setUp()
 
-        # Swap CustomStorage for filefield for testing so that it uses
-        # the temporary media folder instead of settings.MEDIA_ROOT
-        self._field = Song._meta.get_field_by_name('filefield')[0]
-        self._default_storage = self._field.storage
-        test_storage = CustomStorage(location=self.media_folder)
-        self._field.storage = test_storage
-
-        # Save songs in the database
-        self._save_songs()
-
-    def tearDown(self):
-        os.remove(self.media_file.name)
-        shutil.rmtree(self.media_folder)
-        self._field = self._default_storage
-
-    def _save_songs(self):
         artist = Artist.objects.create(name='The Artist',
                                        filepath='T/The Artist')
         album1 = Album.objects.create(title='First Album',
@@ -236,6 +229,7 @@ class AlbumModelTest(TestCase):
         song = album.song_set.all()[0]
         self.assertEquals(open(self.media_file.name).read(),
                           song.filefield.read())
+        self.assertNoLogError()
 
     def test_rename_album_to_existing_album_merges_folders(self):
         album1 = Album.objects.get(title='First Album')
@@ -259,7 +253,10 @@ class AlbumModelTest(TestCase):
                 set(os.listdir(full_path(album2.filepath))),
                 set(['02 - Second Song.ogg', 'The First Song.ogg'])
         )
+
         #TODO: more tests
+
+        self.assertNoLogError()
 
     def test_save_album_without_change_is_idempotent(self):
         album = Album.objects.get(title='First Album')
@@ -278,6 +275,7 @@ class AlbumModelTest(TestCase):
         self.assertTrue(os.path.exists(full_path(album.filepath)))
         self.assertEquals(os.listdir(full_path(album.filepath)),
                           ['The First Song.ogg'])
+        self.assertNoLogError()
 
     def test_delete_album_removes_folder(self):
         album = Album.objects.get(title='First Album')
@@ -287,6 +285,7 @@ class AlbumModelTest(TestCase):
         album.delete()
 
         self.assertFalse(os.path.exists(filename))
+        self.assertNoLogError()
 
     def test_delete_last_album_of_artist_deletes_artist(self):
         album1 = Album.objects.get(title='First Album')
@@ -301,61 +300,35 @@ class AlbumModelTest(TestCase):
         self.assertRaises(Artist.DoesNotExist,
                           Artist.objects.get,
                           name='The Artist')
+        self.assertNoLogError()
 
 
-@override_settings(MEDIA_ROOT=TEST_MEDIA_FOLDER)
-class SongModelTest(TestCase):
+@override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
+class SongModelTest(ModelTest):
 
     def setUp(self):
-        self.media_folder = TEST_MEDIA_FOLDER
-        if not os.path.exists(TEST_MEDIA_FOLDER):
-            os.mkdir(TEST_MEDIA_FOLDER)
-        self.media_file = tempfile.NamedTemporaryFile(suffix='.ogg',
-                                                      delete=False)
-        self.media_file.write("""
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-        feugiat sem velit, sed rutrum urna. Etiam sed varius risus. Aenean
-        consequat enim magna. Praesent sed metus tellus, eget sagittis sem.
-        """)
-        self.media_file.close()
+        super(SongModelTest, self).setUp()
 
-        # Swap CustomStorage for filefield for testing so that it uses
-        # the temporary media folder instead of settings.MEDIA_ROOT
-        self._field = Song._meta.get_field_by_name('filefield')[0]
-        self._default_storage = self._field.storage
-        test_storage = CustomStorage(location=self.media_folder)
-        self._field.storage = test_storage
-
-        # Save a song in the database
-        self.song = self._save_song()
-
-    def tearDown(self):
-        os.remove(self.media_file.name)
-        self._field = self._default_storage
-        shutil.rmtree(self.media_folder)
-
-    def _save_song(self):
         artist = Artist.objects.create(name='The Artist',
                                        filepath='T/The Artist')
         album = Album.objects.create(title='The Album',
                                      artist=artist,
                                      filepath='T/The Artist/The Album')
-        song = Song(title='The Song', artist=artist, album=album,
+        self.song = Song(title='The Song', artist=artist, album=album,
                     bitrate=128000, filetype='ogg', first_save=True,
                     filefield=File(open(self.media_file.name)))
-        song.save()
+        self.song.save()
 
-        return song
-
-    def test_save_new_song_creates_file_in_media_folder(self):
+    def test_save_new_song_creates_file_in_media_directory(self):
         filename = os.path.join(
-            self.media_folder, 'T', 'The Artist', 'The Album', 'The Song.ogg'
+            self.media_dir, 'T', 'The Artist', 'The Album', 'The Song.ogg'
         )
 
-        self.assertEquals(os.listdir(self.media_folder), ['T'])
+        self.assertEquals(os.listdir(self.media_dir), ['T'])
         self.assertTrue(os.path.exists(filename))
         self.assertEquals(open(self.media_file.name).read(),
                           open(filename).read())
+        self.assertNoLogError()
 
     def test_rename_song_renames_filename(self):
         old_filename = full_path(self.song.filefield.name)
@@ -365,7 +338,7 @@ class SongModelTest(TestCase):
         self.song.save()
 
         new_filename = os.path.join(
-            self.media_folder, 'T', 'The Artist', 'The Album', 'La Chanson.ogg'
+            self.media_dir, 'T', 'The Artist', 'The Album', 'La Chanson.ogg'
         )
 
         self.assertEquals(
@@ -374,10 +347,13 @@ class SongModelTest(TestCase):
         )
         self.assertTrue(os.path.exists(new_filename))
         self.assertFalse(os.path.exists(old_filename))
+        self.assertNoLogError()
 
+    #TODO
     def test_change_song_album_moves_file_to_new_album_folder(self):
         pass
 
+    #TODO
     def test_change_song_artist_moves_file_to_new_artist_folder(self):
         pass
 
@@ -404,6 +380,7 @@ class SongModelTest(TestCase):
         current_content = self.song.filefield.read()
 
         self.assertEquals(original_content, current_content)
+        self.assertNoLogError()
 
     def test_delete_song_removes_file(self):
         filename = full_path(self.song.filefield.name)
@@ -412,6 +389,7 @@ class SongModelTest(TestCase):
         self.song.delete()
 
         self.assertFalse(os.path.exists(filename))
+        self.assertNoLogError()
 
     def test_delete_last_song_of_album_deletes_album(self):
         # Check that Album.DoesNotExist is not thrown
@@ -422,3 +400,4 @@ class SongModelTest(TestCase):
         self.assertRaises(Album.DoesNotExist,
                           Album.objects.get,
                           title='The Album')
+        self.assertNoLogError()

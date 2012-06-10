@@ -8,7 +8,7 @@ MEDIA_ROOT = '/path/to/media/root'
 
 # Files that are removed from the dropbox by the file import routine
 # (specified as python regular expressions).
-DUMMY_FILES = [r'\.DS_Store', r'Thumbs\.db', r'desktop\.ini', r'._*']
+DUMMY_FILES = [r'\.DS_Store', r'Thumbs\.db', r'desktop\.ini', r'\._*']
 
 # Supported audio formats.
 SUPPORTED_FORMATS = ['mp3', 'mp4', 'ogg', 'flac', 'wma']

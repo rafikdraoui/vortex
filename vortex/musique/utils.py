@@ -1,5 +1,6 @@
 import os
 import shutil
+import re
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -27,3 +28,13 @@ def path_exists(path):
 
 def full_path(name):
     return os.path.join(settings.MEDIA_ROOT, name)
+
+
+def titlecase(s):
+    """Title case a string with correct handling of apostrophes.
+    Code taken from the official Python documentation.
+    """
+    return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
+                  lambda mo: mo.group(0)[0].upper() +
+                             mo.group(0)[1:].lower(),
+                  s)

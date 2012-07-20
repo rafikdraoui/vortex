@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.files import File
 
 from vortex.musique.models import Artist, Album, Song
+from vortex.musique.utils import titlecase
 
 
 LOGGER = logging.getLogger(__name__)
@@ -95,15 +96,16 @@ def import_file(filename, mutagen_options):
         handle_import_error(filename, 'mutagen error')
         return
 
-    artist_name = info['artist'].title()
+    artist_name = titlecase(info['artist'])
     artist_path = os.path.join(artist_name[0], artist_name)
     artist, created = Artist.objects.get_or_create(name=artist_name,
                                                    filepath=artist_path)
 
-    album_path = os.path.join(artist_path, info['album'].title())
-    album, created = Album.objects.get_or_create(title=info['album'].title(),
-                                                 artist=artist,
-                                                 filepath=album_path)
+    album_path = os.path.join(artist_path, titlecase(info['album']))
+    album, created = Album.objects.get_or_create(
+                                            title=titlecase(info['album']),
+                                            artist=artist,
+                                            filepath=album_path)
 
     filetype = filename.rsplit('.')[-1].lower()
     original_path = filename.replace(

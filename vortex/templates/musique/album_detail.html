@@ -26,7 +26,9 @@
         </li>
     {% endfor %}
     </ul>
-    <a href="#">{% trans "Download Album" %}</a>
+    <a href="/musique/album/{{album.id}}/download">
+        {% trans "Download Album" %}
+    </a>
 </div>
 
 <img id="cover" src="{{ STATIC_URL }}images/cover.png" />

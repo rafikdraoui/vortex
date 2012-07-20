@@ -2,66 +2,66 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-12 12:47-0400\n"
+"POT-Creation-Date: 2012-07-20 19:18+0100\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: musique/models.py:16
+#: musique/models.py:15
 msgid "name"
 msgstr "nom"
 
-#: musique/models.py:17 musique/models.py:57
+#: musique/models.py:16 musique/models.py:59
 msgid "file path"
 msgstr "chemin d'accès"
 
-#: musique/models.py:28 musique/models.py:56 musique/models.py:117
+#: musique/models.py:27 musique/models.py:58 musique/models.py:108
 msgid "artist"
 msgstr "artiste"
 
-#: musique/models.py:29
+#: musique/models.py:28
 msgid "artists"
 msgstr "artistes"
 
-#: musique/models.py:55 musique/models.py:116
+#: musique/models.py:57 musique/models.py:107
 msgid "title"
 msgstr "titre"
 
-#: musique/models.py:65 musique/models.py:118
+#: musique/models.py:67 musique/models.py:109
 msgid "album"
 msgstr "album"
 
-#: musique/models.py:66
+#: musique/models.py:68
 msgid "albums"
 msgstr "albums"
 
-#: musique/models.py:119
+#: musique/models.py:110
 msgid "track"
 msgstr "numéro"
 
-#: musique/models.py:120
+#: musique/models.py:111
 msgid "bitrate"
 msgstr ""
 
-#: musique/models.py:121
+#: musique/models.py:112
 msgid "file type"
 msgstr "type de fichier"
 
-#: musique/models.py:122
+#: musique/models.py:113
 msgid "file"
 msgstr "fichier"
 
-#: musique/models.py:126
+#: musique/models.py:117
 msgid "original path"
 msgstr "chemin d'accès original"
 
-#: musique/models.py:132
+#: musique/models.py:125
 msgid "song"
 msgstr "chanson"
 
-#: musique/models.py:133
+#: musique/models.py:126
 msgid "songs"
 msgstr "chansons"
 
@@ -113,13 +113,17 @@ msgstr "modifier"
 msgid "by"
 msgstr "par"
 
-#: templates/musique/album_detail.html:29
+#: templates/musique/album_detail.html:30
 msgid "Download Album"
 msgstr "Télécharger l'album"
 
 #: templates/musique/album_list.html:5 templates/musique/base.html:11
 msgid "Albums"
 msgstr "Albums"
+
+#: templates/musique/artist_detail.html:21
+msgid "Download Artist Discography"
+msgstr "Télécharger la discographie de l'artiste"
 
 #: templates/musique/artist_list.html:5 templates/musique/base.html:9
 msgid "Artists"
@@ -137,7 +141,7 @@ msgstr "Mettre à jour la bibliothèque"
 msgid "Admin"
 msgstr "Admin"
 
-#: templates/musique/song_detail.html:23
+#: templates/musique/song_detail.html:28
 msgid "Download Song"
 msgstr "Télécharger la chanson"
 

@@ -1,6 +1,7 @@
 import os
-import shutil
 import re
+import zipfile
+import tempfile
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -38,3 +39,21 @@ def titlecase(s):
                   lambda mo: mo.group(0)[0].upper() +
                              mo.group(0)[1:].lower(),
                   s)
+
+def zip_folder(src_path, dst_path=None):
+    """Zip a directory structure at src_path and returns the path of
+    the resulting zip file.
+    """
+    if dst_path is None:
+        dst_file = tempfile.NamedTemporaryFile(suffix='.zip', delete=False)
+    else:
+        dst_file = open(dst_path, 'w')
+    zfile = zipfile.ZipFile(dst_file, 'w')
+    dirname = os.path.dirname(src_path) + os.path.sep
+    for root, dirs, files in os.walk(src_path, topdown=False):
+        for name in files:
+            full_name = os.path.join(root, name)
+            zfile.write(full_name, full_name.replace(dirname, '', 1))
+    zfile.close()
+    dst_file.close()
+    return dst_file.name

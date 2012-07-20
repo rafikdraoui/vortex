@@ -20,14 +20,14 @@ class AlbumInline(admin.StackedInline):
 class MusiqueAdmin(admin.ModelAdmin):
     change_form_template = 'admin/musique/change_form.html'
 
-    def get_back_link(self, request):
-        return request.path.replace('admin/', '')
-
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        extra_context['back_link'] = self.get_back_link(request)
+        extra_context['back_link'] = request.path.replace('admin/', '')
         return super(MusiqueAdmin, self).change_view(
-                            request, object_id, extra_context=extra_context)
+                                                request,
+                                                object_id,
+                                                form_url,
+                                                extra_context=extra_context)
 
 
 class ArtistAdmin(MusiqueAdmin):

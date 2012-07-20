@@ -7,7 +7,6 @@ from zipfile import ZipFile
 from django.utils import unittest
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.conf import settings
 
 from vortex.musique import library
 from vortex.musique.models import Artist, Album, Song

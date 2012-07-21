@@ -1,4 +1,5 @@
 import re
+import tempfile
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -40,21 +41,28 @@ def update_library(request):
 
 
 def _download(instance):
-    #TODO: delete zip file after download
-    zfile = zip_folder(full_path(instance.filepath))
-    response = HttpResponse(open(zfile, 'rb').read(),
-                            content_type='application/zip')
+    tfile = tempfile.NamedTemporaryFile(suffix='.zip')
+    zip_folder(full_path(instance.filepath), tfile.name)
+
+    #TODO: Use iterator in case data is too big for memory. This implies
+    # that the temporary file needs to stay on disk during download, and
+    # that it is deleted at some later time.
+    tfile.seek(0)
+    data = tfile.read()
+    tfile.close()
+
+    response = HttpResponse(data, content_type='application/zip')
     response['Content-Disposition'] = \
         u'attachment; filename=%s.zip' % unicode(instance)
     return response
 
 
-def download_artist(request, artist_id):
-    return _download(Artist.objects.get(pk=artist_id))
+def download_artist(request, pk):
+    return _download(Artist.objects.get(pk=pk))
 
 
-def download_album(request, album_id):
-    return _download(Album.objects.get(pk=album_id))
+def download_album(request, pk):
+    return _download(Album.objects.get(pk=pk))
 
 
 @requires_csrf_token

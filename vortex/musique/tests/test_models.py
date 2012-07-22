@@ -86,6 +86,45 @@ class ArtistModelTest(ModelTest):
                             first_save=True,
                             filefield=File(open(self.media_file.name)))
 
+        common_album1 = Album.objects.create(
+                                        title='Common Album',
+                                        artist=artist1,
+                                        filepath='F/First Artist/Common Album')
+        Song.objects.create(title='Common Song 1',
+                            artist=artist1,
+                            album=common_album1,
+                            bitrate=128000,
+                            filetype='ogg',
+                            first_save=True,
+                            filefield=File(open(self.media_file.name)))
+        Song.objects.create(title='Common Song 3',
+                            artist=artist1,
+                            album=common_album1,
+                            bitrate=128000,
+                            filetype='ogg',
+                            first_save=True,
+                            filefield=File(open(self.media_file.name)))
+
+        common_album2 = Album.objects.create(
+                                        title='Common Album',
+                                        artist=artist2,
+                                        filepath='O/Other Artist/Common Album')
+        Song.objects.create(title='Common Song 2',
+                            artist=artist2,
+                            album=common_album2,
+                            bitrate=128000,
+                            filetype='ogg',
+                            first_save=True,
+                            filefield=File(open(self.media_file.name)))
+        Song.objects.create(title='Common Song 3',
+                            artist=artist2,
+                            album=common_album2,
+                            bitrate=128000,
+                            filetype='ogg',
+                            first_save=True,
+                            filefield=File(open(self.media_file.name)))
+
+
     def test_rename_artist_to_non_existent_artist_renames_folder(self):
         artist = Artist.objects.get(name='First Artist')
         original_filename = full_path(artist.filepath)
@@ -118,8 +157,8 @@ class ArtistModelTest(ModelTest):
         artist2 = Artist.objects.get(name='Other Artist')
         original_filename = full_path(artist1.filepath)
 
-        self.assertEquals(len(artist1.album_set.all()), 1)
-        self.assertEquals(len(artist2.album_set.all()), 1)
+        self.assertEquals(len(artist1.album_set.all()), 2)
+        self.assertEquals(len(artist2.album_set.all()), 2)
 
         artist1.name = 'Other Artist'
         artist1.save()
@@ -133,10 +172,17 @@ class ArtistModelTest(ModelTest):
         Album.objects.get(title='First Album')
 
         albums = artist2.album_set.all()
-        self.assertEquals(len(albums), 2)
+        self.assertEquals(len(albums), 3)
         self.assertEquals(set(os.listdir(full_path(artist2.filepath))),
-                          set(['First Album', 'Second Album']))
-        #TODO: more tests
+                          set(['First Album', 'Second Album', 'Common Album']))
+
+        # Check to see that the songs of the common album were merged
+        common_album = artist2.album_set.get(title='Common Album')
+        self.assertEquals(len(common_album.song_set.all()), 3)
+        self.assertEquals(set(os.listdir(full_path(common_album.filepath))),
+                          set(['Common Song 1.ogg',
+                               'Common Song 2.ogg',
+                               'Common Song 3.ogg']))
 
         self.assertNoLogError()
 
@@ -145,16 +191,16 @@ class ArtistModelTest(ModelTest):
         self.assertEquals(artist.name, 'First Artist')
         self.assertEquals(artist.filepath, 'F/First Artist')
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertEquals(os.listdir(full_path(artist.filepath)),
-                          ['First Album'])
+        self.assertEquals(set(os.listdir(full_path(artist.filepath))),
+                          set(['First Album', 'Common Album']))
 
         artist.save()
 
         self.assertEquals(artist.name, 'First Artist')
         self.assertEquals(artist.filepath, 'F/First Artist')
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertEquals(os.listdir(full_path(artist.filepath)),
-                          ['First Album'])
+        self.assertEquals(set(os.listdir(full_path(artist.filepath))),
+                          set(['First Album', 'Common Album']))
         self.assertNoLogError()
 
     def test_delete_artist_removes_folder(self):

@@ -2,7 +2,7 @@ import os
 import logging
 
 from django.utils.translation import ugettext_lazy as _
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.conf import settings
@@ -81,7 +81,11 @@ class Album(models.Model):
             new_album = query[0]
             for song in self.song_set.all():
                 song.album = new_album
-                song.save()
+                try:
+                    song.save()
+                except IntegrityError:
+                    # Song already exists under the other album
+                    pass
             self.delete()
         elif new_path != old_path:
             self.filepath = new_path

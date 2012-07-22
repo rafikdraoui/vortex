@@ -10,8 +10,9 @@ PROJECT_DIR = os.path.dirname(__file__)
 try:
     from vortex.conf import *
 except:
-    #FIXME: more informative error
-    raise
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured(
+                'vortex.conf is missing or is improperly configured')
 
 DATABASES = {
     'default': {

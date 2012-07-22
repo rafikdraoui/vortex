@@ -10,7 +10,9 @@
 <div id=title>
     <h1>
         {{ album }}
-        <a href="/admin/musique/album/{{ album.id }}">({% trans "edit" %})</a>
+        <a href="{% url 'admin:musique_album_change' album.id %}">
+            ({% trans "edit" %})
+        </a>
     </h1>
 </div>
 

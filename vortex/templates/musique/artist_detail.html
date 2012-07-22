@@ -6,7 +6,7 @@
 <div id=title>
     <h1>
         {{ artist }}
-        <a href="/admin/musique/artist/{{ artist.id }}">
+        <a href="{% url 'admin:musique_artist_change' artist.id %}">
             ({% trans "edit" %})
         </a>
     </h1>

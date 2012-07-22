@@ -9,17 +9,17 @@
 
 <div id=title>
     <h2>
-        {{ song.title }}
+        {{ song }}
         <a href="/admin/musique/song/{{ song.id }}">({% trans "edit" %})</a>
     </h2>
 </div>
 
 <h3>Artist:
-    <a href="/musique/artist/{{ song.artist.id }}">{{ song.artist }}</a>
+    <a href="{{ song.artist.get_absolute_url }}">{{ song.artist }}</a>
 </h3>
 
 <h3>Album:
-    <a href="/musique/album/{{ song.album.id }}">{{ song.album }}</a>
+    <a href="{{ song.album.get_absolute_url }}">{{ song.album }}</a>
 </h3>
 
 <h3>Original Path: {{ song.original_path }}</h3>

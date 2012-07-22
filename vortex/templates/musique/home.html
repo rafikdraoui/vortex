@@ -1,9 +1,14 @@
 {% extends "musique/base.html" %}
 {% load i18n %}
+{% load url from future %}
 
 {% block content %}
 <p>{% trans "Home page" %}</p>
 
-<p><a href="/musique/update">{% trans "Update Library" %}</a></p>
+<p>
+    <a href="{% url 'vortex.musique.views.update_library' %}">
+        {% trans "Update Library" %}
+    </a>
+</p>
 <p><a href="/admin">{% trans "Admin" %}</a></p>
 {% endblock %}

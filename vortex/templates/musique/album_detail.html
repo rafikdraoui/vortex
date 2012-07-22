@@ -1,5 +1,6 @@
 {% extends "musique/base.html" %}
 {% load i18n %}
+{% load url from future %}
 
 {% block css %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/album.css" />
@@ -8,25 +9,25 @@
 {% block content %}
 <div id=title>
     <h1>
-        {{ album.title }}
+        {{ album }}
         <a href="/admin/musique/album/{{ album.id }}">({% trans "edit" %})</a>
     </h1>
 </div>
 
 <h2>
     {% trans "by" %}
-    <a href="/musique/artist/{{ album.artist.id }}">{{ album.artist }} </a>
+    <a href="{{ album.artist.get_absolute_url }}">{{ album.artist }} </a>
 </h2>
 
 <div id="songlist">
     <ul>
     {% for song in songs %}
         <li>
-            <a href="/musique/song/{{song.id}}">{% if song.track %}{{ song.track }} - {% endif %}{{ song.title }}</a>
+            <a href="{{ song.get_absolute_url }}">{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>
         </li>
     {% endfor %}
     </ul>
-    <a href="/musique/album/{{album.id}}/download">
+    <a href="{% url 'vortex.musique.views.download_album' album.id %}">
         {% trans "Download Album" %}
     </a>
 </div>

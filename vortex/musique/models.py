@@ -19,13 +19,17 @@ class Artist(models.Model):
                                     max_length=200,
                                     unique=True)
 
-    def __unicode__(self):
-        return self.name
-
     class Meta:
         ordering = ['name']
         verbose_name = _('artist')
         verbose_name_plural = _('artists')
+
+    def __unicode__(self):
+        return self.name
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('artist_detail', (), {'pk': str(self.id)})
 
     def save(self, *args, **kwargs):
         old_path = self.filepath
@@ -69,6 +73,10 @@ class Album(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('album_detail', (), {'pk': str(self.id)})
 
     #FIXME: Reduce number of SQL queries needed for saving
     def save(self, *args, **kwargs):
@@ -131,6 +139,10 @@ class Song(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('song_detail', (), {'pk': str(self.id)})
 
     def save(self, *args, **kwargs):
         if len(self.track) == 1:

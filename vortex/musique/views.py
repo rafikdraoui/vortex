@@ -67,7 +67,6 @@ def download_album(request, pk):
 
 @requires_csrf_token
 def page_not_found(request, template_name='404.html'):
-    #TODO??: use redirect(Model) with suitable Model.get_absolute_url()
     if re.match(r'/musique/artist/\d+/', request.path):
         return redirect('/musique/artist/')
     if re.match(r'/musique/album/\d+/', request.path):

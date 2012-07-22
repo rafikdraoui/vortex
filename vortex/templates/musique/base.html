@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load url from future %}
 
 {% block header %}
 <nav>
     <ul>
-        <li><a href="/">{% trans "Home" %}</a></li>
+        <li><a href="{% url 'vortex.musique.views.home' %}">{% trans "Home" %}</a></li>
         <li>|</li>
-        <li><a href="/musique/artist/">{% trans "Artists" %}</a></li>
+        <li><a href="{% url 'artist_list' %}">{% trans "Artists" %}</a></li>
         <li>|</li>
-        <li><a href="/musique/album/">{% trans "Albums" %}</a></li>
+        <li><a href="{% url 'album_list' %}">{% trans "Albums" %}</a></li>
     </ul>
 </nav>
 {% endblock %}

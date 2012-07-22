@@ -1,10 +1,11 @@
 {% extends "musique/base.html" %}
 {% load i18n %}
+{% load url from future %}
 
 {% block content %}
 <div id=title>
     <h1>
-        {{ artist.name }}
+        {{ artist }}
         <a href="/admin/musique/artist/{{ artist.id }}">
             ({% trans "edit" %})
         </a>
@@ -13,11 +14,11 @@
 
 <ul>
 {% for album in albums %}
-<li><a href="/musique/album/{{album.id}}">{{ album }}</a></li>
+    <li><a href="{{ album.get_absolute_url }}">{{ album }}</a></li>
 {% endfor %}
 </ul>
 
-<a href="/musique/artist/{{artist.id}}/download">
+<a href="{% url 'vortex.musique.views.download_artist' artist.id %}">
     {% trans "Download Artist Discography" %}
 </a>
 

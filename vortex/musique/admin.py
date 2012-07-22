@@ -17,26 +17,13 @@ class AlbumInline(admin.StackedInline):
     has_add_permission = lambda x, y: False
 
 
-class MusiqueAdmin(admin.ModelAdmin):
-    change_form_template = 'admin/musique/change_form.html'
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['back_link'] = request.path.replace('admin/', '')
-        return super(MusiqueAdmin, self).change_view(
-                                                request,
-                                                object_id,
-                                                form_url,
-                                                extra_context=extra_context)
-
-
-class ArtistAdmin(MusiqueAdmin):
+class ArtistAdmin(admin.ModelAdmin):
     readonly_fields = ['filepath']
     search_fields = ['name']
     inlines = [AlbumInline]
 
 
-class AlbumAdmin(MusiqueAdmin):
+class AlbumAdmin(admin.ModelAdmin):
     readonly_fields = ['filepath']
     search_fields = ['title']
     list_display = ('title', 'artist')
@@ -44,7 +31,7 @@ class AlbumAdmin(MusiqueAdmin):
     inlines = [SongInline]
 
 
-class SongAdmin(MusiqueAdmin):
+class SongAdmin(admin.ModelAdmin):
     readonly_fields = ['bitrate', 'filetype', 'filefield', 'original_path']
     search_fields = ['title']
     list_display = ('title', 'album', 'artist')

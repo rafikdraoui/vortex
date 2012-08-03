@@ -145,13 +145,10 @@ def import_file(filename, mutagen_options):
     os.remove(filename)
 
 
-def get_tag_field(container, tag_name):
-    tag = container.get(tag_name, [u'Unknown %s' % tag_name.capitalize()])[0]
-    tag = tag or u'Unknown %s' % tag_name.capitalize()
-    return tag.replace('/', '-')
-
-
 def get_wma_info(filename):
+    """Returns a dictionnary describing attributes of the WMA audio
+    file referred to by `filename`.
+    """
 
     try:
         audio = mutagen.File(filename)
@@ -189,6 +186,16 @@ def get_wma_info(filename):
 
     return {'title': title, 'artist': artist, 'album': album,
             'track': track, 'bitrate': bitrate}
+
+
+def get_tag_field(container, tag_name):
+    """Helper function to retrieve an appropriate value for the tag
+    with name `tag_name` from the mutagen audio container.
+    """
+
+    tag = container.get(tag_name, [u'Unknown %s' % tag_name.capitalize()])[0]
+    tag = tag or u'Unknown %s' % tag_name.capitalize()
+    return tag.replace('/', '-')
 
 
 def get_song_info(filename, mutagen_options):

@@ -29,6 +29,7 @@ class UploadTest(TestCase):
         if not os.path.exists(TEST_DROPBOX_DIR):
             os.mkdir(TEST_DROPBOX_DIR)
 
+        # use a temporary log file
         self.logfile = tempfile.NamedTemporaryFile(delete=False)
         default_handler = library.LOGGER.handlers[0]
         library.LOGGER.removeHandler(default_handler)
@@ -50,6 +51,7 @@ class UploadTest(TestCase):
         self._field = self._default_storage
 
     def assertNoLogError(self):
+        """Asserts that nothing was written to the log file."""
         self.assertEquals(os.path.getsize(self.logfile.name), 0)
 
     def test_get_song_info_mp3(self):
@@ -173,7 +175,7 @@ class UploadTest(TestCase):
 
         self.assertNoLogError()
 
-    def test_importing_unsuported_format_gives_an_error(self):
+    def test_importing_unsupported_format_gives_an_error(self):
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.wav'),
                     self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.wav')
@@ -187,6 +189,8 @@ class UploadTest(TestCase):
         self.assertTrue(os.path.exists(filename))
 
     def test_importing_dummy_file_removes_it_from_dropbox(self):
+
+        # create the dummy file
         filename = os.path.join(self.dropbox, '.DS_Store')
         f = open(filename, 'w')
         f.close()

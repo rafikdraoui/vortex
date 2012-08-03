@@ -31,6 +31,7 @@ class ModelTest(TestCase):
         """)
         self.media_file.close()
 
+        # use a temporary log file
         self.logfile = tempfile.NamedTemporaryFile(delete=False)
         default_handler = LOGGER.handlers[0]
         LOGGER.removeHandler(default_handler)
@@ -50,6 +51,7 @@ class ModelTest(TestCase):
         self._field = self._default_storage
 
     def assertNoLogError(self):
+        """Asserts that nothing was written to the log file."""
         self.assertEquals(os.path.getsize(self.logfile.name), 0)
 
 

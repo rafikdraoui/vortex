@@ -41,6 +41,9 @@ def update_library(request):
 
 
 def _download(instance):
+    """Returns a HTTP response that is a ZIP file of the folder
+    at instance.filepath.
+    """
     tfile = tempfile.NamedTemporaryFile(suffix='.zip')
     zip_folder(full_path(instance.filepath), tfile.name)
 
@@ -67,6 +70,11 @@ def download_album(request, pk):
 
 @requires_csrf_token
 def page_not_found(request, template_name='404.html'):
+    """Overridden so that a 404 to non-existing artist, album or
+    song redirects to the artist list, album list or song list
+    views instead of serving a 404 error.
+    """
+
     if re.match(r'/musique/artist/\d+/', request.path):
         return redirect('/musique/artist/')
     if re.match(r'/musique/album/\d+/', request.path):

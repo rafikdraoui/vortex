@@ -32,10 +32,15 @@ class Artist(models.Model):
         return ('artist_detail', (), {'pk': str(self.id)})
 
     def save(self, *args, **kwargs):
+        """ Overridden to ensure renaming of artist directory
+        whenever the artist is renamed.
+        """
+
         old_path = self.filepath
         new_path = os.path.join(self.name[0].upper(), self.name)
         query = Artist.objects.filter(name=self.name).exclude(id=self.id)[:1]
         if query:
+            # Artist with that name already exists. Merge the albums.
             new_artist = query[0]
             for album in self.album_set.all():
                 for song in album.song_set.all():
@@ -80,12 +85,17 @@ class Album(models.Model):
 
     #FIXME: Reduce number of SQL queries needed for saving
     def save(self, *args, **kwargs):
+        """ Overridden to ensure renaming of album directory
+        whenever the album is renamed.
+        """
+
         old_path = self.filepath
         new_path = os.path.join(self.artist.filepath, self.title)
         query = Album.objects.filter(artist__id=self.artist_id,
                                      title=self.title
                             ).exclude(id=self.id)[:1]
         if query:
+            # Album with that name already exists. Merge the songs.
             new_album = query[0]
             for song in self.song_set.all():
                 song.album = new_album
@@ -109,6 +119,7 @@ class Album(models.Model):
 
 
 def _get_song_filepath(song_instance, filename=None):
+    """Returns an appropriate file system path for the song."""
     basename = u'%s.%s' % (song_instance.title, song_instance.filetype)
     if song_instance.track:
         basename = u'%s - %s' % (song_instance.track, basename)
@@ -145,15 +156,19 @@ class Song(models.Model):
         return ('song_detail', (), {'pk': str(self.id)})
 
     def save(self, *args, **kwargs):
+        """ Overridden to ensure renaming of the song file whenever
+        the song is renamed.
+        """
+
         if len(self.track) == 1:
             self.track = '0' + self.track
-        file = self.filefield
-        old_path = file.name
+        thefile = self.filefield
+        old_path = thefile.name
         new_path = _get_song_filepath(self)
 
         if old_path != new_path:
-            content = ContentFile(file.read())
-            file.save(new_path, content, save=False)
+            content = ContentFile(thefile.read())
+            thefile.save(new_path, content, save=False)
             if not self.first_save and old_path.lower() != new_path.lower():
                 # .lower() hack is for case-insensitive systems
                 try:
@@ -164,6 +179,11 @@ class Song(models.Model):
 
         super(Song, self).save(*args, **kwargs)
 
+
+""" The following post_delete hooks ensure that the underlying
+files and directories corresponding to the songs, albums and
+artists are removed from the file system when they are deleted
+from the library."""
 
 @receiver(post_delete, sender=Song, dispatch_uid='delete_song')
 def remove_song(sender, **kwargs):

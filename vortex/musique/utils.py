@@ -7,6 +7,7 @@ from django.core.files.storage import FileSystemStorage
 
 
 class CustomStorage(FileSystemStorage):
+    """Custom FileSystemStorage class that overwrites existing files."""
 
     def _save(self, name, content):
         if self.exists(name):

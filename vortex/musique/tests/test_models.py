@@ -3,10 +3,9 @@ import shutil
 import tempfile
 from logging import FileHandler
 
-from django.utils import unittest
+from django.core.files import File
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.files import File
 
 from vortex.musique.models import Artist, Album, Song, LOGGER
 from vortex.musique.utils import CustomStorage, full_path
@@ -175,16 +174,17 @@ class ArtistModelTest(ModelTest):
 
         albums = artist2.album_set.all()
         self.assertEquals(len(albums), 3)
-        self.assertEquals(set(os.listdir(full_path(artist2.filepath))),
-                          set(['First Album', 'Second Album', 'Common Album']))
+        self.assertEquals(
+            sorted(os.listdir(full_path(artist2.filepath))),
+            sorted(['First Album', 'Second Album', 'Common Album']))
 
         # Check to see that the songs of the common album were merged
         common_album = artist2.album_set.get(title='Common Album')
         self.assertEquals(len(common_album.song_set.all()), 3)
-        self.assertEquals(set(os.listdir(full_path(common_album.filepath))),
-                          set(['Common Song 1.ogg',
-                               'Common Song 2.ogg',
-                               'Common Song 3.ogg']))
+        self.assertEquals(sorted(os.listdir(full_path(common_album.filepath))),
+                          sorted(['Common Song 1.ogg',
+                                  'Common Song 2.ogg',
+                                  'Common Song 3.ogg']))
 
         self.assertNoLogError()
 
@@ -193,16 +193,16 @@ class ArtistModelTest(ModelTest):
         self.assertEquals(artist.name, 'First Artist')
         self.assertEquals(artist.filepath, 'F/First Artist')
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertEquals(set(os.listdir(full_path(artist.filepath))),
-                          set(['First Album', 'Common Album']))
+        self.assertEquals(sorted(os.listdir(full_path(artist.filepath))),
+                          sorted(['First Album', 'Common Album']))
 
         artist.save()
 
         self.assertEquals(artist.name, 'First Artist')
         self.assertEquals(artist.filepath, 'F/First Artist')
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertEquals(set(os.listdir(full_path(artist.filepath))),
-                          set(['First Album', 'Common Album']))
+        self.assertEquals(sorted(os.listdir(full_path(artist.filepath))),
+                          sorted(['First Album', 'Common Album']))
         self.assertNoLogError()
 
     def test_delete_artist_removes_folder(self):
@@ -215,6 +215,9 @@ class ArtistModelTest(ModelTest):
         self.assertFalse(os.path.exists(filename))
         self.assertNoLogError()
 
+    #TODO
+    def test_handle_delete_error(self):
+        pass
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
 class AlbumModelTest(ModelTest):
@@ -298,8 +301,8 @@ class AlbumModelTest(ModelTest):
         songs = album2.song_set.all()
         self.assertEquals(len(songs), 2)
         self.assertEquals(
-                set(os.listdir(full_path(album2.filepath))),
-                set(['02 - Second Song.ogg', 'The First Song.ogg'])
+                sorted(os.listdir(full_path(album2.filepath))),
+                sorted(['02 - Second Song.ogg', 'The First Song.ogg'])
         )
 
         #TODO: more tests
@@ -349,6 +352,10 @@ class AlbumModelTest(ModelTest):
                           Artist.objects.get,
                           name='The Artist')
         self.assertNoLogError()
+
+    #TODO
+    def test_handle_delete_error(self):
+        pass
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
@@ -449,3 +456,7 @@ class SongModelTest(ModelTest):
                           Album.objects.get,
                           title='The Album')
         self.assertNoLogError()
+
+    #TODO
+    def test_handle_delete_error(self):
+        pass

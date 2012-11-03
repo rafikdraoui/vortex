@@ -1,8 +1,9 @@
 from selenium import webdriver
+
 from django.test import LiveServerTestCase
 
 
 #TODO
-class SimpleTest(LiveServerTestCase):
-    def test_basic_addition(self):
-        self.assertEqual(1 + 1, 2)
+class FunctionalTest(LiveServerTestCase):
+    def test_can_navigate_to_home_page(self):
+        pass

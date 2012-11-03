@@ -1,16 +1,19 @@
 import os
 import shutil
 import tempfile
+import zipfile
 from logging import FileHandler
-from zipfile import ZipFile
 
-from django.utils import unittest
+from django.core.files.base import ContentFile
+from django.http import HttpRequest
 from django.test import TestCase
+from django.test.client import Client
 from django.test.utils import override_settings
 
 from vortex.musique import library
 from vortex.musique.models import Artist, Album, Song
 from vortex.musique.utils import CustomStorage
+from vortex.musique.views import update_library
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()
@@ -19,7 +22,7 @@ TEST_FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR, DROPBOX=TEST_DROPBOX_DIR)
-class UploadTest(TestCase):
+class ViewTest(TestCase):
 
     def setUp(self):
         self.media_dir = TEST_MEDIA_DIR
@@ -203,21 +206,24 @@ class UploadTest(TestCase):
         self.assertNoLogError()
 
     def test_upload_dropbox_files_to_library(self):
+        # Put some files in dropbox
         zipped_dropbox = os.path.join(TEST_FILES_DIR, 'test_dropbox.zip')
-        with ZipFile(zipped_dropbox, 'r') as f:
+        with zipfile.ZipFile(zipped_dropbox, 'r') as f:
             f.extractall(self.dropbox)
 
-        self.assertEquals(set(os.listdir(self.dropbox)),
-                          set(['song1.ogg', 'The Artist', 'Unknown']))
-        self.assertEquals(set(os.listdir(
-                                os.path.join(self.dropbox, 'The Artist'))),
-                          set(['Album', 'song2.ogg', 'song3.ogg']))
-        self.assertEquals(set(os.listdir(
-                                os.path.join(self.dropbox, 'Unknown'))),
-                          set(['song5.ogg', 'song6.ogg']))
+        self.assertEquals(sorted(os.listdir(self.dropbox)),
+                          sorted(['song1.ogg', 'The Artist', 'Unknown']))
+        self.assertEquals(
+            sorted(os.listdir(os.path.join(self.dropbox, 'The Artist'))),
+            sorted(['Album', 'song2.ogg', 'song3.ogg']))
+        self.assertEquals(
+            sorted(os.listdir(os.path.join(self.dropbox, 'Unknown'))),
+            sorted(['song5.ogg', 'song6.ogg']))
 
-        library.update()
+        # Upload files to library
+        update_library(HttpRequest())
 
+        # Check that the files have been imported
         self.assertNoLogError()
         self.assertEquals(os.listdir(self.dropbox), [])
 
@@ -229,10 +235,50 @@ class UploadTest(TestCase):
         self.assertEquals(len(all_albums), 4)
         self.assertEquals(len(all_songs), 6)
 
-        self.assertEquals(set(os.listdir(self.media_dir)),
-                          set(['L', 'T']))
+        self.assertEquals(sorted(os.listdir(self.media_dir)),
+                          sorted(['L', 'T']))
         filename = os.path.join(self.media_dir, 'T', 'The Artist',
                                 'The Album', '04 - The Fourth Song.ogg')
         self.assertTrue(os.path.exists(filename))
 
         #TODO: more tests
+
+    def test_download(self):
+        # Upload some files
+        zipped_dropbox = os.path.join(TEST_FILES_DIR, 'test_dropbox.zip')
+        with zipfile.ZipFile(zipped_dropbox, 'r') as f:
+            f.extractall(self.dropbox)
+        library.update()
+
+        # make request
+        c = Client()
+        response = c.get('/musique/artist/1/download/')
+
+        # check response have right headers
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+        self.assertEqual(response['Content-Disposition'],
+                         'attachment; filename=The Artist.zip')
+
+        # check structure of returned zip file
+        songs = Artist.objects.get(pk=1).song_set.all()
+        original_song_names = map(lambda s: s.filefield.name[2:],
+                                  list(songs))
+
+        content = ContentFile(response.content)
+        self.assertTrue(zipfile.is_zipfile(content))
+        with zipfile.ZipFile(content, 'r') as z:
+            self.assertIsNone(z.testzip())
+            self.assertEqual(sorted(z.namelist()), sorted(original_song_names))
+
+    def test_fetching_url_of_nonexisting_instance_redirects_to_list_view(self):
+        c = Client()
+        response = c.get('/musique/artist/1/')
+        self.assertEqual(response.status_code, 302)
+        redirect_url = response.get('Location', '')
+        self.assertEqual(redirect_url, 'http://testserver/musique/artist/')
+
+    def test_fetching_other_nonexisting_url_returns_404(self):
+        c = Client()
+        response = c.get('/musique/artist/bob/')
+        self.assertEqual(response.status_code, 404)

@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from logging import FileHandler
 
+from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -60,11 +61,8 @@ class ArtistModelTest(ModelTest):
     def setUp(self):
         super(ArtistModelTest, self).setUp()
 
-        artist1 = Artist.objects.create(name='First Artist',
-                                        filepath='F/First Artist')
-        album1 = Album.objects.create(title='First Album',
-                                      artist=artist1,
-                                      filepath='F/First Artist/First Album')
+        artist1 = Artist.objects.create(name='First Artist')
+        album1 = Album.objects.create(title='First Album', artist=artist1)
         Song.objects.create(title='The First Song',
                             artist=artist1,
                             album=album1,
@@ -73,11 +71,8 @@ class ArtistModelTest(ModelTest):
                             first_save=True,
                             filefield=File(open(self.media_file.name)))
 
-        artist2 = Artist.objects.create(name='Other Artist',
-                                        filepath='O/Other Artist')
-        album2 = Album.objects.create(title='Second Album',
-                                      artist=artist2,
-                                      filepath='O/Other Artist/Second Album')
+        artist2 = Artist.objects.create(name='Other Artist')
+        album2 = Album.objects.create(title='Second Album', artist=artist2)
         Song.objects.create(title='Second Song',
                             artist=artist2,
                             album=album2,
@@ -87,10 +82,8 @@ class ArtistModelTest(ModelTest):
                             first_save=True,
                             filefield=File(open(self.media_file.name)))
 
-        common_album1 = Album.objects.create(
-                                        title='Common Album',
-                                        artist=artist1,
-                                        filepath='F/First Artist/Common Album')
+        common_album1 = Album.objects.create(title='Common Album',
+                                             artist=artist1)
         Song.objects.create(title='Common Song 1',
                             artist=artist1,
                             album=common_album1,
@@ -106,10 +99,8 @@ class ArtistModelTest(ModelTest):
                             first_save=True,
                             filefield=File(open(self.media_file.name)))
 
-        common_album2 = Album.objects.create(
-                                        title='Common Album',
-                                        artist=artist2,
-                                        filepath='O/Other Artist/Common Album')
+        common_album2 = Album.objects.create(title='Common Album',
+                                             artist=artist2)
         Song.objects.create(title='Common Song 2',
                             artist=artist2,
                             album=common_album2,
@@ -124,7 +115,6 @@ class ArtistModelTest(ModelTest):
                             filetype='ogg',
                             first_save=True,
                             filefield=File(open(self.media_file.name)))
-
 
     def test_rename_artist_to_non_existent_artist_renames_folder(self):
         artist = Artist.objects.get(name='First Artist')
@@ -169,7 +159,7 @@ class ArtistModelTest(ModelTest):
                           name='First Artist')
         self.assertFalse(os.path.exists(original_filename))
 
-        # Check the Album.DoesNotExist is not thrown
+        # Check that Album.DoesNotExist is not thrown
         Album.objects.get(title='First Album')
 
         albums = artist2.album_set.all()
@@ -215,9 +205,6 @@ class ArtistModelTest(ModelTest):
         self.assertFalse(os.path.exists(filename))
         self.assertNoLogError()
 
-    #TODO
-    def test_handle_delete_error(self):
-        pass
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
 class AlbumModelTest(ModelTest):
@@ -225,11 +212,8 @@ class AlbumModelTest(ModelTest):
     def setUp(self):
         super(AlbumModelTest, self).setUp()
 
-        artist = Artist.objects.create(name='The Artist',
-                                       filepath='T/The Artist')
-        album1 = Album.objects.create(title='First Album',
-                                      artist=artist,
-                                      filepath='T/The Artist/First Album')
+        artist = Artist.objects.create(name='The Artist')
+        album1 = Album.objects.create(title='First Album', artist=artist)
         Song.objects.create(title='The First Song',
                             artist=artist,
                             album=album1,
@@ -238,9 +222,7 @@ class AlbumModelTest(ModelTest):
                             first_save=True,
                             filefield=File(open(self.media_file.name)))
 
-        album2 = Album.objects.create(title='Second Album',
-                                      artist=artist,
-                                      filepath='T/The Artist/Second Album')
+        album2 = Album.objects.create(title='Second Album', artist=artist)
         Song.objects.create(title='Second Song',
                             artist=artist,
                             album=album2,
@@ -353,10 +335,6 @@ class AlbumModelTest(ModelTest):
                           name='The Artist')
         self.assertNoLogError()
 
-    #TODO
-    def test_handle_delete_error(self):
-        pass
-
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
 class SongModelTest(ModelTest):
@@ -364,11 +342,8 @@ class SongModelTest(ModelTest):
     def setUp(self):
         super(SongModelTest, self).setUp()
 
-        artist = Artist.objects.create(name='The Artist',
-                                       filepath='T/The Artist')
-        album = Album.objects.create(title='The Album',
-                                     artist=artist,
-                                     filepath='T/The Artist/The Album')
+        artist = Artist.objects.create(name='The Artist')
+        album = Album.objects.create(title='The Album', artist=artist)
         self.song = Song(title='The Song', artist=artist, album=album,
                     bitrate=128000, filetype='ogg', first_save=True,
                     filefield=File(open(self.media_file.name)))
@@ -396,21 +371,54 @@ class SongModelTest(ModelTest):
             self.media_dir, 'T', 'The Artist', 'The Album', 'La Chanson.ogg'
         )
 
-        self.assertEquals(
-            full_path(self.song.filefield.name),
-            new_filename
-        )
+        self.assertEquals(full_path(self.song.filefield.name), new_filename)
         self.assertTrue(os.path.exists(new_filename))
         self.assertFalse(os.path.exists(old_filename))
         self.assertNoLogError()
 
-    #TODO
     def test_change_song_album_moves_file_to_new_album_folder(self):
-        pass
+        old_filename = full_path(self.song.filefield.name)
+        self.assertTrue(os.path.exists(old_filename))
 
-    #TODO
-    def test_change_song_artist_moves_file_to_new_artist_folder(self):
-        pass
+        new_album = Album.objects.create(title='Live', artist=self.song.artist)
+        self.song.album = new_album
+        self.song.save()
+
+        new_filename = os.path.join(
+            self.media_dir, 'T', 'The Artist', 'Live', 'The Song.ogg'
+        )
+
+        self.assertEquals(full_path(self.song.filefield.name), new_filename)
+        self.assertTrue(os.path.exists(new_filename))
+        self.assertFalse(os.path.exists(old_filename))
+        self.assertNoLogError()
+
+    def test_change_song_artist_without_changing_album_raises_error(self):
+        old_filename = full_path(self.song.filefield.name)
+        self.assertTrue(os.path.exists(old_filename))
+
+        new_artist = Artist.objects.create(name='Bob')
+        self.song.artist = new_artist
+        self.assertRaises(ValidationError, self.song.save, ())
+
+    def test_change_song_artist_and_album_moves_file_to_new_folder(self):
+        old_filename = full_path(self.song.filefield.name)
+        self.assertTrue(os.path.exists(old_filename))
+
+        new_artist = Artist.objects.create(name='Bob')
+        new_album = Album.objects.create(title='The Album', artist=new_artist)
+        self.song.artist = new_artist
+        self.song.album = new_album
+        self.song.save()
+
+        new_filename = os.path.join(
+            self.media_dir, 'B', 'Bob', 'The Album', 'The Song.ogg'
+        )
+
+        self.assertEquals(full_path(self.song.filefield.name), new_filename)
+        self.assertTrue(os.path.exists(new_filename))
+        self.assertFalse(os.path.exists(old_filename))
+        self.assertNoLogError()
 
     def test_save_song_without_change_is_idempotent(self):
         self.assertEquals(self.song.title, 'The Song')
@@ -456,7 +464,3 @@ class SongModelTest(ModelTest):
                           Album.objects.get,
                           title='The Album')
         self.assertNoLogError()
-
-    #TODO
-    def test_handle_delete_error(self):
-        pass

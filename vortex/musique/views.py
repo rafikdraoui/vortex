@@ -1,15 +1,15 @@
 import re
 import tempfile
 
-from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.views.generic import DetailView
+from django.shortcuts import render, redirect
 from django.views import defaults
 from django.views.decorators.csrf import requires_csrf_token
+from django.views.generic import DetailView
 
+from vortex.musique import library
 from vortex.musique.models import Artist, Album
 from vortex.musique.utils import full_path, zip_folder
-from vortex.musique import library
 
 
 class ArtistDetailView(DetailView):
@@ -61,11 +61,21 @@ def _download(instance):
 
 
 def download_artist(request, pk):
-    return _download(Artist.objects.get(pk=pk))
+    artist = Artist.objects.get(pk=pk)
+    if len(artist.song_set.all()) == 0:
+        #TODO: display error message
+        return redirect(artist.get_absolute_url())
+    else:
+        return _download(artist)
 
 
 def download_album(request, pk):
-    return _download(Album.objects.get(pk=pk))
+    album = Album.objects.get(pk=pk)
+    if len(album.song_set.all()) == 0:
+        #TODO: display error message
+        return redirect(album.get_absolute_url())
+    else:
+        return _download(album)
 
 
 @requires_csrf_token

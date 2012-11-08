@@ -243,7 +243,7 @@ class ViewTest(TestCase):
 
         #TODO: more tests
 
-    def test_download(self):
+    def test_download_artist(self):
         # Upload some files
         zipped_dropbox = os.path.join(TEST_FILES_DIR, 'test_dropbox.zip')
         with zipfile.ZipFile(zipped_dropbox, 'r') as f:
@@ -270,6 +270,20 @@ class ViewTest(TestCase):
         with zipfile.ZipFile(content, 'r') as z:
             self.assertIsNone(z.testzip())
             self.assertEqual(sorted(z.namelist()), sorted(original_song_names))
+
+    def test_download_artist_with_no_songs_redirects_to_detail_view(self):
+        # Create dummy artist
+        artist = Artist.objects.create(name='The Artist')
+
+        # make request
+        c = Client()
+        response = c.get('/musique/artist/1/download/')
+
+        # check response have right headers
+        self.assertEqual(response.status_code, 302)
+        redirect_url = response.get('Location', '')
+        self.assertEqual(redirect_url, 'http://testserver/musique/artist/1/')
+
 
     def test_fetching_url_of_nonexisting_instance_redirects_to_list_view(self):
         c = Client()

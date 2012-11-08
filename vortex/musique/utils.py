@@ -40,6 +40,7 @@ def titlecase(s):
                              mo.group(0)[1:].lower(),
                   s)
 
+
 def zip_folder(src_path, dst_path):
     """Zip a directory structure at src_path into the file
     given by dst_path.

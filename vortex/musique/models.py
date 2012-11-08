@@ -1,12 +1,13 @@
-import os
 import logging
+import os
 
-from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.db import models, IntegrityError
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from django.conf import settings
-from django.core.files.base import ContentFile
+from django.utils.translation import ugettext_lazy as _
 
 from vortex.musique.utils import full_path, CustomStorage
 
@@ -32,7 +33,7 @@ class Artist(models.Model):
         return ('artist_detail', (), {'pk': str(self.id)})
 
     def save(self, *args, **kwargs):
-        """ Overridden to ensure renaming of artist directory
+        """Overridden to ensure renaming of artist directory
         whenever the artist is renamed.
         """
 
@@ -45,21 +46,20 @@ class Artist(models.Model):
             for album in self.album_set.all():
                 for song in album.song_set.all():
                     song.artist = new_artist
-                    song.save()
+                    song.save(clean=False)
                 album.artist = new_artist
                 album.save()
             self.delete()
-        elif new_path != old_path:
+        else:
             self.filepath = new_path
             super(Artist, self).save(*args, **kwargs)
-            for album in self.album_set.all():
-                album.save()
-            try:
-                os.rmdir(full_path(old_path))
-            except OSError, msg:
-                handle_delete_error(self, msg)
-        else:
-            super(Artist, self).save(*args, **kwargs)
+            if old_path and new_path != old_path:
+                for album in self.album_set.all():
+                    album.save()
+                try:
+                    os.rmdir(full_path(old_path))
+                except OSError, msg:
+                    handle_delete_error(self, msg)
 
 
 class Album(models.Model):
@@ -85,7 +85,7 @@ class Album(models.Model):
 
     #FIXME: Reduce number of SQL queries needed for saving
     def save(self, *args, **kwargs):
-        """ Overridden to ensure renaming of album directory
+        """Overridden to ensure renaming of album directory
         whenever the album is renamed.
         """
 
@@ -105,17 +105,16 @@ class Album(models.Model):
                     # Song already exists under the other album
                     pass
             self.delete()
-        elif new_path != old_path:
+        else:
             self.filepath = new_path
             super(Album, self).save(*args, **kwargs)
-            for song in self.song_set.all():
-                song.save()
-            try:
-                os.rmdir(full_path(old_path))
-            except OSError, msg:
-                handle_delete_error(self, msg)
-        else:
-            super(Album, self).save(*args, **kwargs)
+            if old_path and new_path != old_path:
+                for song in self.song_set.all():
+                    song.save()
+                try:
+                    os.rmdir(full_path(old_path))
+                except OSError, msg:
+                    handle_delete_error(self, msg)
 
 
 def _get_song_filepath(song_instance, filename=None):
@@ -155,10 +154,22 @@ class Song(models.Model):
     def get_absolute_url(self):
         return ('song_detail', (), {'pk': str(self.id)})
 
+
+    def clean(self):
+        """Validates that the album belongs to the artist."""
+        if self.album not in self.artist.album_set.all():
+            raise ValidationError(_(
+                    'Album "%s" does not belong to artist "%s".'
+                    % (self.album, self.artist)))
+
     def save(self, *args, **kwargs):
-        """ Overridden to ensure renaming of the song file whenever
+        """Overridden to ensure renaming of the song file whenever
         the song is renamed.
         """
+
+        if kwargs.get('clean', True):
+            self.clean()
+        kwargs.pop('clean', None)
 
         if len(self.track) == 1:
             self.track = '0' + self.track
@@ -180,10 +191,11 @@ class Song(models.Model):
         super(Song, self).save(*args, **kwargs)
 
 
-""" The following post_delete hooks ensure that the underlying
+"""The following post_delete hooks ensure that the underlying
 files and directories corresponding to the songs, albums and
 artists are removed from the file system when they are deleted
 from the library."""
+
 
 @receiver(post_delete, sender=Song, dispatch_uid='delete_song')
 def remove_song(sender, **kwargs):

@@ -1,6 +1,6 @@
+import logging
 import os
 import re
-import logging
 
 import mutagen
 
@@ -61,8 +61,8 @@ def update():
     regex = re.compile(r'%s' % pattern)
     for root, dirs, files in os.walk(settings.DROPBOX, topdown=False):
         for name in files:
-            if (re.match(regex, name) or
-                name.endswith(('jpg', 'jpeg', 'gif', 'png'))):
+            if re.match(regex, name) or name.endswith(
+                                            ('jpg', 'jpeg', 'gif', 'png')):
                 #FIXME: keep images for cover image
                 try:
                     os.remove(os.path.join(root, name))

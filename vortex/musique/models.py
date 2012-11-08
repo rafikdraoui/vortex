@@ -159,8 +159,9 @@ class Song(models.Model):
         """Validates that the album belongs to the artist."""
         if self.album not in self.artist.album_set.all():
             raise ValidationError(_(
-                    'Album "%s" does not belong to artist "%s".'
-                    % (self.album, self.artist)))
+                    'Album "%(album)s" does not belong '
+                    'to artist "%(artist)s".')
+                    % {'album': self.album, 'artist': self.artist})
 
     def save(self, *args, **kwargs):
         """Overridden to ensure renaming of the song file whenever

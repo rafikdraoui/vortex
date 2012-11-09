@@ -113,6 +113,7 @@ class ViewTest(TestCase):
         self.assertNoLogError()
 
     def test_import_file(self):
+        # put test file in dropbox
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
                     self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.ogg')
@@ -125,6 +126,7 @@ class ViewTest(TestCase):
         with open(filename, 'rb') as f:
             original_content = f.read()
 
+        # import file
         library.import_file(filename, self.mutagen_opts)
         song = Song.objects.get(title='The Song')
 
@@ -140,11 +142,13 @@ class ViewTest(TestCase):
         self.assertNoLogError()
 
     def test_import_existing_file_with_no_better_bitrate_skips_it(self):
+        # put test files in dropbox
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
                     self.dropbox)
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
                     os.path.join(self.dropbox, 'testfile_copy.ogg'))
 
+        # import files
         filename = os.path.join(self.dropbox, 'testfile.ogg')
         library.import_file(filename, self.mutagen_opts)
         filename = os.path.join(self.dropbox, 'testfile_copy.ogg')
@@ -158,11 +162,13 @@ class ViewTest(TestCase):
         self.assertTrue(os.path.exists(filename))
 
     def test_import_existing_file_with_better_bitrate_replaces_it(self):
+        # put test files in dropbox
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile-128k.mp3'),
                     self.dropbox)
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.mp3'),
                     self.dropbox)
 
+        # import files
         filename = os.path.join(self.dropbox, 'testfile-128k.mp3')
         library.import_file(filename, self.mutagen_opts)
         song = Song.objects.get(title='The Song')
@@ -179,6 +185,7 @@ class ViewTest(TestCase):
         self.assertNoLogError()
 
     def test_importing_unsupported_format_gives_an_error(self):
+        # put file in dropbox and import it
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.wav'),
                     self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.wav')
@@ -192,11 +199,10 @@ class ViewTest(TestCase):
         self.assertTrue(os.path.exists(filename))
 
     def test_importing_dummy_file_removes_it_from_dropbox(self):
-
         # create the dummy file
         filename = os.path.join(self.dropbox, '.DS_Store')
-        f = open(filename, 'w')
-        f.close()
+        with open(filename, 'w'):
+            pass
 
         self.assertTrue(os.path.exists(filename))
 
@@ -241,8 +247,6 @@ class ViewTest(TestCase):
                                 'The Album', '04 - The Fourth Song.ogg')
         self.assertTrue(os.path.exists(filename))
 
-        #TODO: more tests
-
     def test_download_artist(self):
         # Upload some files
         zipped_dropbox = os.path.join(TEST_FILES_DIR, 'test_dropbox.zip')
@@ -273,7 +277,7 @@ class ViewTest(TestCase):
 
     def test_download_artist_with_no_songs_redirects_to_detail_view(self):
         # Create dummy artist
-        artist = Artist.objects.create(name='The Artist')
+        Artist.objects.create(name='The Artist')
 
         # make request
         c = Client()
@@ -284,6 +288,10 @@ class ViewTest(TestCase):
         redirect_url = response.get('Location', '')
         self.assertEqual(redirect_url, 'http://testserver/musique/artist/1/')
 
+        # check that a message has been set in the cookie
+        self.assertTrue('messages' in response.cookies.keys())
+        self.assertIn('The artist does not have any song',
+                      response.cookies.get('messages').value)
 
     def test_fetching_url_of_nonexisting_instance_redirects_to_list_view(self):
         c = Client()

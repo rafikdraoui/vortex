@@ -118,9 +118,13 @@ class ArtistModelTest(ModelTest):
 
     def test_rename_artist_to_non_existent_artist_renames_folder(self):
         artist = Artist.objects.get(name='First Artist')
-        original_filename = full_path(artist.filepath)
+        original_artist_path = full_path(artist.filepath)
+        album = artist.album_set.get(pk=1)
+        original_album_path = full_path(album.filepath)
+        original_song_names = os.listdir(original_album_path)
 
-        self.assertTrue(os.path.exists(original_filename))
+        self.assertTrue(os.path.exists(original_artist_path))
+        self.assertTrue(os.path.exists(original_album_path))
         self.assertRaises(Artist.DoesNotExist,
                           Artist.objects.get,
                           name='Premier Artiste')
@@ -134,12 +138,18 @@ class ArtistModelTest(ModelTest):
         self.assertEquals(artist.filepath,
                           os.path.join('P', 'Premier Artiste'))
 
-        new_filename = full_path(artist.filepath)
+        new_artist_path = full_path(artist.filepath)
+        new_album_path = full_path(artist.album_set.get(pk=1).filepath)
+        new_song_names = os.listdir(new_album_path)
 
-        self.assertTrue(os.path.exists(new_filename))
-        self.assertFalse(os.path.exists(original_filename))
+        self.assertTrue(os.path.exists(new_artist_path))
+        self.assertFalse(os.path.exists(original_artist_path))
+        self.assertTrue(os.path.exists(new_album_path))
+        self.assertFalse(os.path.exists(original_album_path))
 
-        # TODO: check that album was preserved during artist renaming
+        self.assertEqual(artist.album_set.get(pk=1), album)
+        self.assertEqual(album.artist, artist)
+        self.assertEquals(original_song_names, new_song_names)
 
         self.assertNoLogError()
 
@@ -286,8 +296,6 @@ class AlbumModelTest(ModelTest):
                 sorted(os.listdir(full_path(album2.filepath))),
                 sorted(['02 - Second Song.ogg', 'The First Song.ogg'])
         )
-
-        #TODO: more tests
 
         self.assertNoLogError()
 

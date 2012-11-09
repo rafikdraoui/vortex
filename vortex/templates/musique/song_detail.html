@@ -11,7 +11,7 @@
 <div id=title>
     <h2>
         {{ song }}
-        <a href="{% url 'admin:musique_song_change' song.id %}">
+        <a class="small" href="{% url 'admin:musique_song_change' song.id %}">
             ({% trans "edit" %})
         </a>
     </h2>

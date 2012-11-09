@@ -7,10 +7,11 @@
 {% endblock %}
 
 {% block content %}
+
 <div id=title>
     <h1>
         {{ album }}
-        <a href="{% url 'admin:musique_album_change' album.id %}">
+        <a class="small" href="{% url 'admin:musique_album_change' album.id %}">
             ({% trans "edit" %})
         </a>
     </h1>

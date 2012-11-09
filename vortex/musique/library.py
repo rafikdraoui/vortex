@@ -238,6 +238,8 @@ def get_song_info(filename, mutagen_options):
 
 
 def handle_import_error(filename, error_msg=None):
+    """Write an error message in the log."""
+
     log_msg = 'Problem importing file %s' % filename
     if error_msg:
         log_msg = '%s (%s)' % (log_msg, error_msg)

@@ -35,6 +35,7 @@ class SongAdmin(admin.ModelAdmin):
     readonly_fields = ['bitrate', 'filetype', 'filefield', 'original_path']
     search_fields = ['title']
     list_display = ('title', 'album', 'artist')
+    has_add_permission = lambda x, y: False
 
 
 admin.site.register(Artist, ArtistAdmin)

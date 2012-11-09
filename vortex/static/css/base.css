@@ -1,8 +1,19 @@
 body {
-    width: 600px;
-    margin: auto;
-    font-family: sans-serif;
     background-color: #fcf6cf;
+    font-family: sans-serif;
+}
+
+#main {
+    margin: auto;
+    width: 80%;
+}
+
+#msg {
+    background: #222;
+    color: #999;
+    margin: 0;
+    padding: 10px;
+    width: 100%;
 }
 
 a {
@@ -19,6 +30,6 @@ nav li {
     display: inline;
 }
 
-#title a {
+.small {
     font-size: small;
 }

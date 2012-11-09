@@ -1,11 +1,14 @@
 import re
 import tempfile
 
+from django.contrib import messages
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import defaults
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.generic import DetailView
+from django.utils.translation import ugettext_lazy as _
 
 from vortex.musique import library
 from vortex.musique.models import Artist, Album
@@ -37,7 +40,7 @@ def home(request):
 def update_library(request):
     #TODO: run asynchronously (using celery?)
     library.update()
-    return redirect('/')
+    return redirect(reverse(home))
 
 
 def _download(instance):
@@ -63,7 +66,8 @@ def _download(instance):
 def download_artist(request, pk):
     artist = Artist.objects.get(pk=pk)
     if len(artist.song_set.all()) == 0:
-        #TODO: display error message
+        messages.add_message(
+            request, messages.INFO, _('The artist does not have any song'))
         return redirect(artist.get_absolute_url())
     else:
         return _download(artist)
@@ -72,7 +76,8 @@ def download_artist(request, pk):
 def download_album(request, pk):
     album = Album.objects.get(pk=pk)
     if len(album.song_set.all()) == 0:
-        #TODO: display error message
+        messages.add_message(
+            request, messages.INFO, _('The album does not have any song'))
         return redirect(album.get_absolute_url())
     else:
         return _download(album)
@@ -86,9 +91,9 @@ def page_not_found(request, template_name='404.html'):
     """
 
     if re.match(r'/musique/artist/\d+/', request.path):
-        return redirect('/musique/artist/')
+        return redirect(reverse('artist_list'))
     if re.match(r'/musique/album/\d+/', request.path):
-        return redirect('/musique/album/')
+        return redirect(reverse('album_list'))
     if re.match(r'/musique/song/\d+/', request.path):
-        return redirect('/musique/song/')
+        return redirect(reverse('song_list'))
     return defaults.page_not_found(request, template_name)

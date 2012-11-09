@@ -1,18 +1,29 @@
 {% load i18n %}
 
-<doctype html>
+<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="utf-8" />
     <title>vortex</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/normalize.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" />
     {% block css %}{% endblock %}
 </head>
 <body>
 
+{% if messages %}
+<div id="msg">
+    {% for message in messages %}
+        {{ message }} </br>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div id="main">
 {% block header %}{% endblock %}
 {% block content %}{% endblock %}
 {% block footer %}{% endblock %}
+<div id="main">
 
 </body>
 </html>

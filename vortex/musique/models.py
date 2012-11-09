@@ -119,6 +119,7 @@ class Album(models.Model):
 
 def _get_song_filepath(song_instance, filename=None):
     """Returns an appropriate file system path for the song."""
+
     basename = u'%s.%s' % (song_instance.title, song_instance.filetype)
     if song_instance.track:
         basename = u'%s - %s' % (song_instance.track, basename)
@@ -154,9 +155,9 @@ class Song(models.Model):
     def get_absolute_url(self):
         return ('song_detail', (), {'pk': str(self.id)})
 
-
     def clean(self):
         """Validates that the album belongs to the artist."""
+
         if self.album not in self.artist.album_set.all():
             raise ValidationError(_(
                     'Album "%(album)s" does not belong '
@@ -238,6 +239,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 def handle_delete_error(instance, msg):
+    """Write an error message in the log."""
+
     if isinstance(instance, Artist):
         LOGGER.info('Problem deleting %s: %s' % (instance.name, msg))
     else:

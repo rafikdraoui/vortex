@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-08 19:20-0500\n"
+"POT-Creation-Date: 2012-11-10 12:44-0500\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -78,64 +78,83 @@ msgstr "L'artiste n'a aucune chanson"
 msgid "The album does not have any song"
 msgstr "L'album n'a aucune chanson"
 
-#: templates/404.html:5
+#: templates/404.html:5 templates/404.html.py:8
 msgid "Page not found"
 msgstr "Page introuvable"
 
-#: templates/404.html:6 templates/500.html:6
+#: templates/404.html:9 templates/500.html:9
 msgid "Back to home page"
 msgstr "Retour à la page d'accueil"
 
-#: templates/500.html:5
+#: templates/500.html:5 templates/500.html.py:8
 msgid "Internal server error"
 msgstr "Erreur interne du serveur"
 
-#: templates/musique/album_detail.html:15
+#: templates/musique/album_detail.html:13
 #: templates/musique/artist_detail.html:10
-#: templates/musique/song_detail.html:15
+#: templates/musique/song_detail.html:11
 msgid "edit"
 msgstr "modifier"
 
-#: templates/musique/album_detail.html:21
+#: templates/musique/album_detail.html:17
+#: templates/musique/song_detail.html:15
 msgid "by"
 msgstr "par"
 
-#: templates/musique/album_detail.html:34
+#: templates/musique/album_detail.html:29
 msgid "Download Album"
 msgstr "Télécharger l'album"
 
-#: templates/musique/album_list.html:5 templates/musique/base.html:12
+#: templates/musique/album_list.html:4 templates/musique/album_list.html:7
+#: templates/musique/base.html:13
 msgid "Albums"
 msgstr "Albums"
 
-#: templates/musique/artist_detail.html:22
+#: templates/musique/artist_detail.html:13
 msgid "Download Artist Discography"
 msgstr "Télécharger la discographie de l'artiste"
 
-#: templates/musique/artist_list.html:5 templates/musique/base.html:10
+#: templates/musique/artist_list.html:4 templates/musique/artist_list.html:7
+#: templates/musique/base.html:12
 msgid "Artists"
 msgstr "Artistes"
 
-#: templates/musique/base.html:8
+#: templates/musique/base.html:11 templates/musique/home.html:5
 msgid "Home"
 msgstr "Accueil"
 
-#: templates/musique/home.html:6
-msgid "Home page"
-msgstr "Page d'accueil"
+#: templates/musique/base.html:22
+msgid "Log in"
+msgstr "Connexion"
 
-#: templates/musique/home.html:10
+#: templates/musique/home.html:11 templates/musique/home.html.py:14
+msgid "Artist"
+msgstr "Artiste"
+
+#: templates/musique/home.html:15
+msgid "Album"
+msgstr "Album"
+
+#: templates/musique/home.html:16
+msgid "Song"
+msgstr "Chanson"
+
+#: templates/musique/home.html:18
+msgid "Search"
+msgstr "Rechercher"
+
+#: templates/musique/home.html:24
 msgid "Update Library"
 msgstr "Mettre à jour la bibliothèque"
 
-#: templates/musique/home.html:13
-msgid "Admin"
-msgstr "Admin"
+#: templates/musique/song_detail.html:16
+msgid "on"
+msgstr "sur"
 
-#: templates/musique/song_detail.html:31
+#: templates/musique/song_detail.html:21
 msgid "Download Song"
 msgstr "Télécharger la chanson"
 
-#: templates/musique/song_list.html:5
+#: templates/musique/song_list.html:4 templates/musique/song_list.html.py:7
 msgid "Songs"
 msgstr "Chansons"

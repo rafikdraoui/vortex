@@ -2,33 +2,23 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/song.css" />
-{% endblock %}
+{% block title %}{{ song }}{% endblock %}
 
 {% block content %}
 
-<div id=title>
-    <h2>
-        {{ song }}
-        <a class="small" href="{% url 'admin:musique_song_change' song.id %}">
-            ({% trans "edit" %})
-        </a>
-    </h2>
-</div>
+  <h2>
+    {{ song }}
+    <a class="small" href="{% url 'admin:musique_song_change' song.id %}">({% trans "edit" %})</a>
+  </h2>
 
-<h3>Artist:
-    <a href="{{ song.artist.get_absolute_url }}">{{ song.artist }}</a>
-</h3>
+  <h3>
+    {% trans "by" %} <a href="{{ song.artist.get_absolute_url }}">{{ song.artist }}</a>
+    ({% trans "on" %} <a href="{{ song.album.get_absolute_url }}">{{ song.album }}</a>)
+  </h3>
 
-<h3>Album:
-    <a href="{{ song.album.get_absolute_url }}">{{ song.album }}</a>
-</h3>
-
-<h3>Original Path: {{ song.original_path }}</h3>
-
-<h2>
-    <a href="/media/{{song.filefield.url}}">{% trans "Download Song" %}</a>
-</h2>
+  <h5>
+    <a href="/media/{{song.filefield.url}}">
+    <i class="icon-download"></i> {% trans "Download Song" %}</a>
+  </h5>
 
 {% endblock %}

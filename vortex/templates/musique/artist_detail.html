@@ -2,24 +2,28 @@
 {% load i18n %}
 {% load url from future %}
 
+{% block title %}{{ artist }}{% endblock %}
+
 {% block content %}
-<div id=title>
-    <h1>
-        {{ artist }}
-        <a class="small" href="{% url 'admin:musique_artist_change' artist.id %}">
-            ({% trans "edit" %})
-        </a>
-    </h1>
-</div>
+  <h1>
+    {{ artist }}
+    <a class="small" href="{% url 'admin:musique_artist_change' artist.id %}"> ({% trans "edit" %})</a>
+  </h1>
 
-<ul>
-{% for album in albums %}
-    <li><a href="{{ album.get_absolute_url }}">{{ album }}</a></li>
-{% endfor %}
-</ul>
+  <h5>
+    <a href="{% url 'download_artist' artist.id %}"><i class="icon-download"></i> {% trans "Download Artist Discography" %}</a>
+  </h5>
 
-<a href="{% url 'vortex.musique.views.download_artist' artist.id %}">
-    {% trans "Download Artist Discography" %}
-</a>
+  <ul class="thumbnails">
+    {% for album in albums %}
+      <li class="span4">
+        <div class="thumbnail">
+          <a href="{{ album.get_absolute_url }}"><img src="{{ STATIC_URL }}/img/cover.png"></a>
+          <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
 
 {% endblock %}

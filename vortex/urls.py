@@ -11,7 +11,7 @@ admin.autodiscover()
 handler404 = page_not_found
 
 urlpatterns = patterns('',
-    url(r'^$', home),
+    url(r'^$', home, name='home'),
     url(r'^musique/', include('vortex.musique.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )

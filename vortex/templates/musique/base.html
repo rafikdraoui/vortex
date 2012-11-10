@@ -3,13 +3,26 @@
 {% load url from future %}
 
 {% block header %}
-<nav>
-    <ul>
-        <li><a href="{% url 'vortex.musique.views.home' %}">{% trans "Home" %}</a></li>
-        <li>|</li>
-        <li><a href="{% url 'artist_list' %}">{% trans "Artists" %}</a></li>
-        <li>|</li>
-        <li><a href="{% url 'album_list' %}">{% trans "Albums" %}</a></li>
+<div class="navbar navbar-inverse navbar-static-top">
+  <div class="navbar-inner">
+    <a class="brand" href="{% url 'home' %}">vortex</a>
+    <ul class="nav">
+      <li class="divider-vertical"></li>
+      <li><a href="{% url 'home' %}"> <i class="icon-home icon-white"></i> {% trans "Home" %}</a></li>
+      <li><a href="{% url 'artist_list' %}">{% trans "Artists" %}</a></li>
+      <li><a href="{% url 'album_list' %}">{% trans "Albums" %}</a></li>
     </ul>
-</nav>
+    <ul class="nav pull-right">
+      <li class="divider-vertical"></li>
+      <li>
+        <a href="{% url 'admin:index' %}"><i class="icon-user icon-white"></i>
+          {% if user.is_authenticated %}
+            {{ user.username }}
+          {% else %}
+            {% trans "Log in" %}
+          {% endif %}
+        </a>
+      </li>
+  </div>
+</div>
 {% endblock %}

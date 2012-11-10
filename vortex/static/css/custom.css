@@ -1,0 +1,15 @@
+.navbar {
+    margin-bottom: 3em;
+}
+
+.thumbnails {
+    margin-top: 3em;
+}
+
+.thumbnail h3 {
+    text-align: center;
+}
+
+.small {
+    font-size: small;
+}

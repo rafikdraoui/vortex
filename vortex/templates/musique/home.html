@@ -2,13 +2,24 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block content %}
-<p>{% trans "Home page" %}</p>
+{% block title %}{% trans "Home" %}{% endblock %}
 
-<p>
-    <a href="{% url 'vortex.musique.views.update_library' %}">
-        {% trans "Update Library" %}
-    </a>
-</p>
-<p><a href="{% url 'admin:index' %}">{% trans "Admin" %}</a></p>
+{% block content %}
+  <div class="hero-unit">
+    <div class="input-prepend input-append offset1">
+      <div class="btn-group">
+        <a class="btn btn-primary" href="#">{% trans "Artist" %}</a>
+        <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#">{% trans "Artist" %}</a></li>
+          <li><a href="#">{% trans "Album" %}</a></li>
+          <li><a href="#">{% trans "Song" %}</a></li>
+        </ul>
+        <input id="searchBar" class="span6" type="text" placeholder="{% trans "Search" %}">
+        <button class="btn btn-primary" type="button"><i class="icon-search icon-white"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <a href="{% url 'update_library' %}">{% trans "Update Library" %}</a>
 {% endblock %}

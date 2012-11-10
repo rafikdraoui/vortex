@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load url from future %}
+
+{% block title %}{% trans "Internal server error" %}{% endblock %}
 
 {% block content %}
 <h2>{% trans "Internal server error" %}</h2>
-<p><a href="/">{% trans "Back to home page" %}</a></p>
+<p><a href="{% url 'home' %}">{% trans "Back to home page" %}</a></p>
 {% endblock %}

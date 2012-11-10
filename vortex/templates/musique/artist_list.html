@@ -1,13 +1,14 @@
 {% extends "musique/base.html" %}
 {% load i18n %}
 
+{% block title %}{% trans "Artists" %}{% endblock %}
+
 {% block content %}
-<h1>{% trans "Artists" %}</h1>
+  <h1>{% trans "Artists" %}</h1>
 
-<ul>
-{% for artist in artist_list %}
+  <ul>
+  {% for artist in artist_list %}
     <li><a href="{{ artist.get_absolute_url }}">{{ artist }}</a></li>
-{% endfor %}
-</ul>
-
+  {% endfor %}
+  </ul>
 {% endblock %}

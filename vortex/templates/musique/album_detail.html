@@ -2,38 +2,38 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/album.css" />
-{% endblock %}
+{% block title %}{{ album }}{% endblock %}
 
 {% block content %}
 
-<div id=title>
+<div class="row">
+  <div class="span6">
     <h1>
-        {{ album }}
-        <a class="small" href="{% url 'admin:musique_album_change' album.id %}">
-            ({% trans "edit" %})
-        </a>
+      {{ album }}
+      <a class="small" href="{% url 'admin:musique_album_change' album.id %}"> ({% trans "edit" %})</a>
     </h1>
-</div>
 
-<h2>
-    {% trans "by" %}
-    <a href="{{ album.artist.get_absolute_url }}">{{ album.artist }} </a>
-</h2>
+    <h3>
+      {% trans "by" %}
+      <a href="{{ album.artist.get_absolute_url }}">{{ album.artist }}</a>
+    </h3>
 
-<div id="songlist">
     <ul>
     {% for song in songs %}
-        <li>
-            <a href="{{ song.get_absolute_url }}">{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>
-        </li>
+      <li>
+        <a href="{{ song.get_absolute_url }}">{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>
+      </li>
     {% endfor %}
     </ul>
-    <a href="{% url 'vortex.musique.views.download_album' album.id %}">
-        {% trans "Download Album" %}
-    </a>
+
+    <h5>
+      <a href="{% url 'download_album' album.id %}"><i class="icon-download"></i> {% trans "Download Album" %}</a>
+    </h5>
+  </div>
+
+  <div class="span6">
+    <img class="img-polaroid" src="{{ STATIC_URL }}img/cover.png">
+  </div>
 </div>
 
-<img id="cover" src="{{ STATIC_URL }}images/cover.png" />
 {% endblock %}

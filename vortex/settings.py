@@ -33,6 +33,8 @@ USE_L10N = True
 
 FILE_UPLOAD_PERMISSIONS = 0644
 
+MEDIA_URL = '/media/'
+
 STATIC_URL = '/static/'
 
 # Additional locations of static files

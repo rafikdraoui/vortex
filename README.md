@@ -23,6 +23,7 @@ playlists, search the library and download audio files.
 * [django][]
 * [south][] (for model migrations)
 * [mutagen][] (for getting information on audio files)
+* [haystack][] (for searching the library)
 * [python-mpd][] (for interfacing with the mpd server)
 
 Optional:
@@ -58,6 +59,12 @@ provide the followings:
 
 * `DATABASES`: configuration info for your database.
 
+* `STATIC_ROOT`: the root folder on the file system from where static files
+  will be served.
+
+You might also want to change the Haystack search engine to a proper one, like
+Solr or ElasticSearch.
+
 Application specific settings are provided in a configuration file (by
 default, it is `conf/vortex_config.py`).
 
@@ -73,8 +80,9 @@ in such a multi-faceted project.
 [rdd]: http://tom.preston-werner.com/2010/08/23/readme-driven-development.html
 [django]: https://www.djangoproject.com
 [mutagen]: https://code.google.com/p/mutagen
+[haystack]: http://haystacksearch.org
 [python-mpd]: http://pypi.python.org/pypi/python-mpd
 [south]: http://south.aeracode.org
-[selenium]: https://code.google.com/p/selenium/
+[selenium]: https://code.google.com/p/selenium
 [pip]: http://www.pip-installer.org
 [Rafik Draoui]: http://www.rafik.ca

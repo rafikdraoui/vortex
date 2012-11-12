@@ -65,7 +65,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'south',
+    'haystack',
     'vortex.musique',
 )
 
@@ -110,6 +112,10 @@ LOGGING = {
         }
     }
 }
+
+HAYSTACK_SITECONF = 'vortex.musique.search_sites'
+HAYSTACK_SEARCH_ENGINE = 'simple'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
 
 try:
     from local_settings import *

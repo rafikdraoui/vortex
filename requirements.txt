@@ -3,3 +3,4 @@ South==0.7.6
 mutagen==1.20
 python-mpd==0.3.0
 selenium==2.26.0
+django-haystack==1.2.7

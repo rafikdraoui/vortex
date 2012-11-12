@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 from django.views.generic import ListView, DetailView
 
+from haystack.views import SearchView
+
 from vortex.musique.models import Artist, Album, Song
 from vortex.musique.views import (ArtistDetailView,
                                   AlbumDetailView,
@@ -23,4 +25,6 @@ urlpatterns = patterns('',
 
     #FIXME: expose views.update_library to admin only
     url(r'^update/$', update_library, name='update_library'),
+
+    url(r'^search/', SearchView(), name='search'),
 )

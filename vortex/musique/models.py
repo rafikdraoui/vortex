@@ -169,9 +169,8 @@ class Song(models.Model):
         the song is renamed.
         """
 
-        if kwargs.get('clean', True):
+        if kwargs.pop('clean', True):
             self.clean()
-        kwargs.pop('clean', None)
 
         if len(self.track) == 1:
             self.track = '0' + self.track

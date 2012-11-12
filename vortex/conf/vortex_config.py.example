@@ -19,7 +19,3 @@ LOGFILE = '/path/to/logfile'
 # See http://docs.python.org/library/logging.html#logrecord-attributes for
 # valid attributes for log record format expansion.
 LOGFORMAT = '%(asctime)s: %(message)s'
-
-# Make this unique, and don't share it with anybody.
-# Example:  'f8u=!_ql(0slj4y-n)4-1^qfe5sf5jhg$*(ms)a1%m&_te89-%'
-SECRET_KEY = '___SECRET_KEY___'

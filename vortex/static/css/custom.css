@@ -13,3 +13,22 @@
 .small {
     font-size: small;
 }
+
+.list li {
+    border-top: thin groove;
+    list-style: none;
+    padding: .7em;
+    width: 70%;
+}
+
+.list li:first-child {
+    border-top: none;
+}
+
+.list li:nth-child(odd) {
+    background-color: #eee;
+}
+
+.list-compact li {
+    padding: .3em;
+}

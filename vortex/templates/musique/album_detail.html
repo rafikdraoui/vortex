@@ -18,7 +18,7 @@
       <a href="{{ album.artist.get_absolute_url }}">{{ album.artist }}</a>
     </h3>
 
-    <ul>
+    <ul class="list">
     {% for song in songs %}
       <li>
         <a href="{{ song.get_absolute_url }}">{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>

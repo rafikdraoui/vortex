@@ -6,9 +6,14 @@
 {% block content %}
   <h1>{% trans "Artists" %}</h1>
 
-  <ul>
-  {% for artist in artist_list %}
-    <li><a href="{{ artist.get_absolute_url }}">{{ artist }}</a></li>
+  {% regroup alpha_list by initial as thelist %}
+
+  {% for initial in thelist %}
+    <h5>{{ initial.grouper }}</h5>
+    <ul class="list list-compact">
+    {% for item in initial.list %}
+      <li><a href="{{ item.instance.get_absolute_url }}">{{ item.instance }}</a></li>
+    {% endfor %}
+    </ul>
   {% endfor %}
-  </ul>
 {% endblock %}

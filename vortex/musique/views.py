@@ -7,12 +7,19 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import defaults
 from django.views.decorators.csrf import requires_csrf_token
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.utils.translation import ugettext_lazy as _
 
 from vortex.musique import library
 from vortex.musique.models import Artist, Album
-from vortex.musique.utils import full_path, zip_folder
+from vortex.musique.utils import full_path, get_alphabetized_list, zip_folder
+
+
+class AlphabetizedListView(ListView):
+    def get_context_data(self, **kwargs):
+        context = super(AlphabetizedListView, self).get_context_data(**kwargs)
+        context['alpha_list'] = get_alphabetized_list(self.model)
+        return context
 
 
 class ArtistDetailView(DetailView):
@@ -40,6 +47,10 @@ def home(request):
 def update_library(request):
     #TODO: run asynchronously (using celery?)
     library.update()
+    messages.add_message(request,
+                         messages.INFO,
+                         _('Library successfully updated'),
+                         fail_silently=True)
     return redirect(reverse(home))
 
 

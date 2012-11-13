@@ -6,7 +6,7 @@
 {% block content %}
   <h1>{% trans "Songs" %}</h1>
 
-  <ul>
+  <ul class="list list-compact">
   {% for song in song_list %}
     <li>
       <a href="{{ song.get_absolute_url }}">{{ song }}</a>
@@ -14,5 +14,4 @@
     </li>
   {% endfor %}
   </ul>
-
 {% endblock %}

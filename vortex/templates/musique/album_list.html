@@ -4,12 +4,16 @@
 {% block title %}{% trans "Albums" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Albums" %}</h1>
+  <h1>{% trans "Albums" %}</h1>
 
-<ul>
-{% for album in album_list %}
-    <li><a href="{{ album.get_absolute_url }}">{{ album }}</a></li>
-{% endfor %}
-</ul>
+  {% regroup alpha_list by initial as thelist %}
 
+  {% for initial in thelist %}
+    <h5>{{ initial.grouper }}</h5>
+    <ul class="list list-compact">
+    {% for item in initial.list %}
+      <li><a href="{{ item.instance.get_absolute_url }}">{{ item.instance }}</a></li>
+    {% endfor %}
+    </ul>
+  {% endfor %}
 {% endblock %}

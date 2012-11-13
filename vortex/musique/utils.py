@@ -52,3 +52,16 @@ def zip_folder(src_path, dst_path):
             full_name = os.path.join(root, name)
             zfile.write(full_name, full_name.replace(dirname, '', 1))
     zfile.close()
+
+
+def get_alphabetized_list(model):
+    """Returns a list of dict with keys 'initial' and 'instance', where
+    'instance' is an instance of the model given as input and 'initial' the
+    first letter of the unicode representation of the instance. The list
+    contains a dict for every instance of the model.
+
+    The output is meant to be used by the 'regroup' built-in template tag.
+    """
+    instances = model.objects.all()
+    return [dict(initial=unicode(instance)[0], instance=instance)
+            for instance in instances]

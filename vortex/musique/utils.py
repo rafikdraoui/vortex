@@ -1,5 +1,4 @@
 import os
-import re
 import zipfile
 
 from django.conf import settings
@@ -32,13 +31,11 @@ def full_path(name):
 
 
 def titlecase(s):
-    """Title case a string with correct handling of apostrophes.
-    Code taken from the official Python documentation.
+    """Title case a string with correct handling of apostrophes and non-ascii
+    characters.
     """
-    return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
-                  lambda mo: mo.group(0)[0].upper() +
-                             mo.group(0)[1:].lower(),
-                  s)
+    split_titled = [w[0].upper() + w[1:].lower() for w in s.split()]
+    return ' '.join(split_titled)
 
 
 def zip_folder(src_path, dst_path):

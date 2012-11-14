@@ -8,10 +8,14 @@ from django.conf import settings
 from django.core.files import File
 
 from vortex.musique.models import Artist, Album, Song
-from vortex.musique.utils import titlecase
 
 
 LOGGER = logging.getLogger(__name__)
+
+if settings.TITLECASE_ARTIST_AND_ALBUM_NAMES:
+    from vortex.musique.utils import titlecase
+else:
+    titlecase = lambda x: x
 
 
 def get_mutagen_audio_options():
@@ -96,7 +100,7 @@ def import_file(filename, mutagen_options):
         return
 
     artist_name = titlecase(info['artist'])
-    artist_path = os.path.join(artist_name[0], artist_name)
+    artist_path = os.path.join(artist_name[0].upper(), artist_name)
     artist, created = Artist.objects.get_or_create(name=artist_name,
                                                    filepath=artist_path)
 

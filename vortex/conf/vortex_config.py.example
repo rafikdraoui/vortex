@@ -19,3 +19,7 @@ LOGFILE = '/path/to/logfile'
 # See http://docs.python.org/library/logging.html#logrecord-attributes for
 # valid attributes for log record format expansion.
 LOGFORMAT = '%(asctime)s: %(message)s'
+
+# Option to automatically titlecase the names of artists and albums that are
+# uploaded from the dropbox.
+TITLECASE_ARTIST_AND_ALBUM_NAMES = False

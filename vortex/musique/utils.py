@@ -60,5 +60,6 @@ def get_alphabetized_list(model):
     The output is meant to be used by the 'regroup' built-in template tag.
     """
     instances = model.objects.all()
-    return [dict(initial=unicode(instance)[0], instance=instance)
-            for instance in instances]
+    thelist = [{'initial': unicode(instance)[0].upper(), 'instance': instance}
+               for instance in instances]
+    return sorted(thelist, key=lambda d: d['initial'])

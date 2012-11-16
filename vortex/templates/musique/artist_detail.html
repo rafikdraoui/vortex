@@ -18,7 +18,7 @@
     {% for album in albums %}
       <li class="span4">
         <div class="thumbnail">
-          <a href="{{ album.get_absolute_url }}"><img src="{{ STATIC_URL }}/img/cover.png"></a>
+          <a href="{{ album.get_absolute_url }}"><img src="{{ album.cover.url }}"></a>
           <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
         </div>
       </li>

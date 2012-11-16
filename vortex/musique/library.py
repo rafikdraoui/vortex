@@ -6,11 +6,16 @@ import mutagen
 
 from django.conf import settings
 from django.core.files import File
+from django.core.files.base import ContentFile
 
 from vortex.musique.models import Artist, Album, Song
 
 
 LOGGER = logging.getLogger(__name__)
+DEFAULT_ALBUM_COVER_IMAGE = os.path.join(settings.STATIC_ROOT,
+                                         'img',
+                                         'default-cover.jpg')
+
 
 if settings.TITLECASE_ARTIST_AND_ALBUM_NAMES:
     from vortex.musique.utils import titlecase
@@ -30,9 +35,22 @@ def get_mutagen_audio_options():
     for fmt in formats:
         if fmt == 'mp3':
             from mutagen.mp3 import EasyMP3
+
+            # Add a key for the ID3 tag holding cover art information
+            def cover_get(id3, key):
+                for k in id3.keys():
+                    if re.match(r'APIC:*', k):
+                        return [id3[k].data]
+                return [None]
+            EasyMP3.ID3.RegisterKey('cover', cover_get)
+
             audio_options.append(EasyMP3)
         elif fmt == 'mp4' or fmt == 'm4a':
             from mutagen.easymp4 import EasyMP4
+
+            # Add a key for the ID3 tag holding cover art information
+            EasyMP4.RegisterTextKey('cover', 'covr')
+
             audio_options.append(EasyMP4)
         elif fmt == 'ogg':
             from mutagen.oggvorbis import OggVorbis
@@ -67,7 +85,7 @@ def update():
         for name in files:
             if re.match(regex, name) or name.endswith(
                                             ('jpg', 'jpeg', 'gif', 'png')):
-                #FIXME: keep images for cover image
+                #FIXME: keep images for get_cover_art
                 try:
                     os.remove(os.path.join(root, name))
                 except Exception:
@@ -109,6 +127,13 @@ def import_file(filename, mutagen_options):
                                             title=titlecase(info['album']),
                                             artist=artist,
                                             filepath=album_path)
+
+    if created:
+        if info['cover_data'] is None:
+            cover_img = get_cover_art(filename)
+        else:
+            cover_img = ContentFile(info['cover_data'])
+        album.cover.save(album.cover.name, cover_img, save=True)
 
     filetype = filename.rsplit('.')[-1].lower()
     original_path = filename.replace(
@@ -189,7 +214,7 @@ def get_wma_info(filename):
     bitrate = audio.info.bitrate
 
     return {'title': title, 'artist': artist, 'album': album,
-            'track': track, 'bitrate': bitrate}
+            'track': track, 'bitrate': bitrate, 'cover_data': None}
 
 
 def get_tag_field(container, tag_name):
@@ -223,6 +248,7 @@ def get_song_info(filename, mutagen_options):
     artist = get_tag_field(audio, 'artist')
     album = get_tag_field(audio, 'album')
     track = audio.get('tracknumber', [u''])[0]
+    cover_data = audio.get('cover', [None])[0]
 
     try:
         track = re.match(r'\d+', track).group()
@@ -238,7 +264,12 @@ def get_song_info(filename, mutagen_options):
         bitrate = 0
 
     return {'title': title, 'artist': artist, 'album': album,
-            'track': track, 'bitrate': bitrate}
+            'track': track, 'bitrate': bitrate, 'cover_data': cover_data}
+
+
+# TODO
+def get_cover_art(filename):
+    return File(open(DEFAULT_ALBUM_COVER_IMAGE, 'rb'))
 
 
 def handle_import_error(filename, error_msg=None):

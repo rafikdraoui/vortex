@@ -3,6 +3,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import models, IntegrityError
 from django.db.models.signals import post_delete
@@ -62,6 +63,13 @@ class Artist(models.Model):
                     handle_delete_error(self, msg)
 
 
+def _get_album_cover_filepath(album_instance, filename=''):
+    """Returns an appropriate file system path for the album cover."""
+
+    extension = os.path.splitext(filename)[1].lower() or '.jpg'
+    return os.path.join(album_instance.filepath, 'cover%s' % extension)
+
+
 class Album(models.Model):
     title = models.CharField(_('title'), max_length=100)
     artist = models.ForeignKey(Artist, verbose_name=_('artist'))
@@ -70,6 +78,11 @@ class Album(models.Model):
                                     recursive=True,
                                     max_length=200,
                                     unique=True)
+    cover = models.ImageField(
+                _('cover art'),
+                upload_to=_get_album_cover_filepath,
+                max_length=200,
+                storage=CustomStorage())
 
     class Meta:
         ordering = ['title']
@@ -111,13 +124,21 @@ class Album(models.Model):
             if old_path and new_path != old_path:
                 for song in self.song_set.all():
                     song.save()
+
+                # move cover image to new directory
+                content = ContentFile(self.cover.read())
+                new_cover_path = _get_album_cover_filepath(self,
+                                                           self.cover.name)
+                self.cover.delete(save=False)
+                self.cover.save(new_cover_path, content, save=False)
+
                 try:
                     os.rmdir(full_path(old_path))
                 except OSError, msg:
                     handle_delete_error(self, msg)
 
 
-def _get_song_filepath(song_instance, filename=None):
+def _get_song_filepath(song_instance, filename=''):
     """Returns an appropriate file system path for the song."""
 
     basename = u'%s.%s' % (song_instance.title, song_instance.filetype)
@@ -130,7 +151,7 @@ class Song(models.Model):
     title = models.CharField(_('title'), max_length=100)
     artist = models.ForeignKey(Artist, verbose_name=_('artist'))
     album = models.ForeignKey(Album, verbose_name=_('album'))
-    track = models.CharField(_('track'), max_length=10, default='')
+    track = models.CharField(_('track'), max_length=10, default='', blank=True)
     bitrate = models.IntegerField(_('bitrate'))
     filetype = models.CharField(_('file type'), max_length=10)
     filefield = models.FileField(_('file'),
@@ -141,6 +162,9 @@ class Song(models.Model):
                                      max_length=200,
                                      default='')
     first_save = models.BooleanField(editable=False)
+    date_added = models.DateTimeField(_('date added'), auto_now_add=True)
+    date_modified = models.DateTimeField(_('date last modified'),
+                                         auto_now=True)
 
     class Meta:
         ordering = ['track', 'title']
@@ -215,6 +239,7 @@ def remove_song(sender, **kwargs):
 def remove_album(sender, **kwargs):
     try:
         album = kwargs['instance']
+        os.remove(full_path(album.cover.name))
         os.rmdir(full_path(album.filepath))
         if album.artist.album_set.count() == 0:
             album.artist.delete()

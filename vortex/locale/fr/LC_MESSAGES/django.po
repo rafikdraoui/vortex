@@ -2,70 +2,82 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-13 17:22-0500\n"
+"POT-Creation-Date: 2012-11-16 02:03-0500\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: musique/models.py:16
+#: musique/models.py:17
 msgid "name"
 msgstr "nom"
 
-#: musique/models.py:17 musique/models.py:68
+#: musique/models.py:18 musique/models.py:76
 msgid "file path"
 msgstr "chemin d'accès"
 
-#: musique/models.py:25 musique/models.py:67 musique/models.py:131
+#: musique/models.py:26 musique/models.py:75 musique/models.py:152
 msgid "artist"
 msgstr "artiste"
 
-#: musique/models.py:26
+#: musique/models.py:27
 msgid "artists"
 msgstr "artistes"
 
-#: musique/models.py:66 musique/models.py:130
+#: musique/models.py:74 musique/models.py:151
 msgid "title"
 msgstr "titre"
 
-#: musique/models.py:76 musique/models.py:132
+#: musique/models.py:82
+msgid "cover art"
+msgstr "image de couverture"
+
+#: musique/models.py:89 musique/models.py:153
 msgid "album"
 msgstr "album"
 
-#: musique/models.py:77
+#: musique/models.py:90
 msgid "albums"
 msgstr "albums"
 
-#: musique/models.py:133
+#: musique/models.py:154
 msgid "track"
 msgstr "numéro"
 
-#: musique/models.py:134
+#: musique/models.py:155
 msgid "bitrate"
 msgstr ""
 
-#: musique/models.py:135
+#: musique/models.py:156
 msgid "file type"
 msgstr "type de fichier"
 
-#: musique/models.py:136
+#: musique/models.py:157
 msgid "file"
 msgstr "fichier"
 
-#: musique/models.py:140
+#: musique/models.py:161
 msgid "original path"
 msgstr "chemin d'accès original"
 
-#: musique/models.py:148
+#: musique/models.py:165
+msgid "date added"
+msgstr "date de l'ajout"
+
+#: musique/models.py:166
+msgid "date last modified"
+msgstr "date de dernière modification"
+
+#: musique/models.py:172
 msgid "song"
 msgstr "chanson"
 
-#: musique/models.py:149
+#: musique/models.py:173
 msgid "songs"
 msgstr "chansons"
 
-#: musique/models.py:163
+#: musique/models.py:187
 #, python-format
 msgid "Album \"%(album)s\" does not belong to artist \"%(artist)s\"."
 msgstr "L'album \"%(album)s\" n'appartient pas à l'artiste \"%(artist)s\"."

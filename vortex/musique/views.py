@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect
 from django.views import defaults
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.generic import DetailView, ListView
+from django.utils.encoding import iri_to_uri
+from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
 from vortex.musique import library
@@ -69,8 +71,9 @@ def _download(instance):
     tfile.close()
 
     response = HttpResponse(data, content_type='application/zip')
+    filename = iri_to_uri(urlquote(unicode(instance)))
     response['Content-Disposition'] = \
-        u'attachment; filename=%s.zip' % unicode(instance)
+        u'attachment; filename=%s.zip' % filename
     return response
 
 

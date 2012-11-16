@@ -262,7 +262,7 @@ class ViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/zip')
         self.assertEqual(response['Content-Disposition'],
-                         'attachment; filename=The Artist.zip')
+                         'attachment; filename=The%20Artist.zip')
 
         # check structure of returned zip file
         songs = Artist.objects.get(pk=1).song_set.all()

@@ -110,4 +110,10 @@ def page_not_found(request, template_name='404.html'):
         return redirect(reverse('album_list'))
     if re.match(r'/musique/song/\d+/', request.path):
         return redirect(reverse('song_list'))
+
+    if re.match(r'/admin/musique/artist/(\d+|None)/', request.path):
+        return redirect(reverse('admin:musique_artist_changelist'))
+    if re.match(r'/admin/musique/album/(\d+|None)/', request.path):
+        return redirect(reverse('admin:musique_album_changelist'))
+
     return defaults.page_not_found(request, template_name)

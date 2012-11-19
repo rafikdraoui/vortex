@@ -1,6 +1,15 @@
 from django.contrib import admin
+from django.forms import ModelForm
 
 from vortex.musique.models import Artist, Album, Song
+
+
+class ArtistModelForm(ModelForm):
+
+    # Do not validate in form. This is needed for renaming an artist to
+    # an existing artist (and thus merge the albums, see models.Artist.save)
+    def validate_unique(self):
+        pass
 
 
 class SongInline(admin.StackedInline):
@@ -21,6 +30,7 @@ class ArtistAdmin(admin.ModelAdmin):
     readonly_fields = ['filepath']
     search_fields = ['name']
     inlines = [AlbumInline]
+    form = ArtistModelForm
 
 
 class AlbumAdmin(admin.ModelAdmin):

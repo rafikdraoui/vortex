@@ -4,6 +4,8 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+from django.conf import settings
+
 
 class Migration(SchemaMigration):
 
@@ -13,7 +15,7 @@ class Migration(SchemaMigration):
 
 
         # Changing field 'Artist.filepath'
-        db.alter_column('musique_artist', 'filepath', self.gf('django.db.models.fields.FilePathField')(path='/Users/rafik/Projets/vortex/media', unique=True, max_length=200, recursive=True))
+        db.alter_column('musique_artist', 'filepath', self.gf('django.db.models.fields.FilePathField')(path=settings.MEDIA_ROOT, unique=True, max_length=200, recursive=True))
         # Adding field 'Song.date_added'
         db.add_column('musique_song', 'date_added',
                       self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2012, 11, 16, 0, 0), blank=True),
@@ -34,7 +36,7 @@ class Migration(SchemaMigration):
 
 
         # Changing field 'Album.filepath'
-        db.alter_column('musique_album', 'filepath', self.gf('django.db.models.fields.FilePathField')(path='/Users/rafik/Projets/vortex/media', unique=True, max_length=200, recursive=True))
+        db.alter_column('musique_album', 'filepath', self.gf('django.db.models.fields.FilePathField')(path=settings.MEDIA_ROOT, unique=True, max_length=200, recursive=True))
 
     def backwards(self, orm):
         # Removing unique constraint on 'Song', fields ['album', 'track', 'artist', 'title']
@@ -42,7 +44,7 @@ class Migration(SchemaMigration):
 
 
         # Changing field 'Artist.filepath'
-        db.alter_column('musique_artist', 'filepath', self.gf('django.db.models.fields.FilePathField')(max_length=200, path='/Users/rafik/Projets/musique-achoppe/media', unique=True, recursive=True))
+        db.alter_column('musique_artist', 'filepath', self.gf('django.db.models.fields.FilePathField')(max_length=200, path=settings.MEDIA_ROOT, unique=True, recursive=True))
         # Deleting field 'Song.date_added'
         db.delete_column('musique_song', 'date_added')
 
@@ -57,20 +59,20 @@ class Migration(SchemaMigration):
 
 
         # Changing field 'Album.filepath'
-        db.alter_column('musique_album', 'filepath', self.gf('django.db.models.fields.FilePathField')(max_length=200, path='/Users/rafik/Projets/musique-achoppe/media', unique=True, recursive=True))
+        db.alter_column('musique_album', 'filepath', self.gf('django.db.models.fields.FilePathField')(max_length=200, path=settings.MEDIA_ROOT, unique=True, recursive=True))
 
     models = {
         'musique.album': {
             'Meta': {'ordering': "['title']", 'object_name': 'Album'},
             'artist': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['musique.Artist']"}),
             'cover': ('django.db.models.fields.files.ImageField', [], {'max_length': '200'}),
-            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'/Users/rafik/Projets/vortex/media'", 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
+            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'%s'" % settings.MEDIA_ROOT, 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'musique.artist': {
             'Meta': {'ordering': "['name']", 'object_name': 'Artist'},
-            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'/Users/rafik/Projets/vortex/media'", 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
+            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'%s'" % settings.MEDIA_ROOT, 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'})
         },

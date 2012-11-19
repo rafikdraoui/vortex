@@ -3,7 +3,6 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import models, IntegrityError
 from django.db.models.signals import post_delete
@@ -33,11 +32,9 @@ class Artist(models.Model):
     def get_absolute_url(self):
         return ('artist_detail', (), {'pk': str(self.id)})
 
+    # Overridden to ensure renaming of artist directory
+    # whenever the artist is renamed.
     def save(self, *args, **kwargs):
-        """Overridden to ensure renaming of artist directory
-        whenever the artist is renamed.
-        """
-
         old_path = self.filepath
         new_path = os.path.join(self.name[0].upper(), self.name)
         query = Artist.objects.filter(name=self.name).exclude(id=self.id)[:1]
@@ -50,12 +47,14 @@ class Artist(models.Model):
                     song.save(clean=False)
                 album.artist = new_artist
                 album.save()
-            self.delete()
+            if self.pk:
+                self.delete()
         else:
             self.filepath = new_path
             super(Artist, self).save(*args, **kwargs)
             if old_path and new_path != old_path:
                 for album in self.album_set.all():
+                    # This is needed to move the files to the new folder
                     album.save()
                 try:
                     os.rmdir(full_path(old_path))
@@ -64,7 +63,7 @@ class Artist(models.Model):
 
 
 def _get_album_cover_filepath(album_instance, filename=''):
-    """Returns an appropriate file system path for the album cover."""
+    """Return an appropriate file system path for the album cover."""
 
     extension = os.path.splitext(filename)[1].lower() or '.jpg'
     return os.path.join(album_instance.filepath, 'cover%s' % extension)
@@ -78,11 +77,10 @@ class Album(models.Model):
                                     recursive=True,
                                     max_length=200,
                                     unique=True)
-    cover = models.ImageField(
-                _('cover art'),
-                upload_to=_get_album_cover_filepath,
-                max_length=200,
-                storage=CustomStorage())
+    cover = models.ImageField(_('cover art'),
+                              upload_to=_get_album_cover_filepath,
+                              max_length=200,
+                              storage=CustomStorage())
 
     class Meta:
         ordering = ['title']
@@ -96,12 +94,9 @@ class Album(models.Model):
     def get_absolute_url(self):
         return ('album_detail', (), {'pk': str(self.id)})
 
-    #FIXME: Reduce number of SQL queries needed for saving
+    # Overridden to ensure renaming of album directory
+    # whenever the album is renamed.
     def save(self, *args, **kwargs):
-        """Overridden to ensure renaming of album directory
-        whenever the album is renamed.
-        """
-
         old_path = self.filepath
         new_path = os.path.join(self.artist.filepath, self.title)
         query = Album.objects.filter(artist__id=self.artist_id,
@@ -117,14 +112,11 @@ class Album(models.Model):
                 except IntegrityError:
                     # Song already exists under the other album
                     pass
-            self.delete()
+            if self.pk:
+                self.delete()
         else:
             self.filepath = new_path
-            super(Album, self).save(*args, **kwargs)
             if old_path and new_path != old_path:
-                for song in self.song_set.all():
-                    song.save()
-
                 # move cover image to new directory
                 content = ContentFile(self.cover.read())
                 new_cover_path = _get_album_cover_filepath(self,
@@ -132,14 +124,21 @@ class Album(models.Model):
                 self.cover.delete(save=False)
                 self.cover.save(new_cover_path, content, save=False)
 
+                super(Album, self).save(*args, **kwargs)
+                for song in self.song_set.all():
+                    song.artist = self.artist
+                    song.save()
+
                 try:
                     os.rmdir(full_path(old_path))
                 except OSError, msg:
                     handle_delete_error(self, msg)
+            else:
+                super(Album, self).save(*args, **kwargs)
 
 
 def _get_song_filepath(song_instance, filename=''):
-    """Returns an appropriate file system path for the song."""
+    """Return an appropriate file system path for the song."""
 
     basename = u'%s.%s' % (song_instance.title, song_instance.filetype)
     if song_instance.track:
@@ -161,10 +160,10 @@ class Song(models.Model):
     original_path = models.CharField(_('original path'),
                                      max_length=200,
                                      default='')
-    first_save = models.BooleanField(editable=False)
     date_added = models.DateTimeField(_('date added'), auto_now_add=True)
     date_modified = models.DateTimeField(_('date last modified'),
                                          auto_now=True)
+    first_save = models.BooleanField(editable=False)
 
     class Meta:
         ordering = ['track', 'title']
@@ -180,7 +179,7 @@ class Song(models.Model):
         return ('song_detail', (), {'pk': str(self.id)})
 
     def clean(self):
-        """Validates that the album belongs to the artist."""
+        """Validate that the album belongs to the artist."""
 
         if self.album not in self.artist.album_set.all():
             raise ValidationError(_(
@@ -188,16 +187,15 @@ class Song(models.Model):
                     'to artist "%(artist)s".')
                     % {'album': self.album, 'artist': self.artist})
 
+    # Overridden to ensure renaming of the song file whenever
+    # the song is renamed.
     def save(self, *args, **kwargs):
-        """Overridden to ensure renaming of the song file whenever
-        the song is renamed.
-        """
-
         if kwargs.pop('clean', True):
             self.clean()
 
         if len(self.track) == 1:
             self.track = '0' + self.track
+
         thefile = self.filefield
         old_path = thefile.name
         new_path = _get_song_filepath(self)
@@ -211,8 +209,8 @@ class Song(models.Model):
                     os.remove(full_path(old_path))
                 except OSError, msg:
                     handle_delete_error(self, msg)
-        self.first_save = False
 
+        self.first_save = False
         super(Song, self).save(*args, **kwargs)
 
 

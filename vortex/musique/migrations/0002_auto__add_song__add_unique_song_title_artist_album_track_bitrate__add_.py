@@ -4,6 +4,8 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+from django.conf import settings
+
 
 class Migration(SchemaMigration):
 
@@ -30,7 +32,7 @@ class Migration(SchemaMigration):
         db.create_table('musique_artist', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=100)),
-            ('filepath', self.gf('django.db.models.fields.FilePathField')(path='/Users/rafik/Projets/musique-achoppe/media', unique=True, max_length=200, recursive=True)),
+            ('filepath', self.gf('django.db.models.fields.FilePathField')(path=settings.MEDIA_ROOT, unique=True, max_length=200, recursive=True)),
         ))
         db.send_create_signal('musique', ['Artist'])
 
@@ -39,7 +41,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('artist', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['musique.Artist'])),
-            ('filepath', self.gf('django.db.models.fields.FilePathField')(path='/Users/rafik/Projets/musique-achoppe/media', unique=True, max_length=200, recursive=True)),
+            ('filepath', self.gf('django.db.models.fields.FilePathField')(path=settings.MEDIA_ROOT, unique=True, max_length=200, recursive=True)),
         ))
         db.send_create_signal('musique', ['Album'])
 
@@ -62,13 +64,13 @@ class Migration(SchemaMigration):
         'musique.album': {
             'Meta': {'ordering': "['title']", 'object_name': 'Album'},
             'artist': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['musique.Artist']"}),
-            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'/Users/rafik/Projets/musique-achoppe/media'", 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
+            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'%s'" % settings.MEDIA_ROOT, 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'musique.artist': {
             'Meta': {'ordering': "['name']", 'object_name': 'Artist'},
-            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'/Users/rafik/Projets/musique-achoppe/media'", 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
+            'filepath': ('django.db.models.fields.FilePathField', [], {'path': "'%s'" % settings.MEDIA_ROOT, 'unique': 'True', 'max_length': '200', 'recursive': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'})
         },

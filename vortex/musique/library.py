@@ -129,11 +129,8 @@ def import_file(filename, mutagen_options):
                                             filepath=album_path)
 
     if created:
-        if info['cover_data'] is None:
-            cover_img = get_cover_art(filename)
-        else:
-            cover_img = ContentFile(info['cover_data'])
-        album.cover.save(album.cover.name, cover_img, save=True)
+        cover_img = get_cover_art(filename, info['cover_data'])
+        album.cover.save(album.cover.name, cover_img)
 
     filetype = filename.rsplit('.')[-1].lower()
     original_path = filename.replace(
@@ -268,8 +265,11 @@ def get_song_info(filename, mutagen_options):
 
 
 # TODO
-def get_cover_art(filename):
-    return File(open(DEFAULT_ALBUM_COVER_IMAGE, 'rb'))
+def get_cover_art(filename, existing_data=None):
+    if existing_data:
+        return ContentFile(existing_data)
+    else:
+        return File(open(DEFAULT_ALBUM_COVER_IMAGE, 'rb'))
 
 
 def handle_import_error(filename, error_msg=None):

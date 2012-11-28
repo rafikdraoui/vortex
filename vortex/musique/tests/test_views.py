@@ -61,55 +61,55 @@ class ViewTest(TestCase):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.mp3')
         info = library.get_song_info(filename, self.mutagen_opts)
 
-        self.assertEquals(info['artist'], 'The Artist')
-        self.assertEquals(info['album'], 'The Album')
-        self.assertEquals(info['title'], 'The Song')
-        self.assertEquals(info['track'], '01')
-        self.assertEquals(info['bitrate'], 320000)
+        self.assertEquals(info.artist, 'The Artist')
+        self.assertEquals(info.album, 'The Album')
+        self.assertEquals(info.title, 'The Song')
+        self.assertEquals(info.track, '01')
+        self.assertEquals(info.bitrate, 320000)
         self.assertNoLogError()
 
     def test_get_song_info_mp4(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.m4a')
         info = library.get_song_info(filename, self.mutagen_opts)
 
-        self.assertEquals(info['artist'], 'The Artist')
-        self.assertEquals(info['album'], 'The Album')
-        self.assertEquals(info['title'], 'The Song')
-        self.assertEquals(info['track'], '01')
-        self.assertEquals(info['bitrate'], 128000)
+        self.assertEquals(info.artist, 'The Artist')
+        self.assertEquals(info.album, 'The Album')
+        self.assertEquals(info.title, 'The Song')
+        self.assertEquals(info.track, '01')
+        self.assertEquals(info.bitrate, 128000)
         self.assertNoLogError()
 
     def test_get_song_info_ogg(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.ogg')
         info = library.get_song_info(filename, self.mutagen_opts)
 
-        self.assertEquals(info['artist'], 'The Artist')
-        self.assertEquals(info['album'], 'The Album')
-        self.assertEquals(info['title'], 'The Song')
-        self.assertEquals(info['track'], '01')
-        self.assertEquals(info['bitrate'], 160000)
+        self.assertEquals(info.artist, 'The Artist')
+        self.assertEquals(info.album, 'The Album')
+        self.assertEquals(info.title, 'The Song')
+        self.assertEquals(info.track, '01')
+        self.assertEquals(info.bitrate, 160000)
         self.assertNoLogError()
 
     def test_get_song_info_flac(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.flac')
         info = library.get_song_info(filename, self.mutagen_opts)
 
-        self.assertEquals(info['artist'], 'The Artist')
-        self.assertEquals(info['album'], 'The Album')
-        self.assertEquals(info['title'], 'The Song')
-        self.assertEquals(info['track'], '01')
-        self.assertEquals(info['bitrate'], 0)
+        self.assertEquals(info.artist, 'The Artist')
+        self.assertEquals(info.album, 'The Album')
+        self.assertEquals(info.title, 'The Song')
+        self.assertEquals(info.track, '01')
+        self.assertEquals(info.bitrate, 0)
         self.assertNoLogError()
 
     def test_get_song_info_wma(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.wma')
         info = library.get_wma_info(filename)
 
-        self.assertEquals(info['artist'], 'The Artist')
-        self.assertEquals(info['album'], 'The Album')
-        self.assertEquals(info['title'], 'The Song')
-        self.assertEquals(info['track'], '01')
-        self.assertEquals(info['bitrate'], 198000)
+        self.assertEquals(info.artist, 'The Artist')
+        self.assertEquals(info.album, 'The Album')
+        self.assertEquals(info.title, 'The Song')
+        self.assertEquals(info.track, '01')
+        self.assertEquals(info.bitrate, 198000)
         self.assertNoLogError()
 
     def test_import_file(self):
@@ -195,7 +195,7 @@ class ViewTest(TestCase):
             log_record = f.read()
 
         self.assertIn('Problem importing file', log_record)
-        self.assertIn('testfile.wav (mutagen error)', log_record)
+        self.assertIn('testfile.wav (Mutagen could not read', log_record)
         self.assertTrue(os.path.exists(filename))
 
     def test_importing_dummy_file_removes_it_from_dropbox(self):
@@ -217,14 +217,14 @@ class ViewTest(TestCase):
         with zipfile.ZipFile(zipped_dropbox, 'r') as f:
             f.extractall(self.dropbox)
 
-        self.assertEquals(sorted(os.listdir(self.dropbox)),
-                          sorted(['song1.ogg', 'The Artist', 'Unknown']))
-        self.assertEquals(
-            sorted(os.listdir(os.path.join(self.dropbox, 'The Artist'))),
-            sorted(['Album', 'song2.ogg', 'song3.ogg']))
-        self.assertEquals(
-            sorted(os.listdir(os.path.join(self.dropbox, 'Unknown'))),
-            sorted(['song5.ogg', 'song6.ogg']))
+        self.assertItemsEqual(os.listdir(self.dropbox),
+                              ['song1.ogg', 'The Artist', 'Unknown'])
+        self.assertItemsEqual(
+            os.listdir(os.path.join(self.dropbox, 'The Artist')),
+            ['Album', 'song2.ogg', 'song3.ogg'])
+        self.assertItemsEqual(
+            os.listdir(os.path.join(self.dropbox, 'Unknown')),
+            ['song5.ogg', 'song6.ogg'])
 
         # Upload files to library
         update_library(HttpRequest())
@@ -241,8 +241,7 @@ class ViewTest(TestCase):
         self.assertEquals(len(all_albums), 4)
         self.assertEquals(len(all_songs), 6)
 
-        self.assertEquals(sorted(os.listdir(self.media_dir)),
-                          sorted(['L', 'T']))
+        self.assertItemsEqual(os.listdir(self.media_dir), ['L', 'T'])
         filename = os.path.join(self.media_dir, 'T', 'The Artist',
                                 'The Album', '04 - The Fourth Song.ogg')
         self.assertTrue(os.path.exists(filename))
@@ -273,7 +272,7 @@ class ViewTest(TestCase):
         self.assertTrue(zipfile.is_zipfile(content))
         with zipfile.ZipFile(content, 'r') as z:
             self.assertIsNone(z.testzip())
-            self.assertEqual(sorted(z.namelist()), sorted(original_song_names))
+            self.assertItemsEqual(z.namelist(), original_song_names)
 
     def test_download_artist_with_no_songs_redirects_to_detail_view(self):
         # Create dummy artist

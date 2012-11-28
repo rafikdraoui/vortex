@@ -32,7 +32,7 @@ class ModelTest(TestCase):
         self.media_file.close()
 
         cover_file = os.path.join(
-                            os.path.dirname(__file__), 'files', 'cover.jpg')
+            os.path.dirname(__file__), 'files', 'cover.jpg')
         self.cover_art = File(open(cover_file, 'rb'))
 
         # use a temporary log file
@@ -188,18 +188,18 @@ class ArtistModelTest(ModelTest):
 
         albums = artist2.album_set.all()
         self.assertEquals(len(albums), 3)
-        self.assertEquals(
-            sorted(os.listdir(full_path(artist2.filepath))),
-            sorted(['First Album', 'Second Album', 'Common Album']))
+        self.assertItemsEqual(
+            os.listdir(full_path(artist2.filepath)),
+            ['First Album', 'Second Album', 'Common Album'])
 
         # Check to see that the songs of the common album were merged
         common_album = artist2.album_set.get(title='Common Album')
         self.assertEquals(len(common_album.song_set.all()), 3)
-        self.assertEquals(sorted(os.listdir(full_path(common_album.filepath))),
-                          sorted(['cover.jpg',
-                                  'Common Song 1.ogg',
-                                  'Common Song 2.ogg',
-                                  'Common Song 3.ogg']))
+        self.assertItemsEqual(os.listdir(full_path(common_album.filepath)),
+                              ['cover.jpg',
+                               'Common Song 1.ogg',
+                               'Common Song 2.ogg',
+                               'Common Song 3.ogg'])
 
         self.assertNoLogError()
 
@@ -208,16 +208,16 @@ class ArtistModelTest(ModelTest):
         self.assertEquals(artist.name, 'First Artist')
         self.assertEquals(artist.filepath, 'F/First Artist')
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertEquals(sorted(os.listdir(full_path(artist.filepath))),
-                          sorted(['First Album', 'Common Album']))
+        self.assertItemsEqual(os.listdir(full_path(artist.filepath)),
+                              ['First Album', 'Common Album'])
 
         artist.save()
 
         self.assertEquals(artist.name, 'First Artist')
         self.assertEquals(artist.filepath, 'F/First Artist')
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertEquals(sorted(os.listdir(full_path(artist.filepath))),
-                          sorted(['First Album', 'Common Album']))
+        self.assertItemsEqual(os.listdir(full_path(artist.filepath)),
+                              ['First Album', 'Common Album'])
         self.assertNoLogError()
 
     def test_delete_artist_removes_folder(self):
@@ -311,9 +311,9 @@ class AlbumModelTest(ModelTest):
 
         songs = album2.song_set.all()
         self.assertEquals(len(songs), 2)
-        self.assertEquals(
-            sorted(os.listdir(full_path(album2.filepath))),
-            sorted(['cover.jpg', '02 - Second Song.ogg', 'The First Song.ogg'])
+        self.assertItemsEqual(
+            os.listdir(full_path(album2.filepath)),
+            ['cover.jpg', '02 - Second Song.ogg', 'The First Song.ogg']
         )
 
         self.assertNoLogError()
@@ -324,8 +324,8 @@ class AlbumModelTest(ModelTest):
         self.assertEquals(album.artist.name, 'The Artist')
         self.assertEquals(album.filepath, 'T/The Artist/First Album')
         self.assertTrue(os.path.exists(full_path(album.filepath)))
-        self.assertEquals(sorted(os.listdir(full_path(album.filepath))),
-                          sorted(['cover.jpg', 'The First Song.ogg']))
+        self.assertItemsEqual(os.listdir(full_path(album.filepath)),
+                              ['cover.jpg', 'The First Song.ogg'])
 
         album.save()
 
@@ -333,8 +333,8 @@ class AlbumModelTest(ModelTest):
         self.assertEquals(album.artist.name, 'The Artist')
         self.assertEquals(album.filepath, 'T/The Artist/First Album')
         self.assertTrue(os.path.exists(full_path(album.filepath)))
-        self.assertEquals(sorted(os.listdir(full_path(album.filepath))),
-                          sorted(['cover.jpg', 'The First Song.ogg']))
+        self.assertItemsEqual(os.listdir(full_path(album.filepath)),
+                              ['cover.jpg', 'The First Song.ogg'])
         self.assertNoLogError()
 
     def test_delete_album_removes_folder(self):
@@ -374,8 +374,8 @@ class SongModelTest(ModelTest):
                                      artist=artist,
                                      cover=self.cover_art)
         self.song = Song(title='The Song', artist=artist, album=album,
-                    bitrate=128000, filetype='ogg', first_save=True,
-                    filefield=File(open(self.media_file.name)))
+                         bitrate=128000, filetype='ogg', first_save=True,
+                         filefield=File(open(self.media_file.name)))
         self.song.save()
 
     def test_save_new_song_creates_file_in_media_directory(self):

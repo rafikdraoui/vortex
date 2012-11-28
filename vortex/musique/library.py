@@ -1,12 +1,14 @@
 import logging
 import os
 import re
+from collections import namedtuple
 
 import mutagen
 
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
+from django.db import IntegrityError
 
 from vortex.musique.models import Artist, Album, Song
 
@@ -15,6 +17,8 @@ LOGGER = logging.getLogger(__name__)
 DEFAULT_ALBUM_COVER_IMAGE = os.path.join(settings.STATIC_ROOT,
                                          'img',
                                          'default-cover.jpg')
+SongInfo = namedtuple('SongInfo', ['title', 'artist', 'album',
+                                   'track', 'bitrate', 'cover_data'])
 
 
 if settings.TITLECASE_ARTIST_AND_ALBUM_NAMES:
@@ -39,7 +43,7 @@ def get_mutagen_audio_options():
             # Add a key for the ID3 tag holding cover art information
             def cover_get(id3, key):
                 for k in id3.keys():
-                    if re.match(r'APIC:*', k):
+                    if re.match(r'APIC:.*', k):
                         return [id3[k].data]
                 return [None]
             EasyMP3.ID3.RegisterKey('cover', cover_get)
@@ -84,11 +88,11 @@ def update():
     for root, dirs, files in os.walk(settings.DROPBOX, topdown=False):
         for name in files:
             if re.match(regex, name) or name.endswith(
-                                            ('jpg', 'jpeg', 'gif', 'png')):
+                    ('jpg', 'jpeg', 'gif', 'png')):
                 #FIXME: keep images for get_cover_art
                 try:
                     os.remove(os.path.join(root, name))
-                except Exception:
+                except OSError:
                     pass
             else:
                 filename = os.path.join(root, name).decode('utf-8')
@@ -96,7 +100,7 @@ def update():
         try:
             if root != settings.DROPBOX:
                 os.rmdir(root)
-        except Exception:
+        except OSError:
             pass
 
 
@@ -113,56 +117,56 @@ def import_file(filename, mutagen_options):
             info = get_wma_info(filename)
         else:
             info = get_song_info(filename, mutagen_options)
-    except ValueError:
-        handle_import_error(filename, 'mutagen error')
+    except ValueError as e:
+        handle_import_error(filename, e.message)
         return
 
-    artist_name = titlecase(info['artist'])
+    artist_name = titlecase(info.artist)
     artist_path = os.path.join(artist_name[0].upper(), artist_name)
     artist, created = Artist.objects.get_or_create(name=artist_name,
                                                    filepath=artist_path)
 
-    album_path = os.path.join(artist_path, titlecase(info['album']))
+    album_path = os.path.join(artist_path, titlecase(info.album))
     album, created = Album.objects.get_or_create(
-                                            title=titlecase(info['album']),
-                                            artist=artist,
-                                            filepath=album_path)
+        title=titlecase(info.album),
+        artist=artist,
+        filepath=album_path)
 
     if created:
-        cover_img = get_cover_art(filename, info['cover_data'])
+        cover_img = get_cover_art(filename, info.cover_data)
         album.cover.save(album.cover.name, cover_img)
 
     filetype = filename.rsplit('.')[-1].lower()
-    original_path = filename.replace(
-                        settings.DROPBOX, '', 1).lstrip(os.path.sep)
+    original_path = filename.replace(settings.DROPBOX, '', 1
+                           ).lstrip(os.path.sep)
 
     #TODO: Handle Unknown Title by Unknown Artist
     try:
         song, created = Song.objects.get_or_create(
-                            title=info['title'],
-                            artist=artist,
-                            album=album,
-                            track=info['track'],
-                            defaults={'filefield': File(open(filename, 'rb')),
-                                      'bitrate': info['bitrate'],
-                                      'filetype': filetype,
-                                      'original_path': original_path,
-                                      'first_save': True})
-    except Exception, msg:
-        handle_import_error(filename, msg)
+            title=info.title,
+            artist=artist,
+            album=album,
+            track=info.track,
+            defaults={'filefield': File(open(filename, 'rb')),
+                      'bitrate': info.bitrate,
+                      'filetype': filetype,
+                      'original_path': original_path,
+                      'first_save': True})
+    except IntegrityError as e:
+        handle_import_error(filename, e.message)
         return
 
     if not created:
         # Song already exists, keep only if better bitrate
-        if song.bitrate >= info['bitrate']:
+        if song.bitrate >= info.bitrate:
             #FIXME: uncomment when Unknown songs are handled correctly
             #os.remove(filename)
-            handle_import_error(filename,
-                                '%s by %s already exists'
-                                    % (info['title'], info['artist']))
+            handle_import_error(
+                filename,
+                '%s by %s already exists' % (info.title, info.artist))
             return
         else:
-            song.bitrate = info['bitrate']
+            song.bitrate = info.bitrate
             song.filefield = File(open(filename, 'rb'))
             song.original_path = original_path
             song.first_save = True
@@ -178,12 +182,11 @@ def get_wma_info(filename):
 
     try:
         audio = mutagen.File(filename)
-    except Exception, msg:
-        handle_import_error(filename, msg)
-        raise ValueError
-    if audio is None:
-        raise ValueError
+    except (RuntimeError, IOError) as e:
+        raise ValueError(e.message)
 
+    if audio is None:
+        raise ValueError('Mutagen could not read %s' % filename)
     title = audio.get('Title', [u'Unknown Title'])[0]
 
     artist = audio.get('Author', [None])[0]
@@ -210,8 +213,8 @@ def get_wma_info(filename):
 
     bitrate = audio.info.bitrate
 
-    return {'title': title, 'artist': artist, 'album': album,
-            'track': track, 'bitrate': bitrate, 'cover_data': None}
+    return SongInfo(title=title, artist=artist, album=album,
+                    track=track, bitrate=bitrate, cover_data=None)
 
 
 def get_tag_field(container, tag_name):
@@ -235,11 +238,11 @@ def get_song_info(filename, mutagen_options):
 
     try:
         audio = mutagen.File(filename, options=mutagen_options)
-    except Exception, msg:
-        handle_import_error(filename, msg)
-        raise ValueError
+    except (RuntimeError, IOError) as e:
+        raise ValueError(e.message)
+
     if audio is None:
-        raise ValueError
+        raise ValueError('Mutagen could not read %s' % filename)
 
     title = get_tag_field(audio, 'title')
     artist = get_tag_field(audio, 'artist')
@@ -260,8 +263,8 @@ def get_song_info(filename, mutagen_options):
         # Flac files have no bitrate attribute
         bitrate = 0
 
-    return {'title': title, 'artist': artist, 'album': album,
-            'track': track, 'bitrate': bitrate, 'cover_data': cover_data}
+    return SongInfo(title=title, artist=artist, album=album,
+                    track=track, bitrate=bitrate, cover_data=cover_data)
 
 
 # TODO
@@ -272,10 +275,8 @@ def get_cover_art(filename, existing_data=None):
         return File(open(DEFAULT_ALBUM_COVER_IMAGE, 'rb'))
 
 
-def handle_import_error(filename, error_msg=None):
+def handle_import_error(filename, error_msg):
     """Write an error message in the log."""
 
-    log_msg = 'Problem importing file %s' % filename
-    if error_msg:
-        log_msg = '%s (%s)' % (log_msg, error_msg)
+    log_msg = 'Problem importing file %s (%s)' % (filename, error_msg)
     LOGGER.info(log_msg)

@@ -12,6 +12,9 @@ from django.utils.translation import ugettext_lazy as _
 from vortex.musique.utils import full_path, CustomStorage
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 class Artist(models.Model):
     name = models.CharField(_('name'), max_length=100, unique=True)
     filepath = models.FilePathField(_('file path'),
@@ -58,8 +61,9 @@ class Artist(models.Model):
                     album.save()
                 try:
                     os.rmdir(full_path(old_path))
-                except OSError, msg:
-                    handle_delete_error(self, msg)
+                except OSError as e:
+                    LOGGER.info('Problem deleting folder %s: %s'
+                                % (full_path(old_path), e.message))
 
 
 def _get_album_cover_filepath(album_instance, filename=''):
@@ -131,8 +135,9 @@ class Album(models.Model):
 
                 try:
                     os.rmdir(full_path(old_path))
-                except OSError, msg:
-                    handle_delete_error(self, msg)
+                except OSError as e:
+                    LOGGER.info('Problem deleting folder %s: %s'
+                                % (full_path(old_path), e.message))
             else:
                 super(Album, self).save(*args, **kwargs)
 
@@ -183,9 +188,9 @@ class Song(models.Model):
 
         if self.album not in self.artist.album_set.all():
             raise ValidationError(_(
-                    'Album "%(album)s" does not belong '
-                    'to artist "%(artist)s".')
-                    % {'album': self.album, 'artist': self.artist})
+                'Album "%(album)s" does not belong '
+                'to artist "%(artist)s".')
+                % {'album': self.album, 'artist': self.artist})
 
     # Overridden to ensure renaming of the song file whenever
     # the song is renamed.
@@ -207,17 +212,17 @@ class Song(models.Model):
                 # .lower() hack is for case-insensitive systems
                 try:
                     os.remove(full_path(old_path))
-                except OSError, msg:
-                    handle_delete_error(self, msg)
+                except OSError as e:
+                    LOGGER.info('Problem deleting file %s: %s'
+                                % (full_path(old_path), e.message))
 
         self.first_save = False
         super(Song, self).save(*args, **kwargs)
 
 
-"""The following post_delete hooks ensure that the underlying
-files and directories corresponding to the songs, albums and
-artists are removed from the file system when they are deleted
-from the library."""
+# The following post_delete hooks ensure that the underlying files and
+# directories corresponding to the songs, albums and artists are removed from
+# the file system when they are deleted from the library.
 
 
 @receiver(post_delete, sender=Song, dispatch_uid='delete_song')
@@ -229,8 +234,6 @@ def remove_song(sender, **kwargs):
             song.album.delete()
     except Album.DoesNotExist:
         pass
-    except Exception, msg:
-        handle_delete_error(song, msg)
 
 
 @receiver(post_delete, sender=Album, dispatch_uid='delete_album')
@@ -243,8 +246,8 @@ def remove_album(sender, **kwargs):
             album.artist.delete()
     except Artist.DoesNotExist:
         pass
-    except Exception, msg:
-        handle_delete_error(album, msg)
+    except OSError as e:
+        LOGGER.info('Problem deleting %s: %s' % (album.title, e.message))
 
 
 @receiver(post_delete, sender=Artist, dispatch_uid='delete_artist')
@@ -253,17 +256,5 @@ def remove_artist(sender, **kwargs):
     try:
         if os.path.exists(full_path(artist.filepath)):
             os.rmdir(full_path(artist.filepath))
-    except Exception, msg:
-        handle_delete_error(artist, msg)
-
-
-LOGGER = logging.getLogger(__name__)
-
-
-def handle_delete_error(instance, msg):
-    """Write an error message in the log."""
-
-    if isinstance(instance, Artist):
-        LOGGER.info('Problem deleting %s: %s' % (instance.name, msg))
-    else:
-        LOGGER.info('Problem deleting %s: %s' % (instance.title, msg))
+    except OSError as e:
+        LOGGER.info('Problem deleting %s: %s' % (artist.name, e.message))

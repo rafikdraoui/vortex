@@ -1,4 +1,4 @@
-{% extends "musique/base.html" %}
+{% extends "library/base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Search" %}{% endblock %}
@@ -20,7 +20,7 @@
 
     {% for result in page %}
       <p><a href="{{ result.object.get_absolute_url }}">
-      {% if result.content_type == "musique.artist" %}
+      {% if result.content_type == "library.artist" %}
         {{ result.object.name }}
       {% else %}
         {{ result.object.title }}

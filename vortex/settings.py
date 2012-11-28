@@ -68,7 +68,7 @@ INSTALLED_APPS = (
 
     'south',
     'haystack',
-    'vortex.musique',
+    'vortex.library',
 )
 
 LOGGING = {
@@ -102,18 +102,18 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'vortex.musique.library': {
+        'vortex.library.update': {
             'handlers': ['vortex_log'],
             'level': 'INFO'
         },
-        'vortex.musique.models': {
+        'vortex.library.models': {
             'handlers': ['vortex_log'],
             'level': 'INFO'
         }
     }
 }
 
-HAYSTACK_SITECONF = 'vortex.musique.search_sites'
+HAYSTACK_SITECONF = 'vortex.library.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'simple'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
 

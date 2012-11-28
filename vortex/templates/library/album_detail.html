@@ -1,4 +1,4 @@
-{% extends "musique/base.html" %}
+{% extends "library/base.html" %}
 {% load i18n %}
 {% load url from future %}
 
@@ -10,7 +10,7 @@
   <div class="span6">
     <h1>
       {{ album }}
-      <a class="small" href="{% url 'admin:musique_album_change' album.id %}"> ({% trans "edit" %})</a>
+      <a class="small" href="{% url 'admin:library_album_change' album.id %}"> ({% trans "edit" %})</a>
     </h1>
 
     <h3>

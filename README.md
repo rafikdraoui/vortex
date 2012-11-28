@@ -48,7 +48,7 @@ python manage.py migrate
 ```
 
 You can also verify that all unit tests are passing with `python manage.py
-test musique`.
+test library`.
 
 You should change the `settings.py` file to fit your needs (or create
 a `local_settings.py` file that overloads it). At the very least you need to

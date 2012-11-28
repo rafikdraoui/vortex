@@ -15,7 +15,7 @@ class Migration(SchemaMigration):
 
 
     models = {
-        
+
     }
 
-    complete_apps = ['musique']
+    complete_apps = ['library']

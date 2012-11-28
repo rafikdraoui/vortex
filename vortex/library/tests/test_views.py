@@ -10,10 +10,10 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from vortex.musique import library
-from vortex.musique.models import Artist, Album, Song
-from vortex.musique.utils import CustomStorage
-from vortex.musique.views import update_library
+from vortex.library import update
+from vortex.library.models import Artist, Album, Song
+from vortex.library.utils import CustomStorage
+from vortex.library.views import update_library
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()
@@ -34,11 +34,11 @@ class ViewTest(TestCase):
 
         # use a temporary log file
         self.logfile = tempfile.NamedTemporaryFile(delete=False)
-        default_handler = library.LOGGER.handlers[0]
-        library.LOGGER.removeHandler(default_handler)
-        library.LOGGER.addHandler(FileHandler(self.logfile.name))
+        default_handler = update.LOGGER.handlers[0]
+        update.LOGGER.removeHandler(default_handler)
+        update.LOGGER.addHandler(FileHandler(self.logfile.name))
 
-        self.mutagen_opts = library.get_mutagen_audio_options()
+        self.mutagen_opts = update.get_mutagen_audio_options()
 
         # Swap CustomStorage for filefield for testing so that it uses
         # the temporary media folder instead of settings.MEDIA_ROOT
@@ -59,7 +59,7 @@ class ViewTest(TestCase):
 
     def test_get_song_info_mp3(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.mp3')
-        info = library.get_song_info(filename, self.mutagen_opts)
+        info = update.get_song_info(filename, self.mutagen_opts)
 
         self.assertEquals(info.artist, 'The Artist')
         self.assertEquals(info.album, 'The Album')
@@ -70,7 +70,7 @@ class ViewTest(TestCase):
 
     def test_get_song_info_mp4(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.m4a')
-        info = library.get_song_info(filename, self.mutagen_opts)
+        info = update.get_song_info(filename, self.mutagen_opts)
 
         self.assertEquals(info.artist, 'The Artist')
         self.assertEquals(info.album, 'The Album')
@@ -81,7 +81,7 @@ class ViewTest(TestCase):
 
     def test_get_song_info_ogg(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.ogg')
-        info = library.get_song_info(filename, self.mutagen_opts)
+        info = update.get_song_info(filename, self.mutagen_opts)
 
         self.assertEquals(info.artist, 'The Artist')
         self.assertEquals(info.album, 'The Album')
@@ -92,7 +92,7 @@ class ViewTest(TestCase):
 
     def test_get_song_info_flac(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.flac')
-        info = library.get_song_info(filename, self.mutagen_opts)
+        info = update.get_song_info(filename, self.mutagen_opts)
 
         self.assertEquals(info.artist, 'The Artist')
         self.assertEquals(info.album, 'The Album')
@@ -103,7 +103,7 @@ class ViewTest(TestCase):
 
     def test_get_song_info_wma(self):
         filename = os.path.join(TEST_FILES_DIR, 'testfile.wma')
-        info = library.get_wma_info(filename)
+        info = update.get_wma_info(filename)
 
         self.assertEquals(info.artist, 'The Artist')
         self.assertEquals(info.album, 'The Album')
@@ -127,7 +127,7 @@ class ViewTest(TestCase):
             original_content = f.read()
 
         # import file
-        library.import_file(filename, self.mutagen_opts)
+        update.import_file(filename, self.mutagen_opts)
         song = Song.objects.get(title='The Song')
 
         self.assertEquals(song.title, 'The Song')
@@ -150,9 +150,9 @@ class ViewTest(TestCase):
 
         # import files
         filename = os.path.join(self.dropbox, 'testfile.ogg')
-        library.import_file(filename, self.mutagen_opts)
+        update.import_file(filename, self.mutagen_opts)
         filename = os.path.join(self.dropbox, 'testfile_copy.ogg')
-        library.import_file(filename, self.mutagen_opts)
+        update.import_file(filename, self.mutagen_opts)
 
         with open(self.logfile.name, 'r') as f:
             log_record = f.read()
@@ -170,12 +170,12 @@ class ViewTest(TestCase):
 
         # import files
         filename = os.path.join(self.dropbox, 'testfile-128k.mp3')
-        library.import_file(filename, self.mutagen_opts)
+        update.import_file(filename, self.mutagen_opts)
         song = Song.objects.get(title='The Song')
         self.assertEquals(song.bitrate, 128000)
 
         filename = os.path.join(self.dropbox, 'testfile.mp3')
-        library.import_file(filename, self.mutagen_opts)
+        update.import_file(filename, self.mutagen_opts)
 
         self.assertEquals(len(Song.objects.all()), 1)
 
@@ -189,7 +189,7 @@ class ViewTest(TestCase):
         shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.wav'),
                     self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.wav')
-        library.import_file(filename, self.mutagen_opts)
+        update.import_file(filename, self.mutagen_opts)
 
         with open(self.logfile.name, 'r') as f:
             log_record = f.read()
@@ -206,7 +206,7 @@ class ViewTest(TestCase):
 
         self.assertTrue(os.path.exists(filename))
 
-        library.update()
+        update.update()
 
         self.assertFalse(os.path.exists(filename))
         self.assertNoLogError()
@@ -251,11 +251,11 @@ class ViewTest(TestCase):
         zipped_dropbox = os.path.join(TEST_FILES_DIR, 'test_dropbox.zip')
         with zipfile.ZipFile(zipped_dropbox, 'r') as f:
             f.extractall(self.dropbox)
-        library.update()
+        update.update()
 
         # make request
         c = Client()
-        response = c.get('/musique/artist/1/download/')
+        response = c.get('/library/artist/1/download/')
 
         # check response have right headers
         self.assertEqual(response.status_code, 200)
@@ -280,12 +280,12 @@ class ViewTest(TestCase):
 
         # make request
         c = Client()
-        response = c.get('/musique/artist/1/download/')
+        response = c.get('/library/artist/1/download/')
 
         # check response have right headers
         self.assertEqual(response.status_code, 302)
         redirect_url = response.get('Location', '')
-        self.assertEqual(redirect_url, 'http://testserver/musique/artist/1/')
+        self.assertEqual(redirect_url, 'http://testserver/library/artist/1/')
 
         # check that a message has been set in the cookie
         self.assertTrue('messages' in response.cookies.keys())
@@ -294,12 +294,12 @@ class ViewTest(TestCase):
 
     def test_fetching_url_of_nonexisting_instance_redirects_to_list_view(self):
         c = Client()
-        response = c.get('/musique/artist/1/')
+        response = c.get('/library/artist/1/')
         self.assertEqual(response.status_code, 302)
         redirect_url = response.get('Location', '')
-        self.assertEqual(redirect_url, 'http://testserver/musique/artist/')
+        self.assertEqual(redirect_url, 'http://testserver/library/artist/')
 
     def test_fetching_other_nonexisting_url_returns_404(self):
         c = Client()
-        response = c.get('/musique/artist/bob/')
+        response = c.get('/library/artist/bob/')
         self.assertEqual(response.status_code, 404)

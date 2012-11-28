@@ -8,8 +8,8 @@ from django.core.files import File
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from vortex.musique.models import Artist, Album, Song, LOGGER
-from vortex.musique.utils import CustomStorage, full_path
+from vortex.library.models import Artist, Album, Song, LOGGER
+from vortex.library.utils import CustomStorage, full_path
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()

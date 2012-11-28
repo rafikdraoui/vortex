@@ -12,9 +12,9 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
-from vortex.musique import library
-from vortex.musique.models import Artist, Album
-from vortex.musique.utils import full_path, get_alphabetized_list, zip_folder
+from vortex.library import update
+from vortex.library.models import Artist, Album
+from vortex.library.utils import full_path, get_alphabetized_list, zip_folder
 
 
 class AlphabetizedListView(ListView):
@@ -42,18 +42,18 @@ class AlbumDetailView(DetailView):
         return context
 
 
-def home(request):
-    return render(request, 'musique/home.html')
+def library_home(request):
+    return render(request, 'library/home.html')
 
 
 def update_library(request):
     #TODO: run asynchronously (using celery?)
-    library.update()
+    update.update()
     messages.add_message(request,
                          messages.INFO,
                          _('Library successfully updated'),
                          fail_silently=True)
-    return redirect(reverse(home))
+    return redirect(reverse(library_home))
 
 
 def _download(instance):
@@ -104,16 +104,16 @@ def page_not_found(request, template_name='404.html'):
     views instead of serving a 404 error.
     """
 
-    if re.match(r'/musique/artist/\d+/', request.path):
+    if re.match(r'/library/artist/\d+/', request.path):
         return redirect(reverse('artist_list'))
-    if re.match(r'/musique/album/\d+/', request.path):
+    if re.match(r'/library/album/\d+/', request.path):
         return redirect(reverse('album_list'))
-    if re.match(r'/musique/song/\d+/', request.path):
+    if re.match(r'/library/song/\d+/', request.path):
         return redirect(reverse('song_list'))
 
-    if re.match(r'/admin/musique/artist/(\d+|None)/', request.path):
-        return redirect(reverse('admin:musique_artist_changelist'))
-    if re.match(r'/admin/musique/album/(\d+|None)/', request.path):
-        return redirect(reverse('admin:musique_album_changelist'))
+    if re.match(r'/admin/library/artist/(\d+|None)/', request.path):
+        return redirect(reverse('admin:library_artist_changelist'))
+    if re.match(r'/admin/library/album/(\d+|None)/', request.path):
+        return redirect(reverse('admin:library_album_changelist'))
 
     return defaults.page_not_found(request, template_name)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.forms import ModelForm
 
-from vortex.musique.models import Artist, Album, Song
+from vortex.library.models import Artist, Album, Song
 
 
 class ArtistModelForm(ModelForm):

@@ -10,7 +10,7 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import IntegrityError
 
-from vortex.musique.models import Artist, Album, Song
+from vortex.library.models import Artist, Album, Song
 
 
 LOGGER = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ SongInfo = namedtuple('SongInfo', ['title', 'artist', 'album',
 
 
 if settings.TITLECASE_ARTIST_AND_ALBUM_NAMES:
-    from vortex.musique.utils import titlecase
+    from vortex.library.utils import titlecase
 else:
     titlecase = lambda x: x
 
@@ -118,7 +118,7 @@ def import_file(filename, mutagen_options):
         else:
             info = get_song_info(filename, mutagen_options)
     except ValueError as e:
-        handle_import_error(filename, e.message)
+        handle_import_error(filename, e)
         return
 
     artist_name = titlecase(info.artist)
@@ -153,7 +153,7 @@ def import_file(filename, mutagen_options):
                       'original_path': original_path,
                       'first_save': True})
     except IntegrityError as e:
-        handle_import_error(filename, e.message)
+        handle_import_error(filename, e)
         return
 
     if not created:
@@ -183,7 +183,7 @@ def get_wma_info(filename):
     try:
         audio = mutagen.File(filename)
     except (RuntimeError, IOError) as e:
-        raise ValueError(e.message)
+        raise ValueError(e)
 
     if audio is None:
         raise ValueError('Mutagen could not read %s' % filename)
@@ -239,7 +239,7 @@ def get_song_info(filename, mutagen_options):
     try:
         audio = mutagen.File(filename, options=mutagen_options)
     except (RuntimeError, IOError) as e:
-        raise ValueError(e.message)
+        raise ValueError(e)
 
     if audio is None:
         raise ValueError('Mutagen could not read %s' % filename)

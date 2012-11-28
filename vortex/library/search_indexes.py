@@ -1,7 +1,7 @@
 from haystack import site
 from haystack.indexes import SearchIndex, CharField
 
-from vortex.musique.models import Artist, Album, Song
+from vortex.library.models import Artist, Album, Song
 
 
 class ArtistIndex(SearchIndex):

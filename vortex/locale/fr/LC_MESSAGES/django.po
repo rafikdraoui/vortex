@@ -2,95 +2,95 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-16 02:03-0500\n"
+"POT-Creation-Date: 2012-11-28 03:20-0500\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: musique/models.py:17
+#: library/models.py:19
 msgid "name"
 msgstr "nom"
 
-#: musique/models.py:18 musique/models.py:76
+#: library/models.py:20 library/models.py:79
 msgid "file path"
 msgstr "chemin d'accès"
 
-#: musique/models.py:26 musique/models.py:75 musique/models.py:152
+#: library/models.py:28 library/models.py:78 library/models.py:156
 msgid "artist"
 msgstr "artiste"
 
-#: musique/models.py:27
+#: library/models.py:29
 msgid "artists"
 msgstr "artistes"
 
-#: musique/models.py:74 musique/models.py:151
+#: library/models.py:77 library/models.py:155
 msgid "title"
 msgstr "titre"
 
-#: musique/models.py:82
+#: library/models.py:84
 msgid "cover art"
 msgstr "image de couverture"
 
-#: musique/models.py:89 musique/models.py:153
+#: library/models.py:91 library/models.py:157
 msgid "album"
 msgstr "album"
 
-#: musique/models.py:90
+#: library/models.py:92
 msgid "albums"
 msgstr "albums"
 
-#: musique/models.py:154
+#: library/models.py:158
 msgid "track"
 msgstr "numéro"
 
-#: musique/models.py:155
+#: library/models.py:159
 msgid "bitrate"
 msgstr ""
 
-#: musique/models.py:156
+#: library/models.py:160
 msgid "file type"
 msgstr "type de fichier"
 
-#: musique/models.py:157
+#: library/models.py:161
 msgid "file"
 msgstr "fichier"
 
-#: musique/models.py:161
+#: library/models.py:165
 msgid "original path"
 msgstr "chemin d'accès original"
 
-#: musique/models.py:165
+#: library/models.py:168
 msgid "date added"
 msgstr "date de l'ajout"
 
-#: musique/models.py:166
+#: library/models.py:169
 msgid "date last modified"
 msgstr "date de dernière modification"
 
-#: musique/models.py:172
+#: library/models.py:176
 msgid "song"
 msgstr "chanson"
 
-#: musique/models.py:173
+#: library/models.py:177
 msgid "songs"
 msgstr "chansons"
 
-#: musique/models.py:187
+#: library/models.py:191
 #, python-format
 msgid "Album \"%(album)s\" does not belong to artist \"%(artist)s\"."
 msgstr "L'album \"%(album)s\" n'appartient pas à l'artiste \"%(artist)s\"."
 
-#: musique/views.py:52
+#: library/views.py:54
 msgid "Library successfully updated"
 msgstr "La bibliothèque a été mise à jour avec succès"
 
-#: musique/views.py:81
+#: library/views.py:84
 msgid "The artist does not have any song"
 msgstr "L'artiste n'a aucune chanson"
 
-#: musique/views.py:91
+#: library/views.py:94
 msgid "The album does not have any song"
 msgstr "L'album n'a aucune chanson"
 
@@ -106,61 +106,61 @@ msgstr "Retour à la page d'accueil"
 msgid "Internal server error"
 msgstr "Erreur interne du serveur"
 
-#: templates/musique/album_detail.html:13
-#: templates/musique/artist_detail.html:10
-#: templates/musique/song_detail.html:11
+#: templates/library/album_detail.html:13
+#: templates/library/artist_detail.html:10
+#: templates/library/song_detail.html:11
 msgid "edit"
 msgstr "modifier"
 
-#: templates/musique/album_detail.html:17
-#: templates/musique/song_detail.html:15
+#: templates/library/album_detail.html:17
+#: templates/library/song_detail.html:15
 msgid "by"
 msgstr "par"
 
-#: templates/musique/album_detail.html:30
+#: templates/library/album_detail.html:30
 msgid "Download Album"
 msgstr "Télécharger l'album"
 
-#: templates/musique/album_list.html:4 templates/musique/album_list.html:7
-#: templates/musique/base.html:13
+#: templates/library/album_list.html:4 templates/library/album_list.html:7
+#: templates/library/base.html:13
 msgid "Albums"
 msgstr "Albums"
 
-#: templates/musique/artist_detail.html:14
+#: templates/library/artist_detail.html:14
 msgid "Download Artist Discography"
 msgstr "Télécharger la discographie de l'artiste"
 
-#: templates/musique/artist_list.html:4 templates/musique/artist_list.html:7
-#: templates/musique/base.html:12
+#: templates/library/artist_list.html:4 templates/library/artist_list.html:7
+#: templates/library/base.html:12
 msgid "Artists"
 msgstr "Artistes"
 
-#: templates/musique/base.html:11 templates/musique/home.html:5
+#: templates/library/base.html:11 templates/library/home.html:5
 msgid "Home"
 msgstr "Accueil"
 
-#: templates/musique/base.html:22
+#: templates/library/base.html:22
 msgid "Log in"
 msgstr "Connexion"
 
-#: templates/musique/home.html:12 templates/search/search.html:4
+#: templates/library/home.html:12 templates/search/search.html:4
 #: templates/search/search.html.py:11
 msgid "Search"
 msgstr "Rechercher"
 
-#: templates/musique/home.html:20
+#: templates/library/home.html:20
 msgid "Update Library"
 msgstr "Mettre à jour la bibliothèque"
 
-#: templates/musique/song_detail.html:16
+#: templates/library/song_detail.html:16
 msgid "on"
 msgstr "sur"
 
-#: templates/musique/song_detail.html:21
+#: templates/library/song_detail.html:21
 msgid "Download Song"
 msgstr "Télécharger la chanson"
 
-#: templates/musique/song_list.html:4 templates/musique/song_list.html.py:7
+#: templates/library/song_list.html:4 templates/library/song_list.html.py:7
 msgid "Songs"
 msgstr "Chansons"
 

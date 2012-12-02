@@ -25,10 +25,7 @@ playlists, search the library and download audio files.
 * [mutagen][] (for getting information on audio files)
 * [haystack][] (for searching the library)
 * [python-mpd][] (for interfacing with the mpd server)
-
-Optional:
-
-* [selenium][] (for running some unit tests)
+* [Python Imaging Library (PIL)][PIL] (for dealing with album cover art)
 
 These can all be installed using [pip][] with the command `pip install -r
 requirements.txt`.
@@ -82,7 +79,7 @@ such a multi-faceted project.
 [mutagen]: https://code.google.com/p/mutagen
 [haystack]: http://haystacksearch.org
 [python-mpd]: http://pypi.python.org/pypi/python-mpd
+[PIL]: http://www.pythonware.com/products/pil
 [south]: http://south.aeracode.org
-[selenium]: https://code.google.com/p/selenium
 [pip]: http://www.pip-installer.org
 [Rafik Draoui]: http://www.rafik.ca

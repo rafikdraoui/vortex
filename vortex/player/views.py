@@ -38,7 +38,7 @@ def mpd_command(func):
             except ConnectionError:
                 pass
 
-        # add a success key if it is not already in the result dict.
+        # add a success key in the result dict if not already present.
         result.setdefault('success', True)
 
         json = simplejson.dumps(result)

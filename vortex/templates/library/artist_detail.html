@@ -7,7 +7,7 @@
 {% block content %}
   <h1>
     {{ artist }}
-    <a class="small" href="{% url 'admin:library_artist_change' artist.id %}"> ({% trans "edit" %})</a>
+    <a class="small-link" href="{% url 'admin:library_artist_change' artist.id %}"> ({% trans "edit" %})</a>
   </h1>
 
   <h5>
@@ -16,14 +16,14 @@
 
   <ul class="thumbnails">
     {% for album in albums %}
-      <li class="span4">
-        <div class="thumbnail">
-          <a href="{{ album.get_absolute_url }}"><img src="{{ album.cover.url }}"></a>
-          <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
-        </div>
-      </li>
+      {% if forloop.counter0|divisibleby:"3" %}<div class="row">{% endif %}
+        <li class="span4">
+          <div class="thumbnail">
+            <a href="{{ album.get_absolute_url }}"><img src="{{ album.cover.url }}"></a>
+            <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
+          </div>
+        </li>
+      {% if forloop.counter|divisibleby:"3" %}</div>{% endif %}
     {% endfor %}
   </ul>
-
-
 {% endblock %}

@@ -23,3 +23,11 @@ LOGFORMAT = '%(asctime)s: %(message)s'
 # Option to automatically titlecase the names of artists and albums that are
 # uploaded from the dropbox.
 TITLECASE_ARTIST_AND_ALBUM_NAMES = False
+
+# MPD configuration
+MPD_HOST = 'localhost'
+MPD_PORT = 6600
+MPD_PASSWORD = None
+
+# Time (in ms) between updating of player interface (put 0 for never).
+PLAYER_REFRESH_INTERVAL = 5000

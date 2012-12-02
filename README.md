@@ -73,8 +73,8 @@ default, it is `conf/vortex_config.py`).
 
 This is built by [Rafik Draoui][] and it is my first non-trivial personal
 project. It was made for real-life usage in my household, but primarily for
-providing an excuse to learn Django, i18n/l10n and whatever else would come up
-in such a multi-faceted project.
+providing an excuse to learn Django, i18n and whatever else would come up in
+such a multi-faceted project.
 
 [mpd]: http://musicpd.org
 [rdd]: http://tom.preston-werner.com/2010/08/23/readme-driven-development.html

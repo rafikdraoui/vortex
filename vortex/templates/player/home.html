@@ -1,0 +1,59 @@
+{% extends "player/base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}{% trans "Home" %}{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div id="player" class="offset1 span8">
+
+      <div id="error-messages"></div>
+      <div id="song-info"></div>
+
+      <div id="controls">
+        <div class="btn-group">
+          <a id="prev-button" class="btn btn-primary">
+            <i class="icon-step-backward icon-white"></i>
+          </a>
+          <a id="play-pause-button" class="btn btn-primary">
+            <i class="icon-play icon-white"></i>
+          </a>
+          <a id="next-button" class="btn btn-primary">
+            <i class="icon-step-forward icon-white"></i>
+          </a>
+        </div>
+        <div class="btn-group" data-toggle="buttons-checkbox">
+          <a id="random-button" class="btn btn-primary">
+              <i class="icon-random icon-white"></i>
+          </a>
+          <a id="repeat-button" class="btn btn-primary">
+              <i class="icon-repeat icon-white"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <a href="{% url 'library_home' %}">{% trans "Browse Music Library" %}</a>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    /* Variables needed by player.js */
+    var vortex = {
+            urls: {
+                update: "{% url 'get_current_info' %}",
+                play_pause: "{% url 'play_pause' %}",
+                next: "{% url 'next' %}",
+                prev: "{% url 'previous' %}",
+                random: "{% url 'random' %}",
+                repeat: "{% url 'repeat' %}",
+            },
+            refresh_rate: {{ REFRESH_INTERVAL }}
+    };
+  </script>
+  <script src="{{ STATIC_URL }}js/player.js"></script>
+ {% endblock %}

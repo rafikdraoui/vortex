@@ -68,7 +68,9 @@ INSTALLED_APPS = (
 
     'south',
     'haystack',
+
     'vortex.library',
+    'vortex.player',
 )
 
 LOGGING = {

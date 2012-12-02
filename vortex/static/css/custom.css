@@ -2,33 +2,6 @@
     margin-bottom: 3em;
 }
 
-.thumbnails {
-    margin-top: 3em;
-}
-
-.thumbnail h3 {
-    text-align: center;
-}
-
-.small {
-    font-size: small;
-}
-
-.list li {
-    border-top: thin groove;
-    list-style: none;
-    padding: .7em;
-    width: 70%;
-}
-
-.list li:first-child {
-    border-top: none;
-}
-
-.list li:nth-child(odd) {
-    background-color: #eee;
-}
-
-.list-compact li {
-    padding: .3em;
+.row {
+    margin-bottom: 2em;
 }

@@ -172,8 +172,8 @@ class ArtistModelTest(ModelTest):
         artist2 = Artist.objects.get(name='Other Artist')
         original_filename = full_path(artist1.filepath)
 
-        self.assertEquals(len(artist1.album_set.all()), 2)
-        self.assertEquals(len(artist2.album_set.all()), 2)
+        self.assertEquals(artist1.album_set.count(), 2)
+        self.assertEquals(artist2.album_set.count(), 2)
 
         artist1.name = 'Other Artist'
         artist1.save()
@@ -186,15 +186,14 @@ class ArtistModelTest(ModelTest):
         # Check that Album.DoesNotExist is not thrown
         Album.objects.get(title='First Album')
 
-        albums = artist2.album_set.all()
-        self.assertEquals(len(albums), 3)
+        self.assertEquals(artist2.album_set.count(), 3)
         self.assertItemsEqual(
             os.listdir(full_path(artist2.filepath)),
             ['First Album', 'Second Album', 'Common Album'])
 
         # Check to see that the songs of the common album were merged
         common_album = artist2.album_set.get(title='Common Album')
-        self.assertEquals(len(common_album.song_set.all()), 3)
+        self.assertEquals(common_album.song_set.count(), 3)
         self.assertItemsEqual(os.listdir(full_path(common_album.filepath)),
                               ['cover.jpg',
                                'Common Song 1.ogg',
@@ -298,8 +297,8 @@ class AlbumModelTest(ModelTest):
         album2 = Album.objects.get(title='Second Album')
         original_filename = full_path(album1.filepath)
 
-        self.assertEquals(len(album1.song_set.all()), 1)
-        self.assertEquals(len(album2.song_set.all()), 1)
+        self.assertEquals(album1.song_set.count(), 1)
+        self.assertEquals(album2.song_set.count(), 1)
 
         album1.title = 'Second Album'
         album1.save()
@@ -309,8 +308,7 @@ class AlbumModelTest(ModelTest):
                           title='First Album')
         self.assertFalse(os.path.exists(original_filename))
 
-        songs = album2.song_set.all()
-        self.assertEquals(len(songs), 2)
+        self.assertEquals(album2.song_set.count(), 2)
         self.assertItemsEqual(
             os.listdir(full_path(album2.filepath)),
             ['cover.jpg', '02 - Second Song.ogg', 'The First Song.ogg']

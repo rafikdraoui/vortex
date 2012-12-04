@@ -35,6 +35,7 @@ class ArtistDetailView(DetailView):
 
 class AlbumDetailView(DetailView):
     model = Album
+    queryset = Album.objects.select_related('artist')
 
     def get_context_data(self, **kwargs):
         context = super(AlbumDetailView, self).get_context_data(**kwargs)
@@ -63,9 +64,9 @@ def _download(instance):
     tfile = tempfile.NamedTemporaryFile(suffix='.zip')
     zip_folder(full_path(instance.filepath), tfile.name)
 
-    #TODO: Use iterator in case data is too big for memory. This implies
-    # that the temporary file needs to stay on disk during download, and
-    # that it is deleted at some later time.
+    #TODO: Use iterator instead in case data is too big for memory. This
+    # implies that the temporary file needs to stay on disk during download,
+    # and that it is deleted at some later time.
     tfile.seek(0)
     data = tfile.read()
     tfile.close()
@@ -79,7 +80,7 @@ def _download(instance):
 
 def download_artist(request, pk):
     artist = Artist.objects.get(pk=pk)
-    if len(artist.song_set.all()) == 0:
+    if artist.song_set.count() == 0:
         messages.add_message(
             request, messages.INFO, _('The artist does not have any song'))
         return redirect(artist.get_absolute_url())
@@ -89,7 +90,7 @@ def download_artist(request, pk):
 
 def download_album(request, pk):
     album = Album.objects.get(pk=pk)
-    if len(album.song_set.all()) == 0:
+    if album.song_set.count() == 0:
         messages.add_message(
             request, messages.INFO, _('The album does not have any song'))
         return redirect(album.get_absolute_url())

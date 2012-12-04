@@ -118,9 +118,9 @@ class ViewTest(TestCase):
                     self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.ogg')
 
-        self.assertEquals(len(Artist.objects.all()), 0)
-        self.assertEquals(len(Album.objects.all()), 0)
-        self.assertEquals(len(Song.objects.all()), 0)
+        self.assertFalse(Artist.objects.exists())
+        self.assertFalse(Album.objects.exists())
+        self.assertFalse(Song.objects.exists())
         self.assertTrue(os.path.exists(filename))
 
         with open(filename, 'rb') as f:
@@ -177,7 +177,7 @@ class ViewTest(TestCase):
         filename = os.path.join(self.dropbox, 'testfile.mp3')
         update.import_file(filename, self.mutagen_opts)
 
-        self.assertEquals(len(Song.objects.all()), 1)
+        self.assertEquals(Song.objects.count(), 1)
 
         song = Song.objects.get(title='The Song')
         self.assertEquals(song.bitrate, 320000)
@@ -233,13 +233,9 @@ class ViewTest(TestCase):
         self.assertNoLogError()
         self.assertEquals(os.listdir(self.dropbox), [])
 
-        all_artists = Artist.objects.all()
-        all_albums = Album.objects.all()
-        all_songs = Song.objects.all()
-
-        self.assertEquals(len(all_artists), 2)
-        self.assertEquals(len(all_albums), 4)
-        self.assertEquals(len(all_songs), 6)
+        self.assertEquals(Artist.objects.count(), 2)
+        self.assertEquals(Album.objects.count(), 4)
+        self.assertEquals(Song.objects.count(), 6)
 
         self.assertItemsEqual(os.listdir(self.media_dir), ['L', 'T'])
         filename = os.path.join(self.media_dir, 'T', 'The Artist',

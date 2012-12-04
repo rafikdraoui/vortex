@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from haystack.views import SearchView
 
@@ -36,10 +36,12 @@ urlpatterns = patterns('',
         name='download_album'),
 
     url(r'^song/$',
-        AlphabetizedListView.as_view(model=Song),
+        ListView.as_view(
+            model=Song, queryset=Song.objects.select_related('artist')),
         name='song_list'),
     url(r'^song/(?P<pk>\d+)/$',
-        DetailView.as_view(model=Song),
+        DetailView.as_view(model=Song,
+                           queryset=Song.objects.select_related(depth=1)),
         name='song_detail'),
 
     #FIXME: expose views.update_library to admin only

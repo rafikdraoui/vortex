@@ -15,15 +15,17 @@
   </h5>
 
   <ul class="thumbnails">
-    {% for album in albums %}
-      {% if forloop.counter0|divisibleby:"3" %}<div class="row">{% endif %}
-        <li class="span4">
-          <div class="thumbnail">
-            <a href="{{ album.get_absolute_url }}"><img src="{{ album.cover.url }}"></a>
-            <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
-          </div>
-        </li>
-      {% if forloop.counter|divisibleby:"3" %}</div>{% endif %}
-    {% endfor %}
+    {% with albums=artist.album_set.all %}
+      {% for album in albums %}
+        {% if forloop.counter0|divisibleby:"3" %}<div class="row">{% endif %}
+          <li class="span4">
+            <div class="thumbnail">
+              <a href="{{ album.get_absolute_url }}"><img src="{{ album.cover.url }}"></a>
+              <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
+            </div>
+          </li>
+        {% if forloop.counter|divisibleby:"3" %}</div>{% endif %}
+      {% endfor %}
+    {% endwith %}
   </ul>
 {% endblock %}

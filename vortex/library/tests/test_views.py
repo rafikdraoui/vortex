@@ -132,7 +132,7 @@ class ViewTest(TestCase):
 
         self.assertEquals(song.title, 'The Song')
         self.assertEquals(song.album.title, 'The Album')
-        self.assertEquals(song.artist.name, 'The Artist')
+        self.assertEquals(song.album.artist.name, 'The Artist')
         self.assertEquals(song.track, '01')
         self.assertEquals(song.bitrate, 160000)
         self.assertEquals(song.filetype, 'ogg')
@@ -260,9 +260,8 @@ class ViewTest(TestCase):
                          'attachment; filename=The%20Artist.zip')
 
         # check structure of returned zip file
-        songs = Artist.objects.get(pk=1).song_set.all()
-        original_song_names = map(lambda s: s.filefield.name[2:],
-                                  list(songs))
+        songs = Song.objects.filter(album__artist=1)
+        original_song_names = [s.filefield.name[2:] for s in songs]
 
         content = ContentFile(response.content)
         self.assertTrue(zipfile.is_zipfile(content))

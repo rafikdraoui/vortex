@@ -13,18 +13,19 @@ from django.db import IntegrityError
 from vortex.library.models import Artist, Album, Song
 
 
-LOGGER = logging.getLogger(__name__)
-DEFAULT_ALBUM_COVER_IMAGE = os.path.join(settings.STATIC_ROOT,
-                                         'img',
-                                         'default-cover.jpg')
-SongInfo = namedtuple('SongInfo', ['title', 'artist', 'album',
-                                   'track', 'bitrate', 'cover_data'])
-
-
 if settings.TITLECASE_ARTIST_AND_ALBUM_NAMES:
     from vortex.library.utils import titlecase
 else:
     titlecase = lambda x: x
+
+LOGGER = logging.getLogger(__name__)
+
+DEFAULT_ALBUM_COVER_IMAGE = os.path.join(settings.STATIC_ROOT,
+                                         'img',
+                                         'default-cover.jpg')
+
+SongInfo = namedtuple('SongInfo', ['title', 'artist', 'album',
+                                   'track', 'bitrate', 'cover_data'])
 
 
 def get_mutagen_audio_options():
@@ -144,7 +145,6 @@ def import_file(filename, mutagen_options):
     try:
         song, created = Song.objects.get_or_create(
             title=info.title,
-            artist=artist,
             album=album,
             track=info.track,
             defaults={'filefield': File(open(filename, 'rb')),

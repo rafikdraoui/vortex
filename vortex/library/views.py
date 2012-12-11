@@ -13,7 +13,7 @@ from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
 from vortex.library import update
-from vortex.library.models import Artist, Album
+from vortex.library.models import Artist, Album, Song
 from vortex.library.utils import full_path, get_alphabetized_list, zip_folder
 
 
@@ -61,7 +61,8 @@ def _download(instance):
 
 def download_artist(request, pk):
     artist = Artist.objects.get(pk=pk)
-    if artist.song_set.count() == 0:
+    num_songs = Song.objects.filter(album__artist=artist).count()
+    if num_songs == 0:
         messages.add_message(
             request, messages.INFO, _('The artist does not have any song'))
         return redirect(artist.get_absolute_url())
@@ -97,5 +98,7 @@ def page_not_found(request, template_name='404.html'):
         return redirect(reverse('admin:library_artist_changelist'))
     if re.match(r'/admin/library/album/(\d+|None)/', request.path):
         return redirect(reverse('admin:library_album_changelist'))
+    if re.match(r'/admin/library/song/(\d+|None)/', request.path):
+        return redirect(reverse('admin:library_song_changelist'))
 
     return defaults.page_not_found(request, template_name)

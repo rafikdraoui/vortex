@@ -15,7 +15,7 @@ class AlbumIndex(SearchIndex):
 
 class SongIndex(SearchIndex):
     text = CharField(document=True, use_template=True)
-    artist = CharField(model_attr='artist')
+    artist = CharField(model_attr='album__artist')
     album = CharField(model_attr='album')
 
 

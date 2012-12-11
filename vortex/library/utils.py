@@ -29,6 +29,31 @@ def titlecase(s):
     return ' '.join(split_titled)
 
 
+def _safe_rmdir(path):
+    """Remove a directory with the given path from the file system if it is
+    empty, logging any eventual error.
+    """
+    if not os.listdir(path):
+        try:
+            os.rmdir(path)
+        except OSError as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info('Problem deleting folder %s: %s' % (path, e))
+
+
+def remove_empty_directories(root=None):
+    """Remove empty directories from the media folder, starting at the given
+    root directory (if not given, the whole media folder is processed).
+    """
+    top = root or settings.MEDIA_ROOT
+    for dirpath, dirnames, filenames in os.walk(top, topdown=False):
+        for directory in dirnames:
+            path = os.path.join(dirpath, directory)
+            _safe_rmdir(path)
+    _safe_rmdir(top)
+
+
 def zip_folder(src_path, dst_path):
     """Zip a directory structure at src_path into the file
     given by dst_path.

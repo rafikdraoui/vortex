@@ -8,11 +8,13 @@
 
   <h2>
     {{ song }}
-    <a class="small-link" href="{% url 'admin:library_song_change' song.id %}">({% trans "edit" %})</a>
+    <a class="small-link" href="{% url 'admin:library_song_change' song.id %}">
+      ({% trans "edit" %})
+    </a>
   </h2>
 
   <h3>
-    {% trans "by" %} <a href="{{ song.artist.get_absolute_url }}">{{ song.artist }}</a>
+    {% trans "by" %} <a href="{{ song.album.artist.get_absolute_url }}">{{ song.album.artist }}</a>
     ({% trans "on" %} <a href="{{ song.album.get_absolute_url }}">{{ song.album }}</a>)
   </h3>
 

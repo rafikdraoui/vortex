@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.forms import ModelForm
+from django.utils.translation import ugettext_lazy as _
 
 from vortex.library.models import Artist, Album, Song
 
@@ -15,14 +16,12 @@ class ArtistModelForm(ModelForm):
 class SongInline(admin.StackedInline):
     model = Song
     fields = [('track', 'title')]
-
     has_add_permission = lambda x, y: False
 
 
 class AlbumInline(admin.StackedInline):
     model = Album
     fields = ('title',)
-
     has_add_permission = lambda x, y: False
 
 
@@ -42,10 +41,15 @@ class AlbumAdmin(admin.ModelAdmin):
 
 
 class SongAdmin(admin.ModelAdmin):
+
+    def get_song_artist(self, song):
+        return '%s' % song.album.artist
+    get_song_artist.short_description = _('Artist')
+
     readonly_fields = ['bitrate', 'filetype', 'filefield',
                        'original_path', 'date_added', 'date_modified']
     search_fields = ['title']
-    list_display = ('title', 'album', 'artist')
+    list_display = ('title', 'album', 'get_song_artist')
     has_add_permission = lambda x, y: False
 
 

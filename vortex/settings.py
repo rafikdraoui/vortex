@@ -104,11 +104,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'vortex.library.update': {
+        'vortex.library.models': {
             'handlers': ['vortex_log'],
             'level': 'INFO'
         },
-        'vortex.library.models': {
+        'vortex.library.update': {
             'handlers': ['vortex_log'],
             'level': 'INFO'
         }

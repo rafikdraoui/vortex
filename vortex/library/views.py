@@ -14,7 +14,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from vortex.library import update
 from vortex.library.models import Artist, Album, Song
-from vortex.library.utils import full_path, get_alphabetized_list, zip_folder
+from vortex.library.utils import (full_path,
+                                  get_alphabetized_list,
+                                  remove_empty_directories,
+                                  sync_cover_images,
+                                  sync_song_files,
+                                  zip_folder)
 
 
 class AlphabetizedListView(ListView):
@@ -67,6 +72,9 @@ def download_artist(request, pk):
             request, messages.INFO, _('The artist does not have any song'))
         return redirect(artist.get_absolute_url())
     else:
+        sync_song_files(Song.objects.filter(album__artist=artist))
+        sync_cover_images(Album.objects.filter(artist=artist))
+        remove_empty_directories(artist.filepath)
         return _download(artist)
 
 
@@ -77,6 +85,9 @@ def download_album(request, pk):
             request, messages.INFO, _('The album does not have any song'))
         return redirect(album.get_absolute_url())
     else:
+        sync_song_files(Song.objects.filter(album=album))
+        sync_cover_images([album])
+        remove_empty_directories(album.filepath)
         return _download(album)
 
 

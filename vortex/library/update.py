@@ -135,6 +135,7 @@ def import_file(filename, mutagen_options):
 
     if created:
         cover_img = get_cover_art(filename, info.cover_data)
+        album.cover_file_type = 'jpg'   # FIXME
         album.cover.save(album.cover.name, cover_img)
 
     filetype = filename.rsplit('.')[-1].lower()

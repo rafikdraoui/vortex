@@ -2,19 +2,9 @@ import os
 import zipfile
 
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from django.core.files.base import ContentFile
 
-
-class CustomStorage(FileSystemStorage):
-    """Custom FileSystemStorage class that overwrites existing files."""
-
-    def _save(self, name, content):
-        if self.exists(name):
-            self.delete(name)
-        return super(CustomStorage, self)._save(name, content)
-
-    def get_available_name(self, name):
-        return name
+from vortex.library.models import Album, Song
 
 
 def full_path(name):
@@ -27,31 +17,6 @@ def titlecase(s):
     """
     split_titled = [w[0].upper() + w[1:].lower() for w in s.split()]
     return ' '.join(split_titled)
-
-
-def _safe_rmdir(path):
-    """Remove a directory with the given path from the file system if it is
-    empty, logging any eventual error.
-    """
-    if not os.listdir(path):
-        try:
-            os.rmdir(path)
-        except OSError as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.info('Problem deleting folder %s: %s' % (path, e))
-
-
-def remove_empty_directories(root=None):
-    """Remove empty directories from the media folder, starting at the given
-    root directory (if not given, the whole media folder is processed).
-    """
-    top = root or settings.MEDIA_ROOT
-    for dirpath, dirnames, filenames in os.walk(top, topdown=False):
-        for directory in dirnames:
-            path = os.path.join(dirpath, directory)
-            _safe_rmdir(path)
-    _safe_rmdir(top)
 
 
 def zip_folder(src_path, dst_path):
@@ -79,3 +44,50 @@ def get_alphabetized_list(model):
     thelist = [{'initial': unicode(instance)[0].upper(), 'instance': instance}
                for instance in instances]
     return sorted(thelist, key=lambda d: d['initial'])
+
+
+def _sync_files(model, filefield_attr, filepath_attr, candidates=None):
+    """Synchronize the files in the media directory with their corresponding
+    model instances given in `candidates`. `filefield_attr` and `filepath_attr`
+    are the names of the instances attributes corresponding to the filefield to
+    be updated and the filepath of the file.
+    """
+
+    if not candidates:
+        candidates = model.objects.select_related().iterator()
+    for instance in candidates:
+        thefile = getattr(instance, filefield_attr)
+        current_path = thefile.name
+        correct_path = getattr(instance, filepath_attr)
+        if current_path != correct_path:
+            content = ContentFile(thefile.read())
+            thefile.delete(save=False)
+            thefile.save(correct_path, content)
+
+
+def sync_song_files(candidates=None):
+    """Ensure that each song instance in the candidates has its file field at
+    the right place in the media directory on the file system.
+    """
+    _sync_files(Song, 'filefield', 'filepath', candidates)
+
+
+def sync_cover_images(candidates=None):
+    """Ensure that each album instance in the candidates has its cover image
+    file at the right place in the media directory on the file system.
+    """
+    _sync_files(Album, 'cover', 'cover_filepath', candidates)
+
+
+def remove_empty_directories(root=None):
+    """Remove empty directories from the media folder, starting at the given
+    root directory (if not given, the whole media folder is processed).
+    """
+    top = full_path(root) if root else settings.MEDIA_ROOT
+    for dirpath, dirnames, filenames in os.walk(top, topdown=False):
+        for directory in dirnames:
+            path = os.path.join(dirpath, directory)
+            if not os.listdir(path):
+                os.rmdir(path)
+    if not os.listdir(top):
+        os.rmdir(top)

@@ -4,7 +4,7 @@ import zipfile
 from django.conf import settings
 from django.core.files.base import ContentFile
 
-from vortex.library.models import Album, Song
+from vortex.library.models import Artist, Album, Song
 
 
 def full_path(name):
@@ -91,3 +91,20 @@ def remove_empty_directories(root=None):
                 os.rmdir(path)
     if not os.listdir(top):
         os.rmdir(top)
+
+
+def delete_empty_instances():
+    """Delete every album that has no song and every artist that has no album.
+    This is used by the `syncfiles` custom management command.
+    """
+    to_delete = []
+    for album in Album.objects.iterator():
+        if album.song_set.count() == 0:
+            to_delete.append(album.pk)
+    Album.objects.filter(id__in=to_delete).delete()
+
+    to_delete = []
+    for artist in Artist.objects.iterator():
+        if artist.album_set.count() == 0:
+            to_delete.append(artist.pk)
+    Artist.objects.filter(id__in=to_delete).delete()

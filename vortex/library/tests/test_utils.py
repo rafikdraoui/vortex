@@ -12,7 +12,8 @@ from django.test.utils import override_settings
 
 from vortex.library import update
 from vortex.library.models import Artist, Album, Song, CustomStorage
-from vortex.library.utils import (full_path,
+from vortex.library.utils import (delete_empty_instances,
+                                  full_path,
                                   remove_empty_directories,
                                   sync_song_files,
                                   sync_cover_images,
@@ -144,6 +145,37 @@ class UtilsTest(TestCase):
 
         self.assertFalse(os.path.exists(full_path(original_path)))
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
+
+    def test_delete_empty_instances(self):
+        artist = Artist.objects.create(name='Brian')
+        Album.objects.create(title='Spam',
+                             artist=artist)
+        album2 = Album.objects.create(title='Eggs',
+                                      artist=artist)
+        song = Song.objects.create(title='A song',
+                                   album=album2,
+                                   bitrate=128000)
+
+        delete_empty_instances()
+
+        # Check that the album 'Spam' has been deleted
+        self.assertRaises(Album.DoesNotExist,
+                          Album.objects.get,
+                          title='Spam')
+
+        # Check that Album.DoesNotExist if not raised for album2
+        Album.objects.get(title='Eggs')
+
+        song.delete()
+        delete_empty_instances()
+
+        # Check that album2 and artist have been deleted
+        self.assertRaises(Album.DoesNotExist,
+                          Album.objects.get,
+                          title='Eggs')
+        self.assertRaises(Artist.DoesNotExist,
+                          Artist.objects.get,
+                          name='Brian')
 
     def test_titlecase(self):
         self.assertEqual(titlecase('spam and eggs'), 'Spam And Eggs')

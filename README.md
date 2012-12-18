@@ -26,6 +26,8 @@ playlists, search the library and download audio files.
 * [haystack][] (for searching the library)
 * [python-mpd][] (for interfacing with the mpd server)
 * [Python Imaging Library (PIL)][PIL] (for dealing with album cover art)
+* [dj-database-url][] (for parsing a `$DATABASE_URL` env variable into a proper
+                       database setting as required by Django)
 
 These can all be installed using [pip][] with the command `pip install -r
 requirements.txt`.
@@ -47,23 +49,40 @@ python manage.py migrate
 You can also verify that all unit tests are passing with `python manage.py
 test library`.
 
-You should change the `settings.py` file to fit your needs (or create
-a `local_settings.py` file that overloads it). At the very least you need to
-provide the followings:
+Configuration options are specified through environment variables, as Python
+variables in `config.py` and optionnaly in a `local_settings.py` file that is
+sourced by `django.conf.settings`.
 
-* `SECRET_KEY`: the secret key used for security in Django. A string of 50
+### Environment variables
+
+* `DATABASE_URL`: The URL for the database in a format suitable for
+  `dj_database_url`. Eg: postgres://user@host:5432/vortex
+
+* `VORTEX_MEDIA_ROOT`: The path of the directory in which music files are kept.
+  This should be the same as the `music_directory` option in the configuration
+  file of the mpd server.
+
+* `VORTEX_DROPBOX`: The path of the directory in which files that are to be
+  imported into the music library are uploaded.
+
+* `VORTEX_LOGFILE`: The file used for logging. Note that this will probably be
+  removed in the future to log directly to standard output in order for
+  `vortex` to be more easily run as a managed app.
+
+#### Optional
+
+* `VORTEX_SECRET_KEY`: the secret key used for security in Django. A string of 50
   random characters would do.
 
-* `DATABASES`: configuration info for your database.
-
-* `STATIC_ROOT`: the root folder on the file system from where static files
+* `VORTEX_STATIC_ROOT`: the root folder on the file system from where static files
   will be served.
 
-You might also want to change the Haystack search engine to a proper one, like
-Solr or ElasticSearch.
+* `MPD_HOST`, `MPD_PORT`, `MPD_PASSWORD`: MPD configuration.
 
-Application specific settings are provided in a configuration file (by
-default, it is `conf/vortex_config.py`).
+### Other settings
+
+The other settings are described in `config.py`. You might want to change the
+Haystack search engine to a proper one, like Solr or ElasticSearch.
 
 
 ## About
@@ -81,5 +100,6 @@ such a multi-faceted project.
 [python-mpd]: http://pypi.python.org/pypi/python-mpd
 [PIL]: http://www.pythonware.com/products/pil
 [south]: http://south.aeracode.org
+[dj-database-url]: https://github.com/kennethreitz/dj-database-url
 [pip]: http://www.pip-installer.org
 [Rafik Draoui]: http://www.rafik.ca

@@ -1,34 +1,34 @@
 # Django settings for vortex project.
 
-# This is a generic public settings file. To have a working app you should
-# put your local settings into a file called local_settings.py
+# This a generic settings file. It assumes that some options have been defined
+# in vortex.conf and through environment variables. You can override some
+# settings or add extra ones (like ADMINS or LANGUAGE_CODE) in a file called
+# local_settings.py.
 
 import os
+import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
+
 
 PROJECT_DIR = os.path.dirname(__file__)
 
-try:
-    from vortex.conf import *
-except:
-    from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured(
-                'vortex.conf is missing or is improperly configured')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                       # Or path to database file if using sqlite3.
-        'USER': '',                       # Not used with sqlite3.
-        'PASSWORD': '',                   # Not used with sqlite3.
-        'HOST': '',                       # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                       # Set to empty string for default. Not used with sqlite3.
-    }
-}
+# Import app specific settings.
+try:
+    from vortex.config import *
+except ImportError:
+    raise ImproperlyConfigured(
+        'vortex.conf is missing or is improperly configured')
+except KeyError as e:
+    raise ImproperlyConfigured(
+        '%s configuration option is missing. '
+        'It should be defined as an environment variable.' % e)
+
+# Parse database configuration from $DATABASE_URL environment variable.
+DATABASES = {'default': dj_database_url.config()}
 
 SITE_ID = 1
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
 USE_L10N = True
 
 FILE_UPLOAD_PERMISSIONS = 0644
@@ -37,13 +37,11 @@ MEDIA_URL = '/media/'
 
 STATIC_URL = '/static/'
 
-# Additional locations of static files
 STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_DIR, 'static'),
 )
+
+STATIC_ROOT = os.environ.get('VORTEX_STATIC_ROOT', '')
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_DIR, 'templates'),
@@ -52,6 +50,8 @@ TEMPLATE_DIRS = (
 LOCALE_PATHS = (
     os.path.join(PROJECT_DIR, 'locale'),
 )
+
+SECRET_KEY = os.environ.get('VORTEX_SECRET_KEY', '')
 
 ROOT_URLCONF = 'vortex.urls'
 
@@ -115,6 +115,7 @@ LOGGING = {
     }
 }
 
+# Haystack settings
 HAYSTACK_SITECONF = 'vortex.library.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'simple'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100

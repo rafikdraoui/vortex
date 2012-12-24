@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import defaults
 from django.views.decorators.csrf import requires_csrf_token
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
@@ -27,6 +27,14 @@ class AlphabetizedListView(ListView):
         context = super(AlphabetizedListView, self).get_context_data(**kwargs)
         context['alpha_list'] = get_alphabetized_list(self.model)
         return context
+
+
+# Subclassed to ensure that the download url is up to date.
+class SongDetailView(DetailView):
+    def get_object(self, queryset=None):
+        obj = super(SongDetailView, self).get_object(queryset)
+        sync_song_files([obj])
+        return obj
 
 
 def library_home(request):

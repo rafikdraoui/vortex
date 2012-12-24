@@ -5,6 +5,7 @@ from haystack.views import SearchView
 
 from vortex.library.models import Artist, Album, Song
 from vortex.library.views import (AlphabetizedListView,
+                                  SongDetailView,
                                   download_artist,
                                   download_album,
                                   library_home,
@@ -37,7 +38,7 @@ urlpatterns = patterns('',
         ListView.as_view(queryset=Song.objects.select_related()),
         name='song_list'),
     url(r'^song/(?P<pk>\d+)/$',
-        DetailView.as_view(queryset=Song.objects.select_related()),
+        SongDetailView.as_view(queryset=Song.objects.select_related()),
         name='song_detail'),
 
     #FIXME: expose views.update_library to admin only

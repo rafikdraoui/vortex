@@ -50,7 +50,7 @@ You can also verify that all unit tests are passing with `python manage.py
 test library`.
 
 Configuration options are specified through environment variables, as Python
-variables in `config.py` and optionnaly in a `local_settings.py` file that is
+variables in `config.py` and optionally in a `local_settings.py` file that is
 sourced by `django.conf.settings`.
 
 ### Environment variables

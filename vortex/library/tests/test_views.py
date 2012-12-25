@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 import os
 import shutil
 import tempfile
@@ -110,6 +112,17 @@ class ViewTest(TestCase):
         self.assertEqual(info.title, 'The Song')
         self.assertEqual(info.track, '01')
         self.assertEqual(info.bitrate, 198000)
+        self.assertNoLogError()
+
+    def test_get_song_info_unicode_file(self):
+        filename = os.path.join(TEST_FILES_DIR, u'ȕñĭçợƌɇ⸞ƒıℓⱻ.ogg')
+        info = update.get_song_info(filename, self.mutagen_opts)
+
+        self.assertEqual(info.artist, u'ṫħĕ Ⓐ řⱦⅈṩȶ')
+        self.assertEqual(info.album, 'The Album')
+        self.assertEqual(info.title, 'The Song')
+        self.assertEqual(info.track, '01')
+        self.assertEqual(info.bitrate, 160000)
         self.assertNoLogError()
 
     def test_import_file(self):

@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def player_home(request):
-    return render(request, 'player/home.html',
+    return render(request,
+                  'player/home.html',
                   {'REFRESH_INTERVAL': settings.PLAYER_REFRESH_INTERVAL})
 
 
@@ -93,5 +94,4 @@ def get_current_info(client):
     state = status.get('state')
     random = status.get('random') == '1'
     repeat = status.get('repeat') == '1'
-    info = dict(song=song, state=state, random=random, repeat=repeat)
-    return info
+    return dict(song=song, state=state, random=random, repeat=repeat)

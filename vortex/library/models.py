@@ -103,7 +103,6 @@ class Album(models.Model):
     @property
     def cover_filepath(self, filename=''):
         """Return an appropriate file system path for the album cover."""
-
         return os.path.join(self.filepath, 'cover.%s' % self.cover_file_type)
 
     # Overriden to take care of merging two albums.

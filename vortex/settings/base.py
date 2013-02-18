@@ -1,16 +1,16 @@
 # Django settings for vortex project.
 
 # This a generic settings file. It assumes that some options have been defined
-# in vortex.conf and through environment variables. You can override some
+# in vortex.config and through environment variables. You can override some
 # settings or add extra ones (like ADMINS or LANGUAGE_CODE) in a file called
-# local_settings.py.
+# local.py.
 
 import os
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 
-PROJECT_DIR = os.path.dirname(__file__)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 
 # Import app specific settings.
@@ -18,7 +18,7 @@ try:
     from vortex.config import *
 except ImportError:
     raise ImproperlyConfigured(
-        'vortex.conf is missing or is improperly configured')
+        'vortex.config is missing or is improperly configured')
 except KeyError as e:
     raise ImproperlyConfigured(
         '%s configuration option is missing. '
@@ -38,17 +38,17 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'static'),
+    os.path.join(PROJECT_ROOT, 'static'),
 )
 
 STATIC_ROOT = os.environ.get('VORTEX_STATIC_ROOT', '')
 
 TEMPLATE_DIRS = (
-    os.path.join(PROJECT_DIR, 'templates'),
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 LOCALE_PATHS = (
-    os.path.join(PROJECT_DIR, 'locale'),
+    os.path.join(PROJECT_ROOT, 'locale'),
 )
 
 SECRET_KEY = os.environ.get('VORTEX_SECRET_KEY', '')
@@ -119,8 +119,3 @@ LOGGING = {
 HAYSTACK_SITECONF = 'vortex.library.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'simple'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
-
-try:
-    from local_settings import *
-except:
-    pass

@@ -50,13 +50,13 @@ You can also verify that all unit tests are passing with `python manage.py
 test library`.
 
 Configuration options are specified through environment variables, as Python
-variables in `config.py` and optionally in a `local_settings.py` file that is
-sourced by `django.conf.settings`.
+variables in `config.py` and optionally in a `settings/local.py` file.
+
 
 ### Environment variables
 
 * `DATABASE_URL`: The URL for the database in a format suitable for
-  `dj_database_url`. Eg: postgres://user@host:5432/vortex
+  `dj_database_url`. (for example, `postgres://user@host:5432/vortex`)
 
 * `VORTEX_MEDIA_ROOT`: The path of the directory in which music files are kept.
   This should be the same as the `music_directory` option in the configuration

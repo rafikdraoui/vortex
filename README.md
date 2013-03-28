@@ -25,7 +25,7 @@ playlists, search the library and download audio files.
 * [mutagen][] (for getting information on audio files)
 * [haystack][] (for searching the library)
 * [python-mpd][] (for interfacing with the mpd server)
-* [Python Imaging Library (PIL)][PIL] (for dealing with album cover art)
+* [Pillow][] (or [PIL][]) (for dealing with album cover art)
 * [dj-database-url][] (for parsing a `$DATABASE_URL` env variable into a proper
                        database setting as required by Django)
 
@@ -33,21 +33,7 @@ These can all be installed using [pip][] with the command `pip install -r
 requirements.txt`.
 
 
-## Installation and Configuration
-
-This is a Django application. Put it somewhere where your webserver can make
-sense of it.
-
-Before running the application, you need to sync the database and migrate the
-table schemas with the following commands:
-
-```
-python manage.py syncdb
-python manage.py migrate
-```
-
-You can also verify that all unit tests are passing with `python manage.py
-test library`.
+## Configuration
 
 Configuration options are specified through environment variables, as Python
 variables in `config.py` and optionally in a `settings/local.py` file.
@@ -98,6 +84,7 @@ such a multi-faceted project.
 [mutagen]: https://code.google.com/p/mutagen
 [haystack]: http://haystacksearch.org
 [python-mpd]: http://pypi.python.org/pypi/python-mpd
+[Pillow]: https://github.com/python-imaging/Pillow
 [PIL]: http://www.pythonware.com/products/pil
 [south]: http://south.aeracode.org
 [dj-database-url]: https://github.com/kennethreitz/dj-database-url

@@ -1,9 +1,9 @@
 from django.core.management.base import NoArgsCommand
 
-from vortex.library.utils import (delete_empty_instances,
-                                  remove_empty_directories,
-                                  sync_cover_images,
-                                  sync_song_files)
+from ...utils import (
+    delete_empty_instances, remove_empty_directories, sync_cover_images,
+    sync_song_files
+)
 
 
 class Command(NoArgsCommand):

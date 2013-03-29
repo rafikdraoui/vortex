@@ -13,9 +13,9 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from vortex.library import update
-from vortex.library.models import Artist, Album, Song, CustomStorage
-from vortex.library.views import update_library
+from .. import update
+from ..models import Artist, Album, Song, CustomStorage
+from ..views import update_library
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()

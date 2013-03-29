@@ -12,14 +12,12 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
-from vortex.library import update
-from vortex.library.models import Artist, Album, Song
-from vortex.library.utils import (full_path,
-                                  get_alphabetized_list,
-                                  remove_empty_directories,
-                                  sync_cover_images,
-                                  sync_song_files,
-                                  zip_folder)
+from . import update
+from .models import Artist, Album, Song
+from .utils import (
+    full_path, get_alphabetized_list, remove_empty_directories,
+    sync_cover_images, sync_song_files, zip_folder
+)
 
 
 class AlphabetizedListView(ListView):

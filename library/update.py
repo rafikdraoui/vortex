@@ -10,11 +10,11 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import IntegrityError
 
-from vortex.library.models import Artist, Album, Song
+from .models import Artist, Album, Song
 
 
 if settings.TITLECASE_ARTIST_AND_ALBUM_NAMES:
-    from vortex.library.utils import titlecase
+    from .utils import titlecase
 else:
     titlecase = lambda x: x
 

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
-from vortex.library.models import Artist, Album, Song
+from .models import Artist, Album, Song
 
 
 class ArtistModelForm(ModelForm):

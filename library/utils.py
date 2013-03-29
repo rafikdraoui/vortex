@@ -4,7 +4,7 @@ import zipfile
 from django.conf import settings
 from django.core.files.base import ContentFile
 
-from vortex.library.models import Artist, Album, Song
+from .models import Artist, Album, Song
 
 
 def full_path(name):

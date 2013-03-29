@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from vortex.player.views import *
+from .views import *
 
 urlpatterns = patterns('',
     url(r'^$', player_home, name='player_home'),

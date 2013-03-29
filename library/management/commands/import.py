@@ -3,14 +3,14 @@ import os
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
 
-from vortex.library.update import update
+from ... import update
 
 
 class Command(NoArgsCommand):
     help = 'Import the files in the dropbox folder into the music library.'
 
     def handle_noargs(self, **options):
-        update()
+        update.update()
 
         if os.listdir(settings.DROPBOX):
             self.stdout.write(

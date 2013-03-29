@@ -10,14 +10,12 @@ import zipfile
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from vortex.library import update
-from vortex.library.models import Artist, Album, Song, CustomStorage
-from vortex.library.utils import (delete_empty_instances,
-                                  full_path,
-                                  remove_empty_directories,
-                                  sync_song_files,
-                                  sync_cover_images,
-                                  titlecase)
+from ..models import Artist, Album, Song, CustomStorage
+from .. import update
+from ..utils import (
+    delete_empty_instances, full_path, remove_empty_directories,
+    sync_song_files, sync_cover_images, titlecase
+)
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()

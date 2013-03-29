@@ -1,9 +1,10 @@
+import json
+
 from mpd import MPDClient, MPDError, ConnectionError
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -42,8 +43,8 @@ def mpd_command(func):
         # add a success key in the result dict if not already present.
         result.setdefault('success', True)
 
-        json = simplejson.dumps(result)
-        return HttpResponse(json, mimetype='application/json')
+        data = json.dumps(result)
+        return HttpResponse(data, mimetype='application/json')
 
     return wrapper
 

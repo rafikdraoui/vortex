@@ -3,13 +3,11 @@ from django.views.generic import DetailView, ListView
 
 from haystack.views import SearchView
 
-from vortex.library.models import Artist, Album, Song
-from vortex.library.views import (AlphabetizedListView,
-                                  SongDetailView,
-                                  download_artist,
-                                  download_album,
-                                  library_home,
-                                  update_library)
+from .models import Artist, Album, Song
+from .views import (
+    AlphabetizedListView, SongDetailView, download_artist, download_album,
+    library_home, update_library
+)
 
 urlpatterns = patterns('',
     url(r'^$', library_home, name='library_home'),

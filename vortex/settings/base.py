@@ -69,8 +69,8 @@ INSTALLED_APPS = (
     'south',
     'haystack',
 
-    'vortex.library',
-    'vortex.player',
+    'library',
+    'player',
 )
 
 LOGGING = {
@@ -104,11 +104,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'vortex.library.models': {
+        'library.models': {
             'handlers': ['vortex_log'],
             'level': 'INFO'
         },
-        'vortex.library.update': {
+        'library.update': {
             'handlers': ['vortex_log'],
             'level': 'INFO'
         }
@@ -116,6 +116,6 @@ LOGGING = {
 }
 
 # Haystack settings
-HAYSTACK_SITECONF = 'vortex.library.search_sites'
+HAYSTACK_SITECONF = 'library.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'simple'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100

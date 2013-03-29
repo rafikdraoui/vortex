@@ -7,8 +7,8 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from vortex.library.models import Artist, Album, Song, CustomStorage
-from vortex.library.utils import full_path
+from ..models import Artist, Album, Song, CustomStorage
+from ..utils import full_path
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()

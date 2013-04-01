@@ -57,7 +57,7 @@ ROOT_URLCONF = 'vortex.urls'
 
 WSGI_APPLICATION = 'vortex.wsgi.application'
 
-INSTALLED_APPS = (
+DJANGO_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -65,13 +65,19 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+)
 
+THIRD_PARTY_APPS = (
     'south',
     'haystack',
+)
 
+LOCAL_APPS = (
     'library',
     'player',
 )
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 LOGGING = {
     'version': 1,

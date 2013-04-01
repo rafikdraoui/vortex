@@ -5,3 +5,5 @@ django-haystack==1.2.7
 python-mpd==0.3.0
 Pillow==2.0.0
 dj-database-url==0.2.1
+
+-e git://github.com/toastdriven/django-haystack.git@f349b5eebbf6763bb2bde074e6ebd06b6ceeb3f4#egg=django_haystack-dev

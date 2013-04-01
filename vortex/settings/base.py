@@ -122,6 +122,9 @@ LOGGING = {
 }
 
 # Haystack settings
-HAYSTACK_SITECONF = 'library.search_sites'
-HAYSTACK_SEARCH_ENGINE = 'simple'
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine'
+    }
+}
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100

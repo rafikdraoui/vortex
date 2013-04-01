@@ -19,7 +19,7 @@
     </h3>
 
     <ul class="list">
-      {% with songs=album.song_set.all %}
+      {% with songs=album.songs.all %}
         {% for song in songs %}
           <li>
             <a href="{{ song.get_absolute_url }}">{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>

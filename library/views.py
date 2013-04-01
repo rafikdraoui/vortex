@@ -86,7 +86,7 @@ def download_artist(request, pk):
 
 def download_album(request, pk):
     album = Album.objects.get(pk=pk)
-    if album.song_set.count() == 0:
+    if album.songs.count() == 0:
         messages.add_message(
             request, messages.INFO, _('The album does not have any song'))
         return redirect(album.get_absolute_url())

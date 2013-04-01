@@ -15,7 +15,7 @@
   </h5>
 
   <ul class="thumbnails">
-    {% with albums=artist.album_set.all %}
+    {% with albums=artist.albums.all %}
       {% for album in albums %}
         {% if forloop.counter0|divisibleby:"3" %}<div class="row">{% endif %}
           <li class="span4">

@@ -46,7 +46,7 @@ class Artist(models.Model):
 
             new_artist = query[0]
 
-            for album in self.album_set.all():
+            for album in self.albums.all():
                 # Used instead of bulk updating in order to update filepaths
                 # and resolve eventual merges of albums.
                 album.artist = new_artist
@@ -66,13 +66,14 @@ class Artist(models.Model):
             # the artist instance needs to be available, which might entail
             # extra database queries.
             # TODO: profile to see which alternative is best.
-            for album in self.album_set.all():
+            for album in self.albums.all():
                 album.save(skip_merge_check=True)
 
 
 class Album(models.Model):
     title = models.CharField(_('title'), max_length=100)
-    artist = models.ForeignKey(Artist, verbose_name=_('artist'))
+    artist = models.ForeignKey(
+        Artist, verbose_name=_('artist'), related_name='albums')
     filepath = models.FilePathField(_('file path'),
                                     path=settings.MEDIA_ROOT,
                                     recursive=True,
@@ -119,12 +120,12 @@ class Album(models.Model):
                 new_album = query[0]
 
                 try:
-                    self.song_set.update(album=new_album)
+                    self.songs.update(album=new_album)
                 except IntegrityError:
                     # At least one of the song already exists under the other
                     # album. We want to ignore these, and so we must save each
                     # song one by one in order to catch the IntegrityError.
-                    for song in self.song_set.all():
+                    for song in self.songs.all():
                         song.album = new_album
                         try:
                             song.save()
@@ -142,7 +143,7 @@ class Album(models.Model):
 
 class Song(models.Model):
     title = models.CharField(_('title'), max_length=100)
-    album = models.ForeignKey(Album, verbose_name=_('album'))
+    album = models.ForeignKey(Album, verbose_name=_('album'), related_name='songs')
     track = models.CharField(_('track'), max_length=10, default='', blank=True)
     bitrate = models.IntegerField(_('bitrate'))
     filetype = models.CharField(_('file type'), max_length=10)

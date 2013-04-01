@@ -99,12 +99,12 @@ def delete_empty_instances():
     """
     to_delete = []
     for album in Album.objects.iterator():
-        if album.song_set.count() == 0:
+        if album.songs.count() == 0:
             to_delete.append(album.pk)
     Album.objects.filter(id__in=to_delete).delete()
 
     to_delete = []
     for artist in Artist.objects.iterator():
-        if artist.album_set.count() == 0:
+        if artist.albums.count() == 0:
             to_delete.append(artist.pk)
     Artist.objects.filter(id__in=to_delete).delete()

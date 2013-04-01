@@ -120,8 +120,8 @@ class ArtistModelTest(ModelTest):
         artist1 = Artist.objects.get(name='First Artist')
         artist2 = Artist.objects.get(name='Other Artist')
 
-        self.assertEqual(artist1.album_set.count(), 2)
-        self.assertEqual(artist2.album_set.count(), 2)
+        self.assertEqual(artist1.albums.count(), 2)
+        self.assertEqual(artist2.albums.count(), 2)
 
         artist1.name = 'Other Artist'
         artist1.save()
@@ -133,16 +133,16 @@ class ArtistModelTest(ModelTest):
         # Check that Album.DoesNotExist is not thrown
         Album.objects.get(title='First Album')
 
-        self.assertEqual(artist2.album_set.count(), 3)
+        self.assertEqual(artist2.albums.count(), 3)
         self.assertItemsEqual(
-            artist2.album_set.values_list('title', flat=True),
+            artist2.albums.values_list('title', flat=True),
             ['First Album', 'Second Album', 'Common Album'])
 
         # Check to see that the songs of the common album were merged
-        common_album = artist2.album_set.get(title='Common Album')
-        self.assertEqual(common_album.song_set.count(), 3)
+        common_album = artist2.albums.get(title='Common Album')
+        self.assertEqual(common_album.songs.count(), 3)
         self.assertItemsEqual(
-            common_album.song_set.values_list('title', flat=True),
+            common_album.songs.values_list('title', flat=True),
             ['Common Song 1', 'Common Song 2', 'Common Song 3'])
 
     def test_save_artist_without_change_is_idempotent(self):
@@ -150,7 +150,7 @@ class ArtistModelTest(ModelTest):
         self.assertEqual(artist.name, 'First Artist')
         self.assertEqual(artist.filepath, 'F/First Artist')
         self.assertItemsEqual(
-            artist.album_set.values_list('title', flat=True),
+            artist.albums.values_list('title', flat=True),
             ['First Album', 'Common Album'])
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
         self.assertItemsEqual(os.listdir(full_path(artist.filepath)),
@@ -161,7 +161,7 @@ class ArtistModelTest(ModelTest):
         self.assertEqual(artist.name, 'First Artist')
         self.assertEqual(artist.filepath, 'F/First Artist')
         self.assertItemsEqual(
-            artist.album_set.values_list('title', flat=True),
+            artist.albums.values_list('title', flat=True),
             ['First Album', 'Common Album'])
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
         self.assertItemsEqual(os.listdir(full_path(artist.filepath)),
@@ -202,8 +202,8 @@ class AlbumModelTest(ModelTest):
         album1 = Album.objects.get(title='First Album')
         album2 = Album.objects.get(title='Second Album')
 
-        self.assertEqual(album1.song_set.count(), 1)
-        self.assertEqual(album2.song_set.count(), 1)
+        self.assertEqual(album1.songs.count(), 1)
+        self.assertEqual(album2.songs.count(), 1)
 
         album1.title = 'Second Album'
         album1.save()
@@ -212,9 +212,9 @@ class AlbumModelTest(ModelTest):
                           Album.objects.get,
                           title='First Album')
 
-        self.assertEqual(album2.song_set.count(), 2)
+        self.assertEqual(album2.songs.count(), 2)
         self.assertItemsEqual(
-            album2.song_set.values_list('title', flat=True),
+            album2.songs.values_list('title', flat=True),
             ['The First Song', 'Second Song'])
 
     def test_omitting_skip_merge_check_raises_integrity_error(self):

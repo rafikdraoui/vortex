@@ -1,7 +1,6 @@
 Django==1.4.5
 South==0.7.6
 mutagen==1.21
-django-haystack==1.2.7
 python-mpd==0.3.0
 Pillow==2.0.0
 dj-database-url==0.2.1

@@ -44,7 +44,7 @@ def mpd_command(func):
         result.setdefault('success', True)
 
         data = json.dumps(result)
-        return HttpResponse(data, mimetype='application/json')
+        return HttpResponse(data, content_type='application/json')
 
     return wrapper
 

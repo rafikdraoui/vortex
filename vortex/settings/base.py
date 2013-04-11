@@ -1,9 +1,8 @@
-# Django settings for vortex project.
-
 # This a generic settings file. It assumes that some options have been defined
 # in vortex.config and through environment variables. You can override some
 # settings or add extra ones (like ADMINS or LANGUAGE_CODE) in a file called
 # local.py.
+from __future__ import unicode_literals
 
 import os
 import dj_database_url
@@ -19,10 +18,6 @@ try:
 except ImportError:
     raise ImproperlyConfigured(
         'vortex.config is missing or is improperly configured')
-except KeyError as e:
-    raise ImproperlyConfigured(
-        '%s configuration option is missing. '
-        'It should be defined as an environment variable.' % e)
 
 # Parse database configuration from $DATABASE_URL environment variable.
 DATABASES = {'default': dj_database_url.config()}

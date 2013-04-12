@@ -4,7 +4,7 @@ import tempfile
 
 from django.core.files import File
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 
 from ..models import Artist, Album, Song, CustomStorage
@@ -15,7 +15,7 @@ TEST_MEDIA_DIR = tempfile.mkdtemp()
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
-class ModelTest(TestCase):
+class ModelTest(TransactionTestCase):
 
     def setUp(self):
         self.media_dir = TEST_MEDIA_DIR

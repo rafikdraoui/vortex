@@ -7,7 +7,7 @@ import shutil
 import tempfile
 import zipfile
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 
 from ..models import Artist, Album, Song, CustomStorage
@@ -24,7 +24,9 @@ TEST_FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR, DROPBOX=TEST_DROPBOX_DIR)
-class UtilsTest(TestCase):
+class UtilsTest(TransactionTestCase):
+
+    reset_sequences = True
 
     def setUp(self):
         if not os.path.exists(TEST_MEDIA_DIR):

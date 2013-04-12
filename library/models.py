@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
-from django.db import models, IntegrityError
+from django.db import models, transaction, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -119,18 +119,25 @@ class Album(models.Model):
 
                 new_album = query[0]
 
-                try:
-                    self.songs.update(album=new_album)
-                except IntegrityError:
-                    # At least one of the song already exists under the other
-                    # album. We want to ignore these, and so we must save each
-                    # song one by one in order to catch the IntegrityError.
-                    for song in self.songs.all():
-                        song.album = new_album
-                        try:
-                            song.save()
-                        except IntegrityError:
-                            pass
+                with transaction.commit_manually():
+                    try:
+                        self.songs.update(album=new_album)
+                        transaction.commit()
+                    except IntegrityError:
+                        # At least one of the song already exists under the other
+                        # album. We want to ignore these, and so we must save each
+                        # song one by one in order to catch the IntegrityError.
+
+                        transaction.rollback()
+
+                        for song in self.songs.all():
+                            song.album = new_album
+                            try:
+                                song.save()
+                            except IntegrityError:
+                                transaction.rollback()
+                            else:
+                                transaction.commit()
 
                 if self.pk:
                     self.delete()

@@ -9,7 +9,7 @@ from logging import FileHandler
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
@@ -24,7 +24,9 @@ TEST_FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR, DROPBOX=TEST_DROPBOX_DIR)
-class ViewTest(TestCase):
+class ViewTest(TransactionTestCase):
+
+    reset_sequences = True
 
     def setUp(self):
         self.media_dir = TEST_MEDIA_DIR
@@ -284,18 +286,18 @@ class ViewTest(TestCase):
 
     def test_download_artist_with_no_songs_redirects_to_detail_view(self):
         # Create dummy artist
-        Artist.objects.create(name='The Artist')
+        a = Artist.objects.create(name='The Artist')
 
         # make request
         c = Client()
-        response = c.get(reverse('download_artist', args=[1]))
+        response = c.get(reverse('download_artist', args=[a.pk]))
 
         # check response have right headers
         self.assertEqual(response.status_code, 302)
         redirect_url = response.get('Location', '')
         self.assertEqual(
             redirect_url,
-            'http://testserver' + reverse('artist_detail', args=[1]))
+            'http://testserver' + reverse('artist_detail', args=[a.pk]))
 
         # check that a message has been set in the cookie
         self.assertTrue('messages' in response.cookies.keys())

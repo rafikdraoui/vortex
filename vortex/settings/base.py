@@ -1,12 +1,18 @@
-# This a generic settings file. It assumes that some options have been defined
-# in vortex.config and through environment variables. You can override some
-# settings or add extra ones (like ADMINS or LANGUAGE_CODE) in a file called
-# local.py.
+"""
+This a generic settings file. It assumes that some options have been defined in
+vortex.config and through environment variables. You can override some settings
+or add extra ones (like ADMINS or LANGUAGE_CODE) by creating another setting
+file that imports all the variables from this file (see dev.py for an example)
+and pointing to this custom file through the --settings option or
+DJANGO_SETTINGS_MODULE environment variable.
+"""
 from __future__ import unicode_literals
 
 import os
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+
+from ..utils import get_from_env
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -36,7 +42,7 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
 
-STATIC_ROOT = os.environ.get('VORTEX_STATIC_ROOT', '')
+STATIC_ROOT = get_from_env('VORTEX_STATIC_ROOT', '')
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, 'templates'),
@@ -46,13 +52,23 @@ LOCALE_PATHS = (
     os.path.join(PROJECT_ROOT, 'locale'),
 )
 
-SECRET_KEY = os.environ.get('VORTEX_SECRET_KEY', '')
+SECRET_KEY = get_from_env('VORTEX_SECRET_KEY', required=True)
 
 ROOT_URLCONF = 'vortex.urls'
 
 WSGI_APPLICATION = 'vortex.wsgi.application'
 
-DJANGO_APPS = (
+ALLOWED_HOSTS = ('localhost', )
+
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+)
+
+INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -60,19 +76,13 @@ DJANGO_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-)
 
-THIRD_PARTY_APPS = (
     'south',
     'haystack',
-)
 
-LOCAL_APPS = (
     'library',
     'player',
 )
-
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 LOGGING = {
     'version': 1,

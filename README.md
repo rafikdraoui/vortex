@@ -20,29 +20,29 @@ playlists, search the library and download audio files.
 
 
 ## Dependencies
-* [django][]
-* [south][] (for model migrations)
+* [Django][] (>= 1.5)
+* [South][] (for model migrations)
 * [mutagen][] (for getting information on audio files)
-* [haystack][] (for searching the library)
+* [django-haystack][] (for searching the library)
 * [python-mpd][] (for interfacing with the mpd server)
 * [Pillow][] (or [PIL][]) (for dealing with album cover art)
-* [dj-database-url][] (for parsing a `$DATABASE_URL` env variable into a proper
-                       database setting as required by Django)
+* [dj-database-url][] (for parsing a `$DATABASE_URL` environment variable into
+                       a proper database setting as required by Django)
 
 These can all be installed using [pip][] with the command `pip install -r
-requirements.txt`.
+requirements/base.txt`.
 
 
 ## Configuration
 
-Configuration options are specified through environment variables, as Python
-variables in `config.py` and optionally in a `settings/local.py` file.
+Configuration options are specified through environment variables and as Python
+variables in `vortex/config.py`.
 
 
 ### Environment variables
 
 * `DATABASE_URL`: The URL for the database in a format suitable for
-  `dj_database_url`. (for example, `postgres://user@host:5432/vortex`)
+  `dj_database_url` (for example, `postgres://user@host:5432/vortex`)
 
 * `VORTEX_MEDIA_ROOT`: The path of the directory in which music files are kept.
   This should be the same as the `music_directory` option in the configuration
@@ -55,8 +55,6 @@ variables in `config.py` and optionally in a `settings/local.py` file.
   removed in the future to log directly to standard output in order for
   `vortex` to be more easily run as a managed app.
 
-#### Optional
-
 * `VORTEX_SECRET_KEY`: the secret key used for security in Django. A string of 50
   random characters would do.
 
@@ -67,7 +65,7 @@ variables in `config.py` and optionally in a `settings/local.py` file.
 
 ### Other settings
 
-The other settings are described in `config.py`. You might want to change the
+The other settings are described in `vortex/config.py`. You might want to change the
 Haystack search engine to a proper one, like Solr or ElasticSearch.
 
 
@@ -80,13 +78,13 @@ such a multi-faceted project.
 
 [mpd]: http://musicpd.org
 [rdd]: http://tom.preston-werner.com/2010/08/23/readme-driven-development.html
-[django]: https://www.djangoproject.com
+[Django]: https://www.djangoproject.com
 [mutagen]: https://code.google.com/p/mutagen
-[haystack]: http://haystacksearch.org
+[django-haystack]: http://haystacksearch.org
 [python-mpd]: http://pypi.python.org/pypi/python-mpd
 [Pillow]: https://github.com/python-imaging/Pillow
 [PIL]: http://www.pythonware.com/products/pil
-[south]: http://south.aeracode.org
+[South]: http://south.aeracode.org
 [dj-database-url]: https://github.com/kennethreitz/dj-database-url
 [pip]: http://www.pip-installer.org
 [Rafik Draoui]: http://www.rafik.ca

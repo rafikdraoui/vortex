@@ -40,7 +40,7 @@ def library_home(request):
 
 
 def update_library(request):
-    #TODO: run asynchronously (using celery?)
+    # TODO: run asynchronously using celery
     update.update()
     messages.add_message(request,
                          messages.INFO,
@@ -56,9 +56,10 @@ def _download(instance):
     tfile = tempfile.NamedTemporaryFile(suffix='.zip')
     zip_folder(full_path(instance.filepath), tfile.name)
 
-    #TODO: Use iterator instead in case data is too big for memory. This
+    # TODO: Use iterator instead in case data is too big for memory. This
     # implies that the temporary file needs to stay on disk during download,
     # and that it is deleted at some later time.
+    # OR use new http StreamingResponse
     tfile.seek(0)
     data = tfile.read()
     tfile.close()

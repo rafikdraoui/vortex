@@ -1,0 +1,8 @@
+-r base.txt
+
+coverage==3.6
+ipython==0.13.1
+ipdb==0.7
+django-devserver==0.5.0
+
+-e git://github.com/django-debug-toolbar/django-debug-toolbar.git@6f79f0b#egg=django-debug-toolbar

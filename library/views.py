@@ -27,8 +27,30 @@ class AlphabetizedListView(ListView):
         return context
 
 
-# Subclassed to ensure that the download url is up to date.
+class ArtistListView(AlphabetizedListView):
+    model = Artist
+
+
+class ArtistDetailView(DetailView):
+    model = Artist
+
+
+class AlbumListView(AlphabetizedListView):
+    model = Artist
+
+
+class AlbumDetailView(DetailView):
+    queryset = Album.objects.select_related()
+
+
+class SongListView(ListView):
+    queryset = Song.objects.select_related()
+
+
 class SongDetailView(DetailView):
+    queryset = Song.objects.select_related()
+
+    # Ensure that the download url is up to date.
     def get_object(self, queryset=None):
         obj = super(SongDetailView, self).get_object(queryset)
         sync_song_files([obj])
@@ -80,7 +102,7 @@ def download_artist(request, pk):
         return redirect(artist.get_absolute_url())
     else:
         sync_song_files(Song.objects.filter(album__artist=artist))
-        sync_cover_images(Album.objects.filter(artist=artist))
+        sync_cover_images(artist.albums.all())
         remove_empty_directories(artist.filepath)
         return _download(artist)
 
@@ -92,7 +114,7 @@ def download_album(request, pk):
             request, messages.INFO, _('The album does not have any song'))
         return redirect(album.get_absolute_url())
     else:
-        sync_song_files(Song.objects.filter(album=album))
+        sync_song_files(album.songs.all())
         sync_cover_images([album])
         remove_empty_directories(album.filepath)
         return _download(album)

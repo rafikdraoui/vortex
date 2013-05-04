@@ -1,7 +1,7 @@
 {% extends "library/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Artists" %}{% endblock %}
+{% block title %}{% trans "Artists" %}{% endblock title %}
 
 {% block content %}
   <h1>{% trans "Artists" %}</h1>
@@ -10,10 +10,10 @@
 
   {% for initial in thelist %}
     <h5>{{ initial.grouper }}</h5>
-    <ul class="list list-compact">
+    <ul class='list list-compact'>
     {% for item in initial.list %}
-      <li><a href="{{ item.instance.get_absolute_url }}">{{ item.instance }}</a></li>
+      <li><a href='{{ item.instance.get_absolute_url }}'>{{ item.instance }}</a></li>
     {% endfor %}
     </ul>
   {% endfor %}
-{% endblock %}
+{% endblock content %}

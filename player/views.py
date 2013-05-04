@@ -4,14 +4,17 @@ from mpd import MPDClient, MPDError, ConnectionError
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.views.generic import TemplateView
 from django.utils.translation import ugettext_lazy as _
 
 
-def player_home(request):
-    return render(request,
-                  'player/home.html',
-                  {'REFRESH_INTERVAL': settings.PLAYER_REFRESH_INTERVAL})
+class PlayerHomeView(TemplateView):
+    template_name = 'player/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PlayerHomeView, self).get_context_data(**kwargs)
+        context['REFRESH_INTERVAL'] = settings.PLAYER_REFRESH_INTERVAL
+        return context
 
 
 def mpd_command(func):

@@ -1,17 +1,16 @@
 {% extends "library/base.html" %}
 {% load i18n %}
-{% load url from future %}
 
-{% block title %}{% trans "Home" %}{% endblock %}
+{% block title %}{% trans "Home" %}{% endblock title %}
 
 {% block content %}
-  <div class="hero-unit">
-    <div class="row">
-      <form method="get" action="{% url 'search' %}">
-        <div class="input-append offset2">
-          <div class="btn-group">
-            <input name="q" class="span6" type="text" placeholder="{% trans "Search" %}">
-            <button class="btn btn-primary" type="submit"><i class="icon-search icon-white"></i></button>
+  <div class='hero-unit'>
+    <div class='row'>
+      <form method='get' action='{% url "search" %}'>
+        <div class='input-append offset2'>
+          <div class='btn-group'>
+            <input name='q' class='span6' type='text' placeholder='{% trans "Search" %}'>
+            <button class='btn btn-primary' type='submit'><i class='icon-search icon-white'></i></button>
           </div>
         </div>
       </form>
@@ -19,6 +18,6 @@
   </div>
 
   {% if user.is_staff %}
-    <p><a href="{% url 'update_library' %}">{% trans "Update Library" %}</a></p>
+    <p><a href='{% url "update_library" %}'>{% trans "Update Library" %}</a></p>
   {% endif %}
-{% endblock %}
+{% endblock content %}

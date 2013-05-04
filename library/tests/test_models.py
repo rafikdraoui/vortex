@@ -21,8 +21,8 @@ class ModelTest(TransactionTestCase):
         self.media_dir = TEST_MEDIA_DIR
         if not os.path.exists(TEST_MEDIA_DIR):
             os.mkdir(TEST_MEDIA_DIR)
-        self.media_file = tempfile.NamedTemporaryFile(suffix='.ogg',
-                                                      delete=False)
+        self.media_file = tempfile.NamedTemporaryFile(
+            suffix='.ogg', delete=False)
         self.media_file.write("""
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
         feugiat sem velit, sed rutrum urna. Etiam sed varius risus. Aenean
@@ -126,9 +126,8 @@ class ArtistModelTest(ModelTest):
         artist1.name = 'Other Artist'
         artist1.save()
 
-        self.assertRaises(Artist.DoesNotExist,
-                          Artist.objects.get,
-                          name='First Artist')
+        self.assertRaises(
+            Artist.DoesNotExist, Artist.objects.get, name='First Artist')
 
         # Check that Album.DoesNotExist is not thrown
         Album.objects.get(title='First Album')
@@ -153,8 +152,9 @@ class ArtistModelTest(ModelTest):
             artist.albums.values_list('title', flat=True),
             ['First Album', 'Common Album'])
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertItemsEqual(os.listdir(full_path(artist.filepath)),
-                              ['First Album', 'Common Album'])
+        self.assertItemsEqual(
+            os.listdir(full_path(artist.filepath)),
+            ['First Album', 'Common Album'])
 
         artist.save()
 
@@ -164,8 +164,9 @@ class ArtistModelTest(ModelTest):
             artist.albums.values_list('title', flat=True),
             ['First Album', 'Common Album'])
         self.assertTrue(os.path.exists(full_path(artist.filepath)))
-        self.assertItemsEqual(os.listdir(full_path(artist.filepath)),
-                              ['First Album', 'Common Album'])
+        self.assertItemsEqual(
+            os.listdir(full_path(artist.filepath)),
+            ['First Album', 'Common Album'])
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
@@ -208,9 +209,8 @@ class AlbumModelTest(ModelTest):
         album1.title = 'Second Album'
         album1.save()
 
-        self.assertRaises(Album.DoesNotExist,
-                          Album.objects.get,
-                          title='First Album')
+        self.assertRaises(
+            Album.DoesNotExist, Album.objects.get, title='First Album')
 
         self.assertEqual(album2.songs.count(), 2)
         self.assertItemsEqual(
@@ -220,9 +220,8 @@ class AlbumModelTest(ModelTest):
     def test_omitting_skip_merge_check_raises_integrity_error(self):
         album = Album.objects.get(title='First Album')
         album.title = 'Second Album'
-        self.assertRaises(IntegrityError,
-                          album.save,
-                          skip_merge_check=True)
+        self.assertRaises(
+            IntegrityError, album.save, skip_merge_check=True)
 
     def test_save_album_without_change_is_idempotent(self):
         album = Album.objects.get(title='First Album')
@@ -230,8 +229,9 @@ class AlbumModelTest(ModelTest):
         self.assertEqual(album.artist.name, 'The Artist')
         self.assertEqual(album.filepath, 'T/The Artist/First Album')
         self.assertTrue(os.path.exists(full_path(album.filepath)))
-        self.assertItemsEqual(os.listdir(full_path(album.filepath)),
-                              ['cover.jpg', 'The First Song.ogg'])
+        self.assertItemsEqual(
+            os.listdir(full_path(album.filepath)),
+            ['cover.jpg', 'The First Song.ogg'])
 
         album.save()
 
@@ -239,8 +239,9 @@ class AlbumModelTest(ModelTest):
         self.assertEqual(album.artist.name, 'The Artist')
         self.assertEqual(album.filepath, 'T/The Artist/First Album')
         self.assertTrue(os.path.exists(full_path(album.filepath)))
-        self.assertItemsEqual(os.listdir(full_path(album.filepath)),
-                              ['cover.jpg', 'The First Song.ogg'])
+        self.assertItemsEqual(
+            os.listdir(full_path(album.filepath)),
+            ['cover.jpg', 'The First Song.ogg'])
 
 
 @override_settings(MEDIA_ROOT=TEST_MEDIA_DIR)
@@ -265,15 +266,15 @@ class SongModelTest(ModelTest):
 
         self.assertEqual(os.listdir(self.media_dir), ['T'])
         self.assertTrue(os.path.exists(filename))
-        self.assertEqual(open(self.media_file.name).read(),
-                         open(filename).read())
+        self.assertEqual(
+            open(self.media_file.name).read(), open(filename).read())
 
     def test_save_song_without_change_is_idempotent(self):
         self.assertEqual(self.song.title, 'The Song')
         self.assertEqual(self.song.album.title, 'The Album')
         self.assertEqual(self.song.album.artist.name, 'The Artist')
-        self.assertEqual(self.song.filefield.name,
-                         'T/The Artist/The Album/The Song.ogg')
+        self.assertEqual(
+            self.song.filefield.name, 'T/The Artist/The Album/The Song.ogg')
         self.assertTrue(os.path.exists(full_path(self.song.filefield.name)))
 
         original_content = self.song.filefield.read()
@@ -283,8 +284,8 @@ class SongModelTest(ModelTest):
         self.assertEqual(self.song.title, 'The Song')
         self.assertEqual(self.song.album.title, 'The Album')
         self.assertEqual(self.song.album.artist.name, 'The Artist')
-        self.assertEqual(self.song.filefield.name,
-                         'T/The Artist/The Album/The Song.ogg')
+        self.assertEqual(
+            self.song.filefield.name, 'T/The Artist/The Album/The Song.ogg')
         self.assertTrue(os.path.exists(full_path(self.song.filefield.name)))
 
         self.song.filefield.seek(0)

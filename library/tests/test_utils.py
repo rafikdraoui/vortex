@@ -69,8 +69,7 @@ class UtilsTest(TransactionTestCase):
         song.title = 'Spam'
         song.save()
 
-        self.assertEqual(
-            song.filepath, 'T/The Artist/The Album/04 - Spam.ogg')
+        self.assertEqual(song.filepath, 'T/The Artist/The Album/04 - Spam.ogg')
         self.assertTrue(os.path.exists(full_path(original_filepath)))
         self.assertFalse(os.path.exists(full_path(song.filepath)))
 
@@ -89,8 +88,7 @@ class UtilsTest(TransactionTestCase):
         album.title = 'Egg'
         album.save()
 
-        self.assertEqual(
-            album.cover_filepath, 'T/The Artist/Egg/cover.jpg')
+        self.assertEqual(album.cover_filepath, 'T/The Artist/Egg/cover.jpg')
         self.assertTrue(os.path.exists(full_path(original_coverpath)))
         self.assertFalse(os.path.exists(full_path(album.cover_filepath)))
 
@@ -148,20 +146,15 @@ class UtilsTest(TransactionTestCase):
 
     def test_delete_empty_instances(self):
         artist = Artist.objects.create(name='Brian')
-        Album.objects.create(title='Spam',
-                             artist=artist)
-        album2 = Album.objects.create(title='Eggs',
-                                      artist=artist)
-        song = Song.objects.create(title='A song',
-                                   album=album2,
-                                   bitrate=128000)
+        Album.objects.create(title='Spam', artist=artist)
+        album2 = Album.objects.create(title='Eggs', artist=artist)
+        song = Song.objects.create(
+            title='A song', album=album2, bitrate=128000)
 
         delete_empty_instances()
 
         # Check that the album 'Spam' has been deleted
-        self.assertRaises(Album.DoesNotExist,
-                          Album.objects.get,
-                          title='Spam')
+        self.assertRaises(Album.DoesNotExist, Album.objects.get, title='Spam')
 
         # Check that Album.DoesNotExist if not raised for album2
         Album.objects.get(title='Eggs')
@@ -170,12 +163,9 @@ class UtilsTest(TransactionTestCase):
         delete_empty_instances()
 
         # Check that album2 and artist have been deleted
-        self.assertRaises(Album.DoesNotExist,
-                          Album.objects.get,
-                          title='Eggs')
-        self.assertRaises(Artist.DoesNotExist,
-                          Artist.objects.get,
-                          name='Brian')
+        self.assertRaises(Album.DoesNotExist, Album.objects.get, title='Eggs')
+        self.assertRaises(
+            Artist.DoesNotExist, Artist.objects.get, name='Brian')
 
     def test_titlecase(self):
         self.assertEqual(titlecase('spam and eggs'), 'Spam And Eggs')

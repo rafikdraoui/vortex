@@ -1,7 +1,7 @@
 {% extends "library/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Albums" %}{% endblock %}
+{% block title %}{% trans "Albums" %}{% endblock title %}
 
 {% block content %}
   <h1>{% trans "Albums" %}</h1>
@@ -16,4 +16,4 @@
     {% endfor %}
     </ul>
   {% endfor %}
-{% endblock %}
+{% endblock content %}

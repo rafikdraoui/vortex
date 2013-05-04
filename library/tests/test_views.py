@@ -8,14 +8,11 @@ from logging import FileHandler
 
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.http import HttpRequest
 from django.test import TransactionTestCase
-from django.test.client import Client
 from django.test.utils import override_settings
 
 from .. import update
 from ..models import Artist, Album, Song, CustomStorage
-from ..views import update_library
 
 
 TEST_MEDIA_DIR = tempfile.mkdtemp()
@@ -129,8 +126,7 @@ class ViewTest(TransactionTestCase):
 
     def test_import_file(self):
         # put test file in dropbox
-        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
-                    self.dropbox)
+        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'), self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.ogg')
 
         self.assertFalse(Artist.objects.exists())
@@ -158,10 +154,10 @@ class ViewTest(TransactionTestCase):
 
     def test_import_existing_file_with_no_better_bitrate_skips_it(self):
         # put test files in dropbox
-        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
-                    self.dropbox)
-        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
-                    os.path.join(self.dropbox, 'testfile_copy.ogg'))
+        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.ogg'), self.dropbox)
+        shutil.copy(
+            os.path.join(TEST_FILES_DIR, 'testfile.ogg'),
+            os.path.join(self.dropbox, 'testfile_copy.ogg'))
 
         # import files
         filename = os.path.join(self.dropbox, 'testfile.ogg')
@@ -178,10 +174,10 @@ class ViewTest(TransactionTestCase):
 
     def test_import_existing_file_with_better_bitrate_replaces_it(self):
         # put test files in dropbox
-        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile-128k.mp3'),
-                    self.dropbox)
-        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.mp3'),
-                    self.dropbox)
+        shutil.copy(
+            os.path.join(TEST_FILES_DIR, 'testfile-128k.mp3'),
+            self.dropbox)
+        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.mp3'), self.dropbox)
 
         # import files
         filename = os.path.join(self.dropbox, 'testfile-128k.mp3')
@@ -201,8 +197,7 @@ class ViewTest(TransactionTestCase):
 
     def test_importing_unsupported_format_gives_an_error(self):
         # put file in dropbox and import it
-        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.wav'),
-                    self.dropbox)
+        shutil.copy(os.path.join(TEST_FILES_DIR, 'testfile.wav'), self.dropbox)
         filename = os.path.join(self.dropbox, 'testfile.wav')
         update.import_file(filename, self.mutagen_opts)
 
@@ -226,14 +221,15 @@ class ViewTest(TransactionTestCase):
         self.assertFalse(os.path.exists(filename))
         self.assertNoLogError()
 
+    # TODO: check if user is authenticated
     def test_upload_dropbox_files_to_library(self):
         # Put some files in dropbox
         zipped_dropbox = os.path.join(TEST_FILES_DIR, 'test_dropbox.zip')
         with zipfile.ZipFile(zipped_dropbox, 'r') as f:
             f.extractall(self.dropbox)
 
-        self.assertItemsEqual(os.listdir(self.dropbox),
-                              ['song1.ogg', 'The Artist', 'Unknown'])
+        self.assertItemsEqual(
+            os.listdir(self.dropbox), ['song1.ogg', 'The Artist', 'Unknown'])
         self.assertItemsEqual(
             os.listdir(os.path.join(self.dropbox, 'The Artist')),
             ['Album', 'song2.ogg', 'song3.ogg'])
@@ -241,8 +237,14 @@ class ViewTest(TransactionTestCase):
             os.listdir(os.path.join(self.dropbox, 'Unknown')),
             ['song5.ogg', 'song6.ogg'])
 
-        # Upload files to library
-        update_library(HttpRequest())
+        # make request to upload files to library
+        response = self.client.get(reverse('update_library'))
+
+        # check that a message has been set in the cookie
+        self.assertTrue('messages' in response.cookies.keys())
+        self.assertIn(
+            'Library successfully updated',
+            response.cookies.get('messages').value)
 
         # Check that the files have been imported
         self.assertNoLogError()
@@ -253,8 +255,9 @@ class ViewTest(TransactionTestCase):
         self.assertEqual(Song.objects.count(), 6)
 
         self.assertItemsEqual(os.listdir(self.media_dir), ['L', 'T'])
-        filename = os.path.join(self.media_dir, 'T', 'The Artist',
-                                'The Album', '04 - The Fourth Song.ogg')
+        filename = os.path.join(
+            self.media_dir, 'T', 'The Artist', 'The Album',
+            '04 - The Fourth Song.ogg')
         self.assertTrue(os.path.exists(filename))
 
     def test_download_artist(self):
@@ -265,14 +268,14 @@ class ViewTest(TransactionTestCase):
         update.update()
 
         # make request
-        c = Client()
-        response = c.get(reverse('download_artist', args=[1]))
+        response = self.client.get(reverse('download_artist', args=[1]))
 
         # check response have right headers
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/zip')
-        self.assertEqual(response['Content-Disposition'],
-                         'attachment; filename=The%20Artist.zip')
+        self.assertEqual(
+            response['Content-Disposition'],
+            'attachment; filename=The%20Artist.zip')
 
         # check structure of returned zip file
         songs = Song.objects.filter(album__artist=1)
@@ -289,8 +292,7 @@ class ViewTest(TransactionTestCase):
         a = Artist.objects.create(name='The Artist')
 
         # make request
-        c = Client()
-        response = c.get(reverse('download_artist', args=[a.pk]))
+        response = self.client.get(reverse('download_artist', args=[a.pk]))
 
         # check response have right headers
         self.assertEqual(response.status_code, 302)
@@ -301,21 +303,21 @@ class ViewTest(TransactionTestCase):
 
         # check that a message has been set in the cookie
         self.assertTrue('messages' in response.cookies.keys())
-        self.assertIn('The artist does not have any song',
-                      response.cookies.get('messages').value)
+        self.assertIn(
+            'The artist does not have any song',
+            response.cookies.get('messages').value)
 
     def test_download_updated_artist_retrieve_the_correct_file_structure(self):
         pass
 
     def test_fetching_url_of_nonexisting_instance_redirects_to_list_view(self):
-        c = Client()
-        response = c.get(reverse('artist_detail', args=[1]))
+        response = self.client.get(reverse('artist_detail', args=[1]))
         self.assertEqual(response.status_code, 302)
         redirect_url = response.get('Location', '')
-        self.assertEqual(redirect_url,
-                         'http://testserver' + reverse('artist_list'))
+        self.assertEqual(
+            redirect_url,
+            'http://testserver' + reverse('artist_list'))
 
     def test_fetching_other_nonexisting_url_returns_404(self):
-        c = Client()
-        response = c.get('/spam/and/eggs')
+        response = self.client.get('/spam/and/eggs')
         self.assertEqual(response.status_code, 404)

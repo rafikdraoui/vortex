@@ -20,12 +20,11 @@ else:
 
 LOGGER = logging.getLogger(__name__)
 
-DEFAULT_ALBUM_COVER_IMAGE = os.path.join(settings.STATIC_ROOT,
-                                         'img',
-                                         'default-cover.jpg')
+DEFAULT_ALBUM_COVER_IMAGE = os.path.join(
+    settings.STATIC_ROOT, 'img', 'default-cover.jpg')
 
-SongInfo = namedtuple('SongInfo', ['title', 'artist', 'album',
-                                   'track', 'bitrate', 'cover_data'])
+SongInfo = namedtuple(
+    'SongInfo', ['title', 'artist', 'album', 'track', 'bitrate', 'cover_data'])
 
 
 def get_mutagen_audio_options():
@@ -123,15 +122,10 @@ def import_file(filename, mutagen_options):
         return
 
     artist_name = titlecase(info.artist)
-    artist_path = os.path.join(artist_name[0].upper(), artist_name)
-    artist, created = Artist.objects.get_or_create(name=artist_name,
-                                                   filepath=artist_path)
+    artist, created = Artist.objects.get_or_create(name=artist_name)
 
-    album_path = os.path.join(artist_path, titlecase(info.album))
     album, created = Album.objects.get_or_create(
-        title=titlecase(info.album),
-        artist=artist,
-        filepath=album_path)
+        title=titlecase(info.album), artist=artist)
 
     if created:
         cover_img = get_cover_art(filename, info.cover_data)
@@ -164,7 +158,7 @@ def import_file(filename, mutagen_options):
             #os.remove(filename)
             handle_import_error(
                 filename,
-                '%s by %s already exists' % (info.title, info.artist))
+                '{info.title} by {info.artist} already exists'.format(info=info))
             return
         else:
             song.bitrate = info.bitrate
@@ -218,7 +212,7 @@ def get_wma_info(filename):
                     track=track, bitrate=bitrate, cover_data=None)
 
 
-def get_tag_field(container, tag_name):
+def _get_tag_field(container, tag_name):
     """Helper function to retrieve an appropriate value for the tag
     with name `tag_name` from the mutagen audio container.
     """
@@ -245,9 +239,9 @@ def get_song_info(filename, mutagen_options):
     if audio is None:
         raise ValueError('Mutagen could not read %s' % filename)
 
-    title = get_tag_field(audio, 'title')
-    artist = get_tag_field(audio, 'artist')
-    album = get_tag_field(audio, 'album')
+    title = _get_tag_field(audio, 'title')
+    artist = _get_tag_field(audio, 'artist')
+    album = _get_tag_field(audio, 'album')
     track = audio.get('tracknumber', [u''])[0]
     cover_data = audio.get('cover', [None])[0]
 
@@ -280,4 +274,4 @@ def handle_import_error(filename, error_msg):
     """Write an error message in the log."""
 
     log_msg = 'Problem importing file %s (%s)' % (filename, error_msg)
-    LOGGER.info(log_msg)
+    LOGGER.error(log_msg)

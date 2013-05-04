@@ -1,17 +1,17 @@
 {% extends "library/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Songs" %}{% endblock %}
+{% block title %}{% trans "Songs" %}{% endblock title %}
 
 {% block content %}
   <h1>{% trans "Songs" %}</h1>
 
-  <ul class="list list-compact">
+  <ul class='list list-compact'>
   {% for song in song_list %}
     <li>
-      <a href="{{ song.get_absolute_url }}">{{ song }}</a>
+      <a href='{{ song.get_absolute_url }}'>{{ song }}</a>
       ({{ song.album.artist }})
     </li>
   {% endfor %}
   </ul>
-{% endblock %}
+{% endblock content %}

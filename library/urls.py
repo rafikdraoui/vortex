@@ -5,12 +5,13 @@ from haystack.views import SearchView
 from .views import (
     ArtistListView, AlbumListView, SongListView,
     ArtistDetailView, AlbumDetailView, SongDetailView,
-    download_artist, download_album, library_home, update_library
+    LibraryHomeView, UpdateLibraryView,
+    download_artist, download_album,
 )
 
 
 urlpatterns = patterns('',
-    url(r'^$', library_home, name='library_home'),
+    url(r'^$', LibraryHomeView.as_view(), name='library_home'),
 
     url(r'^artist/$', ArtistListView.as_view(), name='artist_list'),
     url(r'^artist/(?P<pk>\d+)/$', ArtistDetailView.as_view(), name='artist_detail'),
@@ -23,8 +24,8 @@ urlpatterns = patterns('',
     url(r'^song/$', SongListView.as_view(), name='song_list'),
     url(r'^song/(?P<pk>\d+)/$', SongDetailView.as_view(), name='song_detail'),
 
-    #FIXME: expose views.update_library to admin only
-    url(r'^update/$', update_library, name='update_library'),
+    #FIXME: expose view to admin only
+    url(r'^update/$', UpdateLibraryView.as_view(), name='update_library'),
 
     url(r'^search/', SearchView(), name='search'),
 )

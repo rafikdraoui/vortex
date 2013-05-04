@@ -20,11 +20,12 @@ class CustomStorage(FileSystemStorage):
 
 class Artist(models.Model):
     name = models.CharField(_('name'), max_length=100, unique=True)
-    filepath = models.FilePathField(_('file path'),
-                                    path=settings.MEDIA_ROOT,
-                                    recursive=True,
-                                    max_length=200,
-                                    unique=True)
+    filepath = models.FilePathField(
+        _('file path'),
+        path=settings.MEDIA_ROOT,
+        recursive=True,
+        max_length=200,
+        unique=True)
 
     class Meta:
         ordering = ['name']
@@ -36,11 +37,11 @@ class Artist(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('artist_detail', (), {'pk': str(self.id)})
+        return ('artist_detail', (), {'pk': str(self.pk)})
 
     # Overriden to take care of merging two artists.
     def save(self, *args, **kwargs):
-        query = Artist.objects.filter(name=self.name).exclude(id=self.id)[:1]
+        query = Artist.objects.filter(name=self.name).exclude(pk=self.pk)[:1]
         if query:
             # Artist with that name already exists. Merge the albums.
 
@@ -74,20 +75,21 @@ class Album(models.Model):
     title = models.CharField(_('title'), max_length=100)
     artist = models.ForeignKey(
         Artist, verbose_name=_('artist'), related_name='albums')
-    filepath = models.FilePathField(_('file path'),
-                                    path=settings.MEDIA_ROOT,
-                                    recursive=True,
-                                    max_length=200,
-                                    unique=True)
-    cover = models.ImageField(_('cover art'),
-                              upload_to=(lambda a, f: a.cover_filepath),
-                              max_length=200,
-                              storage=CustomStorage())
+    filepath = models.FilePathField(
+        _('file path'),
+        path=settings.MEDIA_ROOT,
+        recursive=True,
+        max_length=200,
+        unique=True)
+    cover = models.ImageField(
+        _('cover art'),
+        upload_to=(lambda a, f: a.cover_filepath),
+        max_length=200,
+        storage=CustomStorage())
 
     #TODO: validate on file upload, change to a choices field
-    cover_file_type = models.CharField(_('cover file type'),
-                                       max_length=5,
-                                       editable=False)
+    cover_file_type = models.CharField(
+        _('cover file type'), max_length=5, editable=False)
 
     class Meta:
         ordering = ['title']
@@ -99,7 +101,7 @@ class Album(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('album_detail', (), {'pk': str(self.id)})
+        return ('album_detail', (), {'pk': str(self.pk)})
 
     @property
     def cover_filepath(self, filename=''):
@@ -113,7 +115,7 @@ class Album(models.Model):
         if not skip_merge_check:
             query = Album.objects.filter(artist_id=self.artist_id,
                                          title=self.title
-                                ).exclude(id=self.id)[:1]
+                                ).exclude(pk=self.pk)[:1]
             if query:
                 # Album with that name already exists. Merge the songs.
 
@@ -154,16 +156,16 @@ class Song(models.Model):
     track = models.CharField(_('track'), max_length=10, default='', blank=True)
     bitrate = models.IntegerField(_('bitrate'))
     filetype = models.CharField(_('file type'), max_length=10)
-    filefield = models.FileField(_('file'),
-                                 upload_to=(lambda s, f: s.filepath),
-                                 max_length=200,
-                                 storage=CustomStorage())
-    original_path = models.CharField(_('original path'),
-                                     max_length=200,
-                                     default='')
+    filefield = models.FileField(
+        _('file'),
+        upload_to=(lambda s, f: s.filepath),
+        max_length=200,
+        storage=CustomStorage())
+    original_path = models.CharField(
+        _('original path'), max_length=200, default='')
     date_added = models.DateTimeField(_('date added'), auto_now_add=True)
-    date_modified = models.DateTimeField(_('date last modified'),
-                                         auto_now=True)
+    date_modified = models.DateTimeField(
+        _('date last modified'), auto_now=True)
     first_save = models.BooleanField(editable=False)
 
     class Meta:
@@ -177,7 +179,7 @@ class Song(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('song_detail', (), {'pk': str(self.id)})
+        return ('song_detail', (), {'pk': str(self.pk)})
 
     @property
     def filepath(self):

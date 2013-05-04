@@ -1,31 +1,30 @@
 {% extends "library/base.html" %}
 {% load i18n %}
-{% load url from future %}
 
-{% block title %}{{ artist }}{% endblock %}
+{% block title %}{{ artist }}{% endblock title %}
 
 {% block content %}
   <h1>
     {{ artist }}
-    <a class="small-link" href="{% url 'admin:library_artist_change' artist.id %}"> ({% trans "edit" %})</a>
+    <a class='small-link' href='{% url "admin:library_artist_change" artist.id %}'> ({% trans "edit" %})</a>
   </h1>
 
   <h5>
-    <a href="{% url 'download_artist' artist.id %}"><i class="icon-download"></i> {% trans "Download Artist Discography" %}</a>
+    <a href='{% url "download_artist" artist.id %}'><i class='icon-download'></i> {% trans "Download Artist Discography" %}</a>
   </h5>
 
-  <ul class="thumbnails">
+  <ul class='thumbnails'>
     {% with albums=artist.albums.all %}
       {% for album in albums %}
-        {% if forloop.counter0|divisibleby:"3" %}<div class="row">{% endif %}
-          <li class="span4">
-            <div class="thumbnail">
-              <a href="{{ album.get_absolute_url }}"><img src="{{ album.cover.url }}"></a>
-              <h3><a href="{{ album.get_absolute_url }}">{{ album }}</a></h3>
+        {% if forloop.counter0|divisibleby:"3" %}<div class='row'>{% endif %}
+          <li class='span4'>
+            <div class='thumbnail'>
+              <a href='{{ album.get_absolute_url }}'><img src='{{ album.cover.url }}'></a>
+              <h3><a href='{{ album.get_absolute_url }}'>{{ album }}</a></h3>
             </div>
           </li>
         {% if forloop.counter|divisibleby:"3" %}</div>{% endif %}
       {% endfor %}
     {% endwith %}
   </ul>
-{% endblock %}
+{% endblock content %}

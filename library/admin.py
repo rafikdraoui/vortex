@@ -46,8 +46,10 @@ class SongAdmin(admin.ModelAdmin):
         return '%s' % song.album.artist
     get_song_artist.short_description = _('Artist')
 
-    readonly_fields = ['bitrate', 'filetype', 'filefield',
-                       'original_path', 'date_added', 'date_modified']
+    readonly_fields = (
+        'bitrate', 'filetype', 'filefield', 'original_path',
+        'date_added', 'date_modified'
+    )
     search_fields = ['title']
     list_display = ('title', 'album', 'get_song_artist')
     has_add_permission = lambda x, y: False

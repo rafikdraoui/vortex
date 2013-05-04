@@ -1,15 +1,14 @@
 {% extends "library/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Search" %}{% endblock %}
+{% block title %}{% trans "Search" %}{% endblock title %}
 
 {% block content %}
-
-  <form method="get" action=".">
-    <div class="input-append">
-      <div class="btn-group">
-        <input name="q" class="span6" type="text" placeholder="{% trans 'Search' %}">
-        <button class="btn btn-primary" type="submit"><i class="icon-search icon-white"></i></button>
+  <form method='get' action='.'>
+    <div class='input-append'>
+      <div class='btn-group'>
+        <input name='q' class='span6' type='text' placeholder='{% trans "Search" %}'>
+        <button class='btn btn-primary' type='submit'><i class='icon-search icon-white'></i></button>
       </div>
     </div>
   </form>
@@ -19,7 +18,7 @@
     <h3>{% trans "Results for" %} <em>{{ query }}</em></h3>
 
     {% for result in page %}
-      <p><a href="{{ result.object.get_absolute_url }}">
+      <p><a href='{{ result.object.get_absolute_url }}'>
       {% if result.content_type == "library.artist" %}
         {{ result.object.name }}
       {% else %}
@@ -32,11 +31,11 @@
 
     {% if page.has_previous or page.has_next %}
       <div>
-        {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+        {% if page.has_previous %}<a href='?q={{ query }}&amp;page={{ page.previous_page_number }}'>{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
         |
-        {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+        {% if page.has_next %}<a href='?q={{ query }}&amp;page={{ page.next_page_number }}'>{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
       </div>
     {% endif %}
   {% endif %}
 
-{% endblock %}
+{% endblock content %}

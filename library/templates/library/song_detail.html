@@ -1,26 +1,23 @@
 {% extends "library/base.html" %}
 {% load i18n %}
-{% load url from future %}
 
-{% block title %}{{ song }}{% endblock %}
+{% block title %}{{ song }}{% endblock title %}
 
 {% block content %}
-
   <h2>
     {{ song }}
-    <a class="small-link" href="{% url 'admin:library_song_change' song.id %}">
+    <a class='small-link' href='{% url "admin:library_song_change" song.id %}'>
       ({% trans "edit" %})
     </a>
   </h2>
 
   <h3>
-    {% trans "by" %} <a href="{{ song.album.artist.get_absolute_url }}">{{ song.album.artist }}</a>
-    ({% trans "on" %} <a href="{{ song.album.get_absolute_url }}">{{ song.album }}</a>)
+    {% trans "by" %} <a href='{{ song.album.artist.get_absolute_url }}'>{{ song.album.artist }}</a>
+    ({% trans "on" %} <a href='{{ song.album.get_absolute_url }}'>{{ song.album }}</a>)
   </h3>
 
   <h5>
-    <a href="{{song.filefield.url}}">
-    <i class="icon-download"></i> {% trans "Download Song" %}</a>
+    <a href='{{song.filefield.url}}'>
+    <i class='icon-download'></i> {% trans "Download Song" %}</a>
   </h5>
-
-{% endblock %}
+{% endblock content %}

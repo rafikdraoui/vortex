@@ -1,41 +1,38 @@
 {% extends "library/base.html" %}
 {% load i18n %}
-{% load url from future %}
 
-{% block title %}{{ album }}{% endblock %}
+{% block title %}{{ album }}{% endblock title %}
 
 {% block content %}
+  <div class='row'>
+    <div class='span6'>
+      <h1>
+        {{ album }}
+        <a class='small-link' href='{% url "admin:library_album_change" album.id %}'> ({% trans "edit" %})</a>
+      </h1>
 
-<div class="row">
-  <div class="span6">
-    <h1>
-      {{ album }}
-      <a class="small-link" href="{% url 'admin:library_album_change' album.id %}"> ({% trans "edit" %})</a>
-    </h1>
+      <h3>
+        {% trans "by" %}
+        <a href='{{ album.artist.get_absolute_url }}'>{{ album.artist }}</a>
+      </h3>
 
-    <h3>
-      {% trans "by" %}
-      <a href="{{ album.artist.get_absolute_url }}">{{ album.artist }}</a>
-    </h3>
+      <ul class='list'>
+        {% with songs=album.songs.all %}
+          {% for song in songs %}
+            <li>
+              <a href='{{ song.get_absolute_url }}'>{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>
+            </li>
+          {% endfor %}
+        {% endwith %}
+      </ul>
 
-    <ul class="list">
-      {% with songs=album.songs.all %}
-        {% for song in songs %}
-          <li>
-            <a href="{{ song.get_absolute_url }}">{% if song.track %}{{ song.track }} - {% endif %}{{ song }}</a>
-          </li>
-        {% endfor %}
-      {% endwith %}
-    </ul>
+      <h5>
+        <a href='{% url "download_album" album.id %}'><i class='icon-download'></i> {% trans "Download Album" %}</a>
+      </h5>
+    </div>
 
-    <h5>
-      <a href="{% url 'download_album' album.id %}"><i class="icon-download"></i> {% trans "Download Album" %}</a>
-    </h5>
+    <div class='span6'>
+      <img class='img-polaroid' src='{{ album.cover.url }}'>
+    </div>
   </div>
-
-  <div class="span6">
-    <img class="img-polaroid" src="{{ album.cover.url }}">
-  </div>
-</div>
-
-{% endblock %}
+{% endblock content %}

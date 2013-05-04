@@ -4,10 +4,10 @@ import tempfile
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views import defaults
 from django.views.decorators.csrf import requires_csrf_token
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView, View
 from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
@@ -18,6 +18,10 @@ from .utils import (
     full_path, get_alphabetized_list, remove_empty_directories,
     sync_cover_images, sync_song_files, zip_folder
 )
+
+
+class LibraryHomeView(TemplateView):
+    template_name = 'library/home.html'
 
 
 class AlphabetizedListView(ListView):
@@ -36,7 +40,7 @@ class ArtistDetailView(DetailView):
 
 
 class AlbumListView(AlphabetizedListView):
-    model = Artist
+    model = Album
 
 
 class AlbumDetailView(DetailView):
@@ -57,18 +61,21 @@ class SongDetailView(DetailView):
         return obj
 
 
-def library_home(request):
-    return render(request, 'library/home.html')
+class UpdateLibraryView(View):
 
+    def get(self, request, *args, **kwargs):
+        # TODO: run asynchronously using celery
+        update.update()
+        messages.info(request, _('Library successfully updated'))
+        return redirect(reverse('library_home'))
 
+"""
 def update_library(request):
     # TODO: run asynchronously using celery
     update.update()
-    messages.add_message(request,
-                         messages.INFO,
-                         _('Library successfully updated'),
-                         fail_silently=True)
-    return redirect(reverse(library_home))
+    messages.info(request, _('Library successfully updated'))
+    return redirect(reverse('library_home'))
+"""
 
 
 def _download(instance):
@@ -97,8 +104,7 @@ def download_artist(request, pk):
     artist = Artist.objects.get(pk=pk)
     num_songs = Song.objects.filter(album__artist=artist).count()
     if num_songs == 0:
-        messages.add_message(
-            request, messages.INFO, _('The artist does not have any song'))
+        messages.info(request, _('The artist does not have any song'))
         return redirect(artist.get_absolute_url())
     else:
         sync_song_files(Song.objects.filter(album__artist=artist))
@@ -110,8 +116,7 @@ def download_artist(request, pk):
 def download_album(request, pk):
     album = Album.objects.get(pk=pk)
     if album.songs.count() == 0:
-        messages.add_message(
-            request, messages.INFO, _('The album does not have any song'))
+        messages.info(request, _('The album does not have any song'))
         return redirect(album.get_absolute_url())
     else:
         sync_song_files(album.songs.all())

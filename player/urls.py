@@ -1,9 +1,12 @@
 from django.conf.urls import patterns, url
 
-from .views import *
+from .views import (
+    play_pause, next, previous, random, repeat, get_current_info,
+    PlayerHomeView,
+)
 
 urlpatterns = patterns('',
-    url(r'^$', player_home, name='player_home'),
+    url(r'^$', PlayerHomeView.as_view(), name='player_home'),
 
     url(r'play-pause/$', play_pause, name='play_pause'),
     url(r'next/$', next, name='next'),
